@@ -19,7 +19,6 @@ export const SEOMetadata= ({title, description}) => {
                 <meta property="og:type" content="image" />
                 <meta property="twitter:title" content={title} />
                 <meta property="og:description" content={description} />
-                <meta property="og:description" content={description} />
                 <meta name="description" content={description} />
                 <meta property="twitter:creator" content="pollinations_ai" />
                 <meta property="twitter:description" content={description} />
