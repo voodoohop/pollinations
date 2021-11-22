@@ -43,7 +43,7 @@ export async function socialPost(platform, cid) {
 
 async function doPost({ post, title, videoURL, coverImage, url }, platform) {
 
-  const postWithHashtags = (await autoHashtag(post)) + fixedHashTags;
+  post = (await autoHashtag(post)) + fixedHashTags;
 
   // Ayrshare API Key
   console.log("starting social post api with key", process.env["AYRSHARE_KEY"])
