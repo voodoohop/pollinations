@@ -34714,7 +34714,6 @@ if (executeCommand)
       await (0, import_await_sleep3.default)(sleepBeforeExit);
       await processing2();
       await close2();
-      await processing2();
     }
     await (0, import_await_sleep3.default)(sleepBeforeExit);
     debug10("awaiting termination of state sync");

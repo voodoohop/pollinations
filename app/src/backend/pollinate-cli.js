@@ -77,7 +77,7 @@ if (executeCommand)
       await awaitSleep(sleepBeforeExit);
       await processing();
       await close();
-      await processing();
+      // await processing();
     }
 
     await awaitSleep(sleepBeforeExit);
