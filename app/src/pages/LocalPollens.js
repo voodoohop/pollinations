@@ -6,7 +6,7 @@ import useIPFS from "../hooks/useIPFS"
 import useLocalPollens from "../hooks/useLocalPollens"
 import { displayContentID } from "../network/utils"
 import { getNotebookMetadata } from "../utils/notebookMetadata"
-import { CardContainerStyle } from "./styles/card"
+// import { CardContainerStyle } from "./styles/card"
 
 const LocalPollens = ({ node }) => {
 
@@ -46,7 +46,9 @@ const Pollen = ({date, cid, popCID}) => {
     const primaryInput = ipfs?.input?.[primaryInputField]
 
     return <Box>
-        <Card style={CardContainerStyle}>
+        <Card 
+        //    style={CardContainerStyle}
+        >
             <CardHeader subheader={<SubHeader cid={cid} />} />
 
             <Box padding='1em'>

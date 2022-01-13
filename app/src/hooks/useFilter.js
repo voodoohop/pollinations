@@ -13,7 +13,7 @@ const category2controls = category_string => {
 }
 const emptyCell = 'Anything'
 
-const useFilter = (notebooks) => {
+const useFilter = (notebooks, isMODELS) => {
     const { selected } = useParams();
     const [ options, setOptions ] = useState([])
     const [ notebookList, setNotebookList ] = useState([])
@@ -44,7 +44,11 @@ const useFilter = (notebooks) => {
             : notebook.controls.output === selected )
 
     const setSelected = (option) => {
-        navigate(`/c/${option}`)
+        if (isMODELS) { 
+            navigate(`/models/${option}`)
+        } else {
+            navigate(`/c/${option}`)
+        }
     }
     return ({
         notebookList: filtered, 

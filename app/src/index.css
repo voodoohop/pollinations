@@ -12,7 +12,7 @@ body {
   margin: 20px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: rgb(26, 26, 26) !important;
+  background-color: rgb(34, 32, 32) !important;
 }
 
 footer {
@@ -21,31 +21,70 @@ footer {
   border-radius: 10px 10px 0 0;
   right: 50;
   bottom: 0;
-  background-color: #424242 !important; 
+  background-color: #424242 !important;
 }
 
-h1, h2, h3, h4, h5, h6, p {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
   color: rgb(255, 236, 249) !important;
+  font-family: Source Code Pro !important;
+  margin: 0.3em 0;
 }
 
-.MuiAccordionSummary-root{padding: 0 !important;}
-.MuiAccordionDetails-root{padding: 8px 0px 16px !important;}
-.MuiAccordion-root:before{display: none;}
-h3{
+h1 {
+  font-size: 4rem;
+  font-family: Lato;
+  font-weight: 300;
+  line-height: 1.167;
+}
+
+h2 {
+  font-size: 3em;
+  line-height: 1.64;
+}
+
+h3 {
   margin-bottom: 0;
 }
-h1 {
-  font-size: 4rem !important;
-  font-family: 'Lato' !important;
+h4 {
+  font-size: 1.5rem;
+  font-family: Lato !important;
+  font-weight: 400;
+  line-height: 1.235;
+}
+
+h6 {
+  font-size: 1.25rem;
+  font-family: Source Code Pro;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.MuiAccordionSummary-root {
+  padding: 0 !important;
+}
+.MuiAccordionDetails-root {
+  padding: 8px 0px 16px !important;
+}
+.MuiAccordion-root:before {
+  display: none;
+}
+.MuiPaper-elevation1 {
+  box-shadow: none !important;
 }
 @media screen and (min-width: 700px) {
   h1 {
     font-size: 6rem !important;
   }
 }
-@media screen and (min-width:1200px) {
+@media screen and (min-width: 1200px) {
   h1 {
-    font-size: 9rem !important;
+    font-size: 7rem !important;
   }
 }
 
@@ -54,17 +93,16 @@ a {
   padding: 10px 0;
 }
 
-.Lato{
-  font-family: 'Lato' !important;
+.Lato {
+  font-family: "Lato" !important;
 }
 
-.MuiCardHeader-root{
-  background-color: rgb(62, 0, 156) !important; 
+.MuiCardHeader-root {
+  background-color: transparent !important;
   /* background: linear-gradient(0deg, transparent 0%, rgba(62,0,156,1) 100%) !important;  */
 }
 
-
-.noMargin{
+.noMargin {
   margin: 0 !important;
 }
 
@@ -74,7 +112,7 @@ error {
   font-size: large;
 }
 
-.video_container{
+.video_container {
   width: 100%;
   min-height: 480px;
 }

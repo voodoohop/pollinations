@@ -5,8 +5,10 @@ import Debug from "debug"
 import { useCallback, useEffect } from "react"
 import { Navigate, Route, Routes, useNavigate, useParams } from "react-router"
 import { BrowserRouter } from "react-router-dom"
-import AppBar from "./components/AppBar"
+
+import TopBar from "./components/organisms/TopBar"
 import ToolBar from "./components/ToolBar"
+
 import useColabNode from "./hooks/useColabNode"
 import useIPFS from "./hooks/useIPFS"
 import useIPFSWrite from "./hooks/useIPFSWrite"
@@ -14,13 +16,15 @@ import useLocalPollens from "./hooks/useLocalPollens"
 import usePollenDone from "./hooks/usePollenDone"
 import About from "./pages/About"
 import BlankMarkdown from "./pages/BlankMarkdown"
-import ChristmasSpecial from "./pages/ChristmaSpecial"
+
 import Creator from "./pages/Create"
 import Feed from "./pages/Feed"
 import Help from "./pages/Help"
 import Home from "./pages/Home"
 import LocalPollens from "./pages/LocalPollens"
+import Models from "./pages/Models"
 import ResultViewer from "./pages/ResultViewer"
+import { ExactRoutes } from "./routes/PublicRoutes"
 
 
 
@@ -39,37 +43,41 @@ const App = () => (
 const Pollinations = () => {
     const { node, overrideContentID, overrideNodeID } = useColabNode();
     debug("got colab node info", node);
-
+    
     const navigate = useNavigate()
-
+    
     // to save pollens since we are not necessarily on the localpollens page
     useLocalPollens(node)
-
+    
     const navigateToNode = useCallback(() => {
         if (node.nodeID)
-            navigate(`/n/${node.nodeID}`)
+        navigate(`/n/${node.nodeID}`)
         else {
             // history.go(0)
             console.error("For some reason NodeID is not set...", node)
         }
     }, [node.nodeID])
-
+    
+    const ipfs = useIPFS("/ipns/k51qzi5uqu5dk56owjc245w1z3i5kgzn1rq6ly6n152iw00px6zx2vv4uzkkh9");
+    
     return (<>
         {/* Nav Bar     */}
-        <AppBar />
+        <TopBar />
         {/* Children that get IPFS state */}
         <Container maxWidth='lg'>
             <Routes>
-                <Route exact path='feed' element={<Feed />} />
-                <Route exact path='help' element={<Help/>}/>
-                <Route exact path='about' element={<About/>}/>
-                <Route exact path='blankMarkdown' element={<BlankMarkdown/>}/>
+                {
+                    ExactRoutes
+                    .map( route => <Route key={route.path} {...route}/>
+                    )
+                }
                 <Route exact path='localpollens' element={<LocalPollens node={node}/>}/>
-                <Route exact path='christmas' element={<ChristmasSpecial/>}/>
+                
 
                 <Route path='n/:nodeID' element={<NodeWithData node={node} overrideNodeID={overrideNodeID} />} />
                 <Route path='p/:contentID/*' element={<ModelRoutes node={node} navigateToNode={navigateToNode} overrideContentID={overrideContentID} />} />
-                <Route path='c/:selected' element={<HomeWithData />} />
+                <Route path='c/:selected' element={<Home ipfs={ipfs} />} />
+                <Route path='models' element={<Models ipfs={ipfs}/>}/>
                 <Route index element={<Navigate replace to="c/Anything" />} />
             </Routes>
             <More />
@@ -79,13 +87,6 @@ const Pollinations = () => {
     </>)
 }
 
-const HomeWithData = () => {
-    const ipfs = useIPFS("/ipns/k51qzi5uqu5dk56owjc245w1z3i5kgzn1rq6ly6n152iw00px6zx2vv4uzkkh9");
-
-    debug("home ipfs", ipfs);
-
-    return <Home ipfs={ipfs} />
-}
 
 const NodeWithData = ({ node, overrideNodeID }) => {
     const ipfs = useIPFS(node.contentID)

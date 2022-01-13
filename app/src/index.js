@@ -17,7 +17,7 @@ const darkTheme = createMuiTheme({
       main: 'rgb(255, 236, 249)',
       },
     secondary: {
-      main: 'rgb(62, 0, 156)'
+      main: 'hsl(0, 0%, 90%)'
     }
   },
 })
