@@ -46,9 +46,7 @@ const Pollen = ({date, cid, popCID}) => {
     const primaryInput = ipfs?.input?.[primaryInputField]
 
     return <Box>
-        <Card 
-        //    style={CardContainerStyle}
-        >
+        <Card>
             <CardHeader subheader={<SubHeader cid={cid} />} />
 
             <Box padding='1em'>
@@ -67,9 +65,9 @@ const Pollen = ({date, cid, popCID}) => {
                 <Button onClick={()=>popCID(cid)}>
                     [ Remove Pollen ]
                 </Button>
-                {/* <Button disabled>
-                    [ Mint Pollen ]
-                </Button> */}
+                <Button onClick={()=>popCID(cid)}>
+                    [ Share to Social ]
+                </Button>
             </Box>
         </Card>
     </Box>

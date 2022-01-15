@@ -4,8 +4,6 @@ import Form from "@rjsf/material-ui";
 import Debug from "debug";
 import { mapObjIndexed, zipObj } from "ramda";
 import React, { useEffect, useMemo, useState } from "react";
-import HelpModal from "./HelpModal";
-// import { useDropzone } from 'react-dropzone'
 
 const debug = Debug("Form");
 
@@ -69,7 +67,7 @@ const FormView = ({ input:originalInput, connected, metadata, onSubmit, onCancel
                 : null
             }
 
-            <HelpModal />
+            
 
         </Box>
     </Form>
@@ -159,30 +157,3 @@ const overrideDefaultValues = (propertiesWithSocial, ipfsInput) =>
 function textOrTextarea(defaultVal) {
     return (defaultVal.split("\n").length > 1 ? "textarea" : "text");
 }
-
-// // File upload widget using dropzone
-// function FileUpload() {
-//     const onDrop = useCallback(async acceptedFiles => {
-//       // Do something with the files
-//       debug("dropped files", acceptedFiles);
-//       const file = acceptedFiles[0];
-//       const { cid } = await _client.add({content: file.stream(), path: file.path});
-
-
-//     }, []);
-
-//     const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop})
-
-//     return (<Paper variant={isDragActive ? "outlined":"elevation"}>
-//       <div {...getRootProps()}>
-//         <input {...getInputProps()} />
-//         {
-//           isDragActive ?
-//             <p>Drop the files here ...</p> :
-//             <p>Drag 'n' drop some files here, or click to select files</p>
-//         }
-//       </div>
-//       </Paper>
-//     )
-//   }
-

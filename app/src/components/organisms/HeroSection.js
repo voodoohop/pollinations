@@ -5,10 +5,10 @@ import MarkDownContent from '../molecules/MarkDownContent'
 // Component
 const HeroSection = props => <Box paddingTop={3} minHeight='30vh'>
 
-  <Box maxWidth='500px' margin='auto'>
-    {/* <MarkdownContent id="landingLeft" /> */}
-    <br/>
-    <MarkDownContent id="landingRight" />
+  <Box maxWidth='100%' margin='auto' >
+
+    <MarkDownContent id="hero" />
+    
   </Box>
 
 </Box>

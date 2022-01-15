@@ -31,8 +31,8 @@ h4,
 h5,
 h6,
 p {
-  color: rgb(255, 236, 249) !important;
-  font-family: Source Code Pro !important;
+  color: white !important;
+  font-family: Lato !important;
   margin: 0.3em 0;
 }
 
@@ -89,7 +89,7 @@ h6 {
 }
 
 a {
-  color: whitesmoke;
+  color: white;
   padding: 10px 0;
 }
 

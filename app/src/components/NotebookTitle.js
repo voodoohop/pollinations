@@ -1,17 +1,11 @@
-import { Typography } from "@material-ui/core";
-
-
 const NotebookTitle = ({name, children}) => (name && (
-    <Typography 
-        variant="h5" 
-        component="h5" 
-        gutterBottom>
+    <h4>
         { 
             name 
         }
         &nbsp;
         {children && {...children}}
-    </Typography>) || null
+    </h4>) || null
 );
 
 export default NotebookTitle;

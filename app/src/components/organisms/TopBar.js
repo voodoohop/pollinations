@@ -8,6 +8,7 @@ import RouterLink from '../molecules/RouterLink'
 import { HorizontalBorder } from '../atoms/Borders'
 import { BigTitle } from '../atoms/BigTitle'
 import { SocialLinks } from '../Social'
+import LaunchColabButton from '../molecules/LaunchColabButton'
 
 const MenuLinks = [
   { children: 'models', to: '/models' },
@@ -17,20 +18,35 @@ const MenuLinks = [
   { children: 'my pollens', to: '/localpollens' },
 ]
 
-const TopBar = () => {
+const TopBar = ({ node, showNode }) => {
     const [open, setOpen] = useState(true)
+
+    function go2Pollen() {
+        setOpen(false)
+        showNode()
+    }
 
     return <Container maxWidth='lg'>
 
         <VisibleContentStyle>
+            {/* <div style={{display: 'flex', alignItems: 'flex-end', gridGap: '1em'}}> */}
+                
+
+                <Button onClick={()=> setOpen(state=>!state)}>
+                    Menu
+                </Button>
             <BigTitle>
                 <RouterLink to={"/"}>
                 pollinations.ai
                 </RouterLink>
             </BigTitle>
-            <Button onClick={()=> setOpen(state=>!state)}>
-                Menu
-            </Button>
+                { (node.connected && node.contentID) ?
+                <Button onClick={go2Pollen}>
+                    [ Current Pollen ]
+                </Button>
+                : <LaunchColabButton {...node} />
+                }
+            {/* </div> */}
         </VisibleContentStyle>
 
         <HorizontalBorder />
@@ -39,10 +55,10 @@ const TopBar = () => {
             {
                 MenuLinks
                 .map( linkProps => <h6 key={linkProps.to} onClick={()=>setOpen(true)}>
-                <RouterLink {...linkProps} />
+                    <RouterLink {...linkProps} />
                 </h6>)
             }
-            <SocialLinks style={{alignSelf: 'end'}}/>
+            <SocialLinks style={{ alignSelf: 'end' }}/>
         </HiddenContentStyle>
         
     </Container>
@@ -51,6 +67,8 @@ const TopBar = () => {
 const VisibleContentStyle = styled.div`
 display: flex;
 justify-content: space-between;
+align-items: flex-end;
+margin-bottom: 10px;
 `
 
 const HiddenContentStyle = styled.div`
@@ -60,7 +78,7 @@ transition: height 0.1s ease-in;
 
 padding: 0.1em 1em;
 overflow-y: hidden;
-background-color: #222;
+background-color: transparent;
 
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(calc(90vw / 6), 1fr));

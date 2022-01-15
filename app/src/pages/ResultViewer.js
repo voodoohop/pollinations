@@ -1,3 +1,4 @@
+import { TextField } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
@@ -56,20 +57,42 @@ export default memo(function ResultViewer({ ipfs }) {
         Connecting to GPU...
       </Typography>
     }
-
-    <NotebookTitle name={metadata?.name}>
-      <Button color="default" to={`/p/${contentID}/create`} component={Link}>
-        [ Clone ]
-      </Button>
-    </NotebookTitle>
-
+    <br/>
     <NotebookProgress output={ipfs?.output} metadata={metadata} />
-    {success ? <Preview {...{ first, primaryInput, ipfs }} /> : <MarkDownContent id={"failure"} contentID={contentID} />}
+    <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))'}}>
 
-    <div style={{ width: '100%' }}>
-      <IpfsLog ipfs={ipfs} contentID={contentID} />
+    {/* Left */}
+      <div style={{display: 'flex', gridGap: '1em', flexDirection: 'column' }}>
+        
+        <TextField
+          disabled
+          fullWidth
+          label='Notebook Name'
+          value={metadata?.name}/>
+        
+        <TextField
+          disabled
+          fullWidth
+          label='Text Input'
+          value={primaryInput}/>
+        
+          <Button color="default" to={`/p/${contentID}/create`} component={Link}>
+            [ Clone ]
+          </Button>
+
+        <IpfsLog ipfs={ipfs} contentID={contentID} />
+
+      </div>
+      
+    {/* Right */}
+      <div>
+
+        {success ? <Preview {...{ first, primaryInput, ipfs }} /> : <MarkDownContent id={"failure"} contentID={contentID} />}
+      
+      </div>
+
+
     </div>
-
   </Box>
 })
 
@@ -80,11 +103,7 @@ function Preview({ first, primaryInput, ipfs }) {
 
       <BigPreview {...first} />
 
-      <Box minWidth='200px' maxWidth='20%'>
-        <Typography variant="h5" gutterBottom>
-          {primaryInput}
-        </Typography>
-      </Box>
+      
     </Box>
 
     {/* previews */}

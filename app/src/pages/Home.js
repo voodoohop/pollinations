@@ -1,8 +1,8 @@
-import { useMemo } from "react"
 import styled from '@emotion/styled'
 import Markdown, { compiler } from "markdown-to-jsx"
 
 import { getNotebooks } from "../data/notebooks"
+import useIPFS from "../hooks/useIPFS"
 
 import Alert from "@material-ui/lab/Alert"
 import RouterLink from "../components/molecules/RouterLink"
@@ -10,38 +10,46 @@ import HeroSection from '../components/organisms/HeroSection'
 import HorizontalList from '../components/organisms/HorizontalList'
 
 
-export default function Home({ ipfs }) {
+function Home() {
 
-  const notebooks = useMemo(() => getNotebooks(ipfs), [ipfs])
-  const notebooksByCategory = groupBy(notebooks, notebook => notebook.category) || []
+  const ipfs = useIPFS("/ipns/k51qzi5uqu5dk56owjc245w1z3i5kgzn1rq6ly6n152iw00px6zx2vv4uzkkh9");
+  const notebooks = getNotebooks(ipfs)[1]
   
   return <>
 
-    { // in case notebook list is not available
+    { 
+    // in case notebook list is not available
       !Object.entries(notebooks).length && <Alert severity="error">
         Model list temporarily unavailable. Please retry in a little while
       </Alert>
     }
 
     <HeroSection />
-    
+
+    <CategoriesContainer>
     {
-      Object.entries(notebooksByCategory)
-      .splice(0, 3)
-      .map( category => 
-        <HorizontalList title={parseCategory(category[0])}>
+      Object.entries(notebooks)
+      .map( (category, idx) => 
+        <HorizontalList key={category[0]} title={parseCategory(category[0])} Idx={idx}>
           {
-            category[1]?.map( notebook => 
+            category[1]?.splice(0,4).map( notebook => 
               <NotebookHomeCard key={notebook.name} {...notebook} />
             )
           }
         </HorizontalList>
       )
     }
+    </CategoriesContainer>
   </>
 }
 
+export default Home
 
+const CategoriesContainer = styled.div`
+width: 100%;
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(1fr, 100%));
+`
 
 
 
@@ -82,9 +90,8 @@ const NotebookHomeCardStyle = styled.div`
 `
 
 // surprise, it's a div instead!
-const gambiarraImg = ({ children, ...props }) => (
-  <div />
-)
+const gambiarraImg = () => <div />
+
 const MarkDownOptions = {
   overrides: {
     img: { component: gambiarraImg }
@@ -93,6 +100,3 @@ const MarkDownOptions = {
 // convenience
 // move elsewhere
 const parseCategory = category => `${category.split('-')[0].slice(2)} > ${category.split('-')[2]}`
-function groupBy(xs, f) {
-  return xs.reduce((r, v, i, a, k = f(v)) => ((r[k] || (r[k] = [])).push(v), r), {});
-}

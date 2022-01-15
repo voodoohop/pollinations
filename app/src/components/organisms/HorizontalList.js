@@ -1,30 +1,30 @@
 import { HorizontalBorder } from "../atoms/Borders"
 import styled from '@emotion/styled'
 
-const HorizontalList = ({ title, children }) => {
-
-    return <Container>
+const HorizontalList = ({ title, children, idx }) => {
+    console.log(children.length)
+    return <Container Count={children.length} Idx={idx}>
         <h4>
             {title}
         </h4>
         <HorizontalBorder />
-        <ListContainer>
+        <ListContainer >
             {children}
         </ListContainer>
     </Container>
 }
 
 const Container = styled.div`
+width: ${props => `${25 * props.Count}%`};
+grid-column: ${props => props.Idx % 4} / ${props => props.Count + 1} ;
 margin: 1em 0;
-text-align: justify;
-text-transform: uppercase;
+text-align: left;
 `
 
 const ListContainer = styled.div`
-width: 100%;
 
 display: grid;
-grid-gap: 0.5em;
+grid-gap: 5em;
 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 
 `

@@ -11,26 +11,15 @@ import ToolBar from "./components/ToolBar"
 
 import useColabNode from "./hooks/useColabNode"
 import useIPFS from "./hooks/useIPFS"
-import useIPFSWrite from "./hooks/useIPFSWrite"
 import useLocalPollens from "./hooks/useLocalPollens"
 import usePollenDone from "./hooks/usePollenDone"
-import About from "./pages/About"
-import BlankMarkdown from "./pages/BlankMarkdown"
 
-import Creator from "./pages/Create"
-import Feed from "./pages/Feed"
-import Help from "./pages/Help"
 import Home from "./pages/Home"
 import LocalPollens from "./pages/LocalPollens"
 import Models from "./pages/Models"
 import ResultViewer from "./pages/ResultViewer"
+import ModelRoutes from "./routes/ModelRoutes"
 import { ExactRoutes } from "./routes/PublicRoutes"
-
-
-
-
-
-
 
 const debug = Debug("AppContainer");
 
@@ -57,18 +46,17 @@ const Pollinations = () => {
             console.error("For some reason NodeID is not set...", node)
         }
     }, [node.nodeID])
-    
-    const ipfs = useIPFS("/ipns/k51qzi5uqu5dk56owjc245w1z3i5kgzn1rq6ly6n152iw00px6zx2vv4uzkkh9");
-    
-    return (<>
-        {/* Nav Bar     */}
-        <TopBar />
-        {/* Children that get IPFS state */}
+        
+    return <>
+
+        <TopBar node={node} showNode={navigateToNode}/>
+
         <Container maxWidth='lg'>
             <Routes>
                 {
+                    // Exact routes without props
                     ExactRoutes
-                    .map( route => <Route key={route.path} {...route}/>
+                    .map( route => <Route key={route.path} exact {...route}/>
                     )
                 }
                 <Route exact path='localpollens' element={<LocalPollens node={node}/>}/>
@@ -76,15 +64,16 @@ const Pollinations = () => {
 
                 <Route path='n/:nodeID' element={<NodeWithData node={node} overrideNodeID={overrideNodeID} />} />
                 <Route path='p/:contentID/*' element={<ModelRoutes node={node} navigateToNode={navigateToNode} overrideContentID={overrideContentID} />} />
-                <Route path='c/:selected' element={<Home ipfs={ipfs} />} />
-                <Route path='models' element={<Models ipfs={ipfs}/>}/>
+                <Route path='c/:selected' element={<Home />} />
+                
+                <Route path='models' element={<Models />}/>
                 <Route index element={<Navigate replace to="c/Anything" />} />
             </Routes>
             <More />
         </Container>
 
-        <ToolBar node={node} showNode={navigateToNode} />
-    </>)
+        {/* <ToolBar node={node} showNode={navigateToNode} /> */}
+    </>
 }
 
 
@@ -111,30 +100,7 @@ const NodeWithData = ({ node, overrideNodeID }) => {
     return <ResultViewer ipfs={ipfs} />
 }
 
-const ModelRoutes = ({ node, navigateToNode, overrideContentID }) => {
-    const { contentID } = useParams();
 
-    const ipfs = useIPFS(contentID);
-
-    const dispatchInput = useIPFSWrite(ipfs, node)
-
-    const dispatch = useCallback(async inputs => {
-        debug("dispatching inputs", inputs)
-        const contentID = await dispatchInput(inputs)
-        debug("dispatched Form")
-        if (overrideContentID)
-            overrideContentID(contentID)
-        navigateToNode()
-    }, [ipfs?.input, dispatchInput])
-
-    return (
-        <Routes>
-            <Route index element={<Navigate replace to="view" />} />
-            <Route path='view' element={<ResultViewer ipfs={ipfs} />} />
-            <Route path='create' element={<Creator ipfs={ipfs} node={node} dispatch={dispatch} />} />
-        </Routes>
-    )
-}
 
 const More = () => <div style={{ margin: '1em auto 4em auto' }}>
     Discuss, get help and contribute on

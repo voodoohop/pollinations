@@ -9,25 +9,23 @@ const debug = Debug('notebooks');
 // get list of notebooks from IPNS path
 // this should be refactored once we cleaned the IFPS state code
 // no need to do raw ipfs operations or data mangling here
-export const getNotebooks = (ipfs) => {
-  const ipfsState = ipfs;
+export const getNotebooks = (ipfsState) => {
 
   debug("ipfsState",ipfsState)
   if (!ipfsState) return null
   
   const notebookCategories = Object.keys(ipfsState);
-
+  console.log(ipfsState)
   const allNotebooks = notebookCategories.map(category => {
     const notebooks = Object.entries(ipfsState[category]);
     debug('getNotebooks', category, notebooks);
   
     return notebooks.map(([name, notebookFolder]) => {
+
       const cid = notebookFolder[".cid"];
-      debug("got cid for",name,notebookFolder,":", cid);
       const notebookJSON = notebookFolder["input"]["notebook.ipynb"];
-      debug("getting metadata for", notebookJSON);
       const { description } = readMetadata(notebookJSON)
-      debug("notebookMetadata", name, description);
+
       return {
         category, 
         name, 
@@ -38,8 +36,12 @@ export const getNotebooks = (ipfs) => {
     });
   }).flat();
   
-  debug('getNotebooks parsed', allNotebooks);
+  const categorizedNotebooks = groupBy(allNotebooks, notebook => notebook.category) || []
   
-  return allNotebooks;
+  return [ allNotebooks, categorizedNotebooks ]
 }
 
+// convenience.........
+function groupBy(array, f) {
+  return array.reduce((r, v, i, a, k = f(v)) => ((r[k] || (r[k] = [])).push(v), r), {});
+}

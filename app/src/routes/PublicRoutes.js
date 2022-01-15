@@ -9,5 +9,4 @@ export const ExactRoutes = [
     { path: 'about', element: <About /> },
     { path: 'help', element: <Help/> },
     { path: 'blankMarkdown', element: <BlankMarkdown/> },
-    { path: 'localpollens', element: props => <LocalPollens node={props.node}/> }
 ]

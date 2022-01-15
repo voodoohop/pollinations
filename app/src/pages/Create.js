@@ -1,15 +1,15 @@
 import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
 import Alert from '@material-ui/lab/Alert';
 import Debug from "debug";
 import Markdown from 'markdown-to-jsx';
-import React, { useCallback, useMemo } from "react";
+import React, { Suspense, useCallback, useMemo } from "react";
 import FormView from '../components/Form';
 import { SEO } from "../components/Helmet";
 import MediaViewer from '../components/MediaViewer';
 import NotebookTitle from "../components/NotebookTitle";
 import { getNotebookMetadata } from "../utils/notebookMetadata";
-
+import styled from '@emotion/styled'
+import Acordion from "../components/organisms/Acordion";
 
 
 
@@ -29,57 +29,61 @@ export default React.memo(function Create({ ipfs, node, dispatch }) {
 
   debug("ipfs state before rendering model", ipfs)
 
+  const NotebookInfos = [
+    { 
+      header: 'Details', 
+      children: metadata && <Markdown children={metadata?.description} />, 
+      defaultExpanded: true 
+    },
+    { header: 'License', children: 'bla' }
+  ]
+
 
   return <>
     <Box my={2}>
 
       <SEO metadata={metadata} ipfs={ipfs} cid={contentID} />
-      {/* control panel */}
+
       <NotebookTitle name={metadata?.name} />
-
-
-      {/* inputs */}
-      <div style={{ width: '100%' }}>
-        {
-          !connected && <Alert severity="info">The inputs are <b>disabled</b> because <b>no Colab node is running</b>! Click on <b>LAUNCH</b> (bottom right) or refer to INSTRUCTIONS for further instructions.</Alert>
-        }
-        <FormView
-          input={ipfs?.input}
-          connected={connected}
-          metadata={metadata}
-          onSubmit={dispatch}
-        />
-      </div>
-
-      {/* just in case */}
       
 
-      {/* previews */}
-      {ipfs.output ? (<div >
-        <MediaViewer output={ipfs.output} contentID={contentID} />
-      </div>) : (<NotebookDescription metadata={metadata} />)
-      }
+      <LayoutStyle>
 
+        <div>
+          {
+            !connected && <Alert severity="info">The inputs are <b>disabled</b> because <b>no Colab node is running</b>! Click on <b>LAUNCH</b> (bottom right) or refer to INSTRUCTIONS for further instructions.</Alert>
+          }
+          <h3>
+            Inputs
+          </h3> 
+          <FormView
+            input={ipfs?.input}
+            connected={connected}
+            metadata={metadata}
+            onSubmit={dispatch} />
+        </div>
+        
+        {
+          ipfs.output ? 
+          <div >
+            <MediaViewer output={ipfs.output} contentID={contentID} />
+          </div> 
+          : 
+          <div>
+            {
+              NotebookInfos
+              .map( info => <Acordion {...info}/> )
+            }
+          </div>
+        }
+
+      </LayoutStyle>
     </Box>
   </>
 });
 
-
-
-// Notebook Description
-
-const NotebookDescription = ({ metadata }) => {
-  if (metadata === null) return null
-  return (<Box mt={8}>
-            <Typography 
-                variant="h5" 
-                component="h5" 
-                gutterBottom>
-                Details
-            </Typography>
-          <Typography color="textSecondary">
-            <Markdown children={metadata.description} />
-          </Typography></Box>)
-}
-
-
+const LayoutStyle = styled.div`
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(45%, 1fr));
+grid-gap: 4em;
+`
