@@ -78,6 +78,7 @@ transition: height 0.1s ease-in;
 padding: 0.1em 1em;
 overflow-y: hidden;
 background-color: transparent;
+text-transform: uppercase;
 
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(calc(90vw / 6), 1fr));
