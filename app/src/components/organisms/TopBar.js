@@ -68,7 +68,6 @@ const VisibleContentStyle = styled.div`
 display: flex;
 justify-content: space-between;
 align-items: flex-end;
-margin-bottom: 10px;
 `
 
 const HiddenContentStyle = styled.div`
