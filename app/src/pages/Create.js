@@ -9,7 +9,6 @@ import MediaViewer from '../components/MediaViewer';
 import NotebookTitle from "../components/NotebookTitle";
 import { getNotebookMetadata } from "../utils/notebookMetadata";
 import styled from '@emotion/styled'
-import Acordion from "../components/organisms/Acordion";
 
 
 
@@ -29,14 +28,7 @@ export default React.memo(function Create({ ipfs, node, dispatch }) {
 
   debug("ipfs state before rendering model", ipfs)
 
-  const NotebookInfos = [
-    { 
-      header: 'Details', 
-      children: metadata && <Markdown children={metadata?.description} />, 
-      defaultExpanded: true 
-    },
-    { header: 'License', children: 'bla' }
-  ]
+
 
 
   return <>
@@ -44,18 +36,16 @@ export default React.memo(function Create({ ipfs, node, dispatch }) {
 
       <SEO metadata={metadata} ipfs={ipfs} cid={contentID} />
 
-      <NotebookTitle name={metadata?.name} />
       
+          {
+            !connected && <Alert severity="info">The inputs are <b>disabled</b> because <b>no Colab node is running</b>! Click on <b>LAUNCH</b> (bottom right) or refer to INSTRUCTIONS for further instructions.</Alert>
+          }
+          <br/>
 
       <LayoutStyle>
 
         <div>
-          {
-            !connected && <Alert severity="info">The inputs are <b>disabled</b> because <b>no Colab node is running</b>! Click on <b>LAUNCH</b> (bottom right) or refer to INSTRUCTIONS for further instructions.</Alert>
-          }
-          <h3>
-            Inputs
-          </h3> 
+          
           <FormView
             input={ipfs?.input}
             connected={connected}
@@ -70,10 +60,9 @@ export default React.memo(function Create({ ipfs, node, dispatch }) {
           </div> 
           : 
           <div>
-            {
-              NotebookInfos
-              .map( info => <Acordion {...info}/> )
-            }
+            <NotebookTitle name={metadata?.name} />
+            
+            { metadata && <Markdown children={metadata?.description} /> }
           </div>
         }
 

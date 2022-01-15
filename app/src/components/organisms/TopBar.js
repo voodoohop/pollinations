@@ -11,7 +11,7 @@ import { SocialLinks } from '../Social'
 import LaunchColabButton from '../molecules/LaunchColabButton'
 
 const MenuLinks = [
-  { children: 'models', to: '/models' },
+  // { children: 'models', to: '/models' },
   { children: 'about', to: '/about' },
   { children: 'feed', to: '/feed' },
   { children: 'help', to: '/help' },

@@ -116,7 +116,8 @@ const toSchema = (key, props, enabled) => {
         "boolean": () => "radio",
         "string": mapStringType,
         "number": () => "updown",
-        "integer": () => "updown"
+        "integer": () => "updown",
+        
     };
 
     // Use custom widgets for certain prefixes such as a
