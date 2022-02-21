@@ -18,6 +18,7 @@ import Home from "./pages/Home"
 import LocalPollens from "./pages/LocalPollens"
 import Models from "./pages/Models"
 import ResultViewer from "./pages/ResultViewer"
+import Wizard from "./pages/Wizard"
 import ModelRoutes from "./routes/ModelRoutes"
 import { ExactRoutes } from "./routes/PublicRoutes"
 
@@ -61,7 +62,7 @@ const Pollinations = () => {
                 }
                 <Route exact path='localpollens' element={<LocalPollens node={node}/>}/>
                 
-
+                <Route exact path='wizard' element={<Wizard node={node} navigateToNode={navigateToNode} overrideContentID={overrideContentID}/>}/>
                 <Route path='n/:nodeID' element={<NodeWithData node={node} overrideNodeID={overrideNodeID} />} />
                 <Route path='p/:contentID/*' element={<ModelRoutes node={node} navigateToNode={navigateToNode} overrideContentID={overrideContentID} />} />
                 <Route path='c/:selected' element={<Home />} />
