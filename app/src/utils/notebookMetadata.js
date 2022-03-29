@@ -62,15 +62,22 @@ function readMetadata(notebookJSON) {
 
 // Extract parameter with preceding comment (to override form description with something more meaningful)
 const extractParametersWithComment = (text, i, codeRows) => {
-  const params = extractParameters(text) || extractEnumerableParameters(text);
+  const params = extractParameters(text) || extractEnumerableParameters(text)
 
-  const previousRow = codeRows[i - 1];
+  const previousRow = codeRows[i - 1]
   if (params && previousRow && previousRow.trim().startsWith("#") && !previousRow.includes("#@param")) {
-    const description = previousRow.trim().slice(1).trim();
-    return { ...params, description }
+    const descriptionRaw = previousRow.trim().slice(1).trim()
+    
+    // check if the description containts the keyword (advanced)
+    const advanced = descriptionRaw.toLowerCase().includes("(advanced)")
+
+    // remove the keyword if it is there (case insensitive)
+    const description = descriptionRaw.replace(/\(advanced\)/i, "").trim()
+
+    return { ...params, description, advanced }
   }
 
-  return params;
+  return params
 }
 
 
