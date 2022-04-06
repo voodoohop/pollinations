@@ -68,6 +68,7 @@ export default function Home() {
     <Box display='grid' gridGap='2em' gridTemplateColumns='repeat(auto-fill, minmax(300px, 1fr))'>
       {
         notebookList
+          .filter(notebook => !notebook.name.includes('broken') && notebook)
           .map(notebook =>
             <NotebookCard key={notebook.name} notebook={notebook} />
           )
