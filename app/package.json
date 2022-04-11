@@ -104,5 +104,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.34"
   }
 }
