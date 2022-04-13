@@ -58,8 +58,7 @@ const Pollinations = () => {
     }, [node.nodeID])
 
     return (<>
-        {/* Nav Bar     */}
-        {/* <AppBar /> */}
+    
         <TopBar node={node} showNode={navigateToNode}/>
 
         {/* Children that get IPFS state */}
