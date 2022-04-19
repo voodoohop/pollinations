@@ -44362,7 +44362,7 @@ var ipfsCp = async (client, ipfsPath, cid) => {
 };
 var ipfsPin = async (client, cid) => {
   debug5("Pinning to remote nft.storage", cid);
-  await client.pin.remote.add(CID.parse(cid), { recursive: true, service: "nft_storage", background: true });
+  return await client.pin.remote.add(CID.parse(cid), { recursive: true, service: "nft_storage", background: true });
   debug5("Pinning to pollinations", cid);
   return await client.pin.add(CID.parse(cid), { recursive: true });
 };
