@@ -2,4 +2,4 @@ wget https://github.com/pollinations/pollinations/archive/refs/heads/gcloud-gpu.
 unzip gcloud-gpu.zip
 mv pollinations-gcloud-gpu pollinations
 pip install papermill
-papermill pollinations/colabs/pollinator.ipynb pollinations/colabs/out.ipynb
+papermill pollinations/colabs/pollinator.ipynb pollinations/colabs/out.ipynb -p on_colab=False
