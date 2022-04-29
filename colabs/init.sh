@@ -13,4 +13,4 @@ mv pollinations-gcloud-gpu pollinations
 cd /pollinations/app && npm run install_backend
 cd ~
 pip install papermill
-papermill /pollinations/colabs/pollinator.ipynb pollinations/colabs/out.ipynb -p on_colab False -p node_id 123
+papermill /pollinations/colabs/pollinator.ipynb /pollinations/colabs/out.ipynb -p on_colab False -p node_id 123
