@@ -1,3 +1,4 @@
+cd ~
 echo "APT::Get::force-yes \"true\";"  >> /etc/apt/apt.conf.d/90forceyes
 
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -7,10 +8,11 @@ export NVM_DIR="$HOME/.nvm"
 nvm install 16
 nvm use 16
 
+cd ~
 wget https://github.com/pollinations/pollinations/archive/refs/heads/gcloud-gpu.zip
 unzip gcloud-gpu.zip
 mv pollinations-gcloud-gpu pollinations
-cd /pollinations/app && npm run install_backend
+cd pollinations/app && npm run install_backend
 cd ~
 pip install papermill
-papermill /pollinations/colabs/pollinator.ipynb /pollinations/colabs/out.ipynb -p on_colab False -p node_id 123
+papermill pollinations/colabs/pollinator.ipynb pollinations/colabs/out.ipynb -p on_colab False -p node_id 123
