@@ -2,93 +2,83 @@ import styled from '@emotion/styled';
 import { Button } from '@material-ui/core';
 import Debug from 'debug';
 import { last } from 'ramda';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useParams } from 'react-router';
+import useIPFSWrite from '../../../hooks/useIPFSWrite';
+import { getWebURL } from '../../../network/ipfsConnector';
 import Thumbs from '../../atoms/Thumb';
 
-const debug = Debug('form/file');
+const debug = Debug('formfile');
+
 
 export default function Previews(props) {
 
-  const { value, id } = props;
-  const { contentID } = useParams()
 
-  const [files, setFiles] = useState([]);
-  const type = getType(id)
+  const { add, cid } = useIPFSWrite()
+
+
+  debug('props', props);
+  const { value, id,  disabled, description, setFieldValue, inputCID } = props;
+
+  const expectedType = getType(id)
+
+
+  debug('value', value)
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: `${type}/*`,
+    accept: expectedType ? `${expectedType}/*` : undefined,
     onDrop: onNew
   });
 
-  useEffect(() => {
 
-    if (!value)
-      return;
-
-    async function hackyFetchOnMount(){
-      const baseUrl = 'https://ipfs.pollinations.ai/ipfs/';
-
-      const fileName = last(value.split("/"))
-
-      const res = await fetch(`${baseUrl}${contentID}/input/${fileName}`)
-      const buf = await res.arrayBuffer()
-      const file = new File([buf], fileName, { type: `${type}/${props.default.split('.').pop()}` })
-
-      onNew([file])
-    }
-    hackyFetchOnMount()
+  async function onNew(acceptedFiles) {
     
-  },[])
+    debug("dropped files", acceptedFiles);
 
+    const newFiles = await Promise.all(acceptedFiles.map(async file => {
 
-  function onNew(acceptedFiles) {
-    setFiles(acceptedFiles.map(file => Object.assign(file, {
-      preview: URL.createObjectURL(file)
-    })));
-    handleChange(props.id, acceptedFiles[0], props.setFieldValue);
+      await add(file.path, file.stream())
+
+      return file.path
+    }));
+
+    const rootCID = await cid()
+
+    const files = newFiles.map(name => ({name, url: getWebURL(rootCID+"/"+name, name)}))
+    
+    await close()
+
+    debug("setting field value",id, files[0].url)
+    
+    setFieldValue(id, files[0].url);
   }
 
-  function handleChange(key, file, callback){
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      let result = addName(reader.result, file.name)
-      callback( key, result )
-    };
-    reader.onerror = (error) => {
-      console.log('Error: ', error);
-    };
-  }
+
+  // debug("files", files)
+  const file = value ? {url: value.startsWith("/content/ipfs/input") ? value.replace("/content/ipfs/input", `https://pollinations.ai/ipfs/${inputCID}`) : value, name: last(value.split("/"))} : null
   
-  // useEffect(() => {
-  //   // Make sure to revoke the data uris to avoid memory leaks
-  //   files.forEach(file => URL.revokeObjectURL(file.preview));
-  // }, [files]);
-
   return (<>
     
-    <Disable disabled={props.disabled} className="container">
-      <label>{props.id}</label>
-      <Style {...getRootProps({className: 'dropzone'})} isEmpty={!files.length}>
+    <Disable disabled={disabled} className="container">
+      <label>{id}</label>
+      <Style {...getRootProps({className: 'dropzone'})} isEmpty={!file}>
         
-        <input {...getInputProps()} disabled={props.disabled} />
+        <input {...getInputProps()} disabled={disabled} />
         {
-            files.length ? 
-            <Thumbs files={files} type={type} />
+            file ? 
+            <Thumbs files={[file]} />
             : <>
-              <p>{props.description}<br/>
+              <p>{description}<br/>
               Drag 'n' drop here.  </p>
             </>
         }
       </Style>
     </Disable>
     {
-          files.length > 0 
+          file 
           && 
-          <Button onClick={() => setFiles([])}>
-            [ Remove {type} ]
+          <Button onClick={() => setFieldValue(id, "")}>
+            [ Remove {expectedType} ]
           </Button>
     }
   </>);
@@ -103,10 +93,6 @@ function getType(id){
     return 'audio'
 }
 
-function addName(string, name){
-  let array = string.split(';')
-  return `${array[0]};name=${name.replace(/\s/g, '')};${array[1]};`
-}
 
 const Disable = styled.div`
 opacity: ${props => props.disabled ? '50%' : '100%'};

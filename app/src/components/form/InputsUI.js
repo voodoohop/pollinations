@@ -1,18 +1,20 @@
-import { 
-    FormControlLabel, 
-    MenuItem, 
-    Radio, 
-    RadioGroup, 
-    TextField,
-    Button, Link } from "@material-ui/core"
+import {
+  Button, FormControlLabel, Link, MenuItem,
+  Radio,
+  RadioGroup,
+  TextField
+} from "@material-ui/core";
+import Debug from "debug";
 import HelpModal from "../HelpModal";
 import DropZone from "./customInputs/file";
+
+const debug = Debug("InputsUI")
 
 export const InputField = (props) => {
 
     if (!props)
       return null
-
+    debug("props", props)
     // Dropzone file input
     if (`${props.id}`.includes('file'))
         return <DropZone {...props} />
@@ -20,31 +22,32 @@ export const InputField = (props) => {
     // Radio buttons Yes/No
     if (props.type === 'boolean') 
       return <div style={props.style}>
-      <label> {props.title} </label>
-      <RadioGroup  value={props.value} onChange={e => props.setFieldValue(props.id, e.target.value === 'true' ? true : false)}>
-        <FormControlLabel
-          label='Yes'
-          value={true}
-          control={<Radio  />}
-          disabled={props.disabled}/>
-        <FormControlLabel
-          label='No'
-          value={false}
-          control={<Radio  />}
-          disabled={props.disabled}/>      
-      </RadioGroup> 
-    </div>
+                <label> {props.title} </label>
+                <RadioGroup  value={props.value} onChange={e => props.setFieldValue(props.id, e.target.value === 'true' ? true : false)}>
+                  <FormControlLabel
+                    label='Yes'
+                    value={true}
+                    control={<Radio  />}
+                    disabled={props.disabled}/>
+                  <FormControlLabel
+                    label='No'
+                    value={false}
+                    control={<Radio  />}
+                    disabled={props.disabled}/>      
+                </RadioGroup> 
+              </div>
     
     // Select Component
     if (props.enum?.length > 0) 
-    return <TextField select {...props}
-    onChange={e => props.setFieldValue(props.id, e.target.value)}>
-    {
-        props.enum.map(option => <MenuItem key={option} value={option}>
-            {option}
-        </MenuItem>)
-    }
-    </TextField>    
+      return <TextField select {...props}
+              onChange={e => props.setFieldValue(props.id, e.target.value)}>
+                {
+                    props.enum.map(option => (
+                      <MenuItem key={option} value={option}>
+                        {option}
+                      </MenuItem>))
+                }
+            </TextField>    
   
     // Text/Rest...
     return <TextField fullWidth {...props}/>
@@ -57,8 +60,7 @@ export const InputField = (props) => {
     return <>
       <Button 
         disabled={isDisabled || formik.isSubmitting} 
-        type="submit"
-      >
+        type="submit">
         [ {formik.isSubmitting ? "Submitting" : "Submit"} ]
       </Button>
   
