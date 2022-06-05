@@ -52,7 +52,7 @@ for path in $IPFS_ROOT/input/*; do
     fi
 
     # if value is a url then download it / a bit hacky and may not be needed in the future
-    if [[ $value == \"http* ]]; then
+    if [[ $value == \"http* ]] || [[ $value == \'http* ]]; then
 	    
         # remove quotes around value
         value=$(echo "$value" | xargs)
