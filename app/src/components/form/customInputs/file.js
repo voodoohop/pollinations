@@ -52,9 +52,9 @@ export default function Previews(props) {
   }
 
 
-  const files = value ? Object.values(value) : []
+  const files = value ? (value instanceof Object ? Object.values(value):[value]) : []
 
-  debug("files", files)
+
   
   return (<>
     

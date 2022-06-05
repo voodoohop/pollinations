@@ -38,7 +38,8 @@ const Thumbs = ({ files }) => <Container>
 
 const Thumb = (url) => {
     
-    const name =  last(url.split("/"))
+    const name =  url.includes("?filename=") ? last(url.split("?filename=")) : last(url.split("/"))
+    debug("Thumb", url, name)
     const mimeType = mime.lookup(name);
     const type = mimeType.split('/')[0];
     
