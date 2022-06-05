@@ -51,10 +51,13 @@ for path in $IPFS_ROOT/input/*; do
         value=$(<$path)
     fi
 
-    # if value is a url then download it
-    if [[ $value == http* ]]; then
+    # if value is a url then download it / a bit hacky and may not be needed in the future
+    if [[ $value == \"http* ]]; then
+	    
+        # remove quotes around value
+        value=$(echo "$value" | xargs)
         echo "🐝: Downloading $value"
-        value=$(curl -s -O -J -w '%{filename_effective}' "$value" | awk {'print $1'})
+        value=$(curl -s -O -J -w '%{filename_effective}' $value | awk {'print $1'})
         # prepend /content to the value
         value="/content/$value"    
     fi
