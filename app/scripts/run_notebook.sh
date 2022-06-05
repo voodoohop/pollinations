@@ -51,6 +51,14 @@ for path in $IPFS_ROOT/input/*; do
         value=$(<$path)
     fi
 
+    # if value is a url then download it
+    if [[ $value == http* ]]; then
+        echo "🐝: Downloading $value"
+        value=$(curl -s -O -J -w '%{filename_effective}' "$value" | awk {'print $1'})
+        # prepend /content to the value
+        value="/content/$value"    
+    fi
+
     echo "${key} : ${value}" >> $NOTEBOOK_PARAMS_FILE
 done
 
