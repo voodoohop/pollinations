@@ -1,75 +1,44 @@
 import { Button, IconButton } from "@material-ui/core"
-import ArrowUpward from '@material-ui/icons/ArrowUpward'
-import { useRef, useState } from "react"
-import useClickOutside from "../../hooks/UI/useClickOutside"
-import LaunchColabButton from "../molecules/LaunchColabButton"
+import GpuInfo from "../molecules/GpuInfo"
+import styled from '@emotion/styled'
 
-
-const ToolBarHeader = ({ node, setOpen, open, showNode }) => {
-
-    function go2Pollen() {
-        setOpen(false)
-        showNode()
-    }
-
-    return <div style={{
-        display: 'flex',
+const ToolBarHeader = ({ go2Pollen, isConnected }) => <div style={{
+        display: isConnected ? 'flex' : 'none',
         justifyContent: 'space-between',
         alignItems: 'flex-start'
     }} >
-        <LaunchColabButton {...node} />
-
-        <div>
-            {
-                (node.connected && node.contentID) &&
-                <Button onClick={go2Pollen} children='[ Current Pollen ]' />
-            }
-            <IconButton onClick={() => setOpen(state => !state)}>
-                <ArrowUpward fontSize='small' style={{ transform: `rotateZ(${open ? '180deg' : '0deg'})` }} />
-            </IconButton>
-        </div>
-
-    </div>
-}
-
-const ToolBarContent = ({ children }) => {
-    return <div style={{
-        width: '500px',
-        padding: '1em',
-        overflow: 'auto'
-    }} children={children} />
-}
+    <Button onClick={go2Pollen} children='[ Current Pollen ]' />            
+</div>
 
 
-const ToolBar = ({ children, node, showNode }) => {
 
-    const [open, setOpen] = useState(false)
-    const toolbarRef = useRef()
-
-    useClickOutside(toolbarRef, () => setOpen(false))
-
-
-    return <div ref={toolbarRef} style={{
+const ToolBar = ({ node, showNode }) => <HideOnMobile>
+        
+     <div style={{
+        display: node?.connected ? 'flex' : 'none',
+        alignItems: 'center',
         position: 'fixed',
         bottom: 0,
         right: 30,
-        minWidth: '30%',
+        minWidth: '325px',
         maxWidth: '470px',
-        minHeight: 50,
-        maxHeight: 500,
-        height: open ? 500 : 50,
-        transition: 'height 0.08s ease-in',
+        height: 50,
         borderRadius: '10px 10px 0 0',
         backgroundColor: '#222',
-        padding: '0.3em',
-        overflowY: open ? 'auto' : 'hidden'
+        padding: '1.3em',
     }} >
-        <ToolBarHeader open={open} setOpen={setOpen} node={node} showNode={showNode} />
-        <ToolBarContent>
-            {children}
-        </ToolBarContent>
+        <ToolBarHeader 
+            go2Pollen={showNode} 
+            node={node} />
 
+        <GpuInfo {...node} />
     </div>
-}
+</HideOnMobile>
 
 export default ToolBar
+
+const HideOnMobile = styled.div`
+@media (max-width: 600px) {
+    display: none;
+}
+`

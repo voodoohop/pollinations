@@ -5,7 +5,7 @@ import { useCallback, useEffect } from "react"
 import { Navigate, Route, Routes, useNavigate, useParams } from "react-router"
 import { BrowserRouter } from "react-router-dom"
 // Components
-import ToolBar from "./components/ToolBar"
+import ToolBar from "./components/organisms/Toolbar"
 import TopBar from "./components/TopBar"
 import Footer from "./components/Footer"
 
