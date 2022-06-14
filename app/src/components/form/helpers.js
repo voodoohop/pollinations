@@ -5,10 +5,10 @@ const debug = Debug("helpers");
 
 // Get the form inputs from the ipfs object. 
 // Use the metadata to find default values
-export function getForm(ipfsInput, metadata) {
+export function getForm(ipfsInput, metadata, disableSocialPost = false) {
   
     // Merge Social checkbox with the form inputs
-    const propertiesWithSocial = ({...metadata.form.properties, ...SocialField});
+    const propertiesWithSocial = disableSocialPost ? metadata.form.properties : ({...metadata.form.properties, ...SocialField});
   
     // Get the form inputs with defaults
     const inputs = overrideDefaultValues(propertiesWithSocial, ipfsInput);

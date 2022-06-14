@@ -7,12 +7,12 @@ import { FormActions, InputField } from './InputsUI';
 
 const debug = Debug("Formik")
 
-const FormikForm = ({ input, connected, metadata, onSubmit }) => {
+const FormikForm = ({ input, connected, metadata, onSubmit, businessEndpoint }) => {
     
   if (!input)
     return null;
 
-  const { inputs, initialValues } = getForm(input, metadata);
+  const { inputs, initialValues } = getForm(input, metadata, businessEndpoint);
 
   const colabLink = metadata?.colabLink;
   const isDisabled = !connected;

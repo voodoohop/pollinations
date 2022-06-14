@@ -9,6 +9,7 @@ import PageTemplate from "./components/PageTemplate"
 // Components
 import ToolBar from "./components/ToolBar"
 import TopBar from "./components/TopBar"
+import useAWSNode from "./hooks/useAWSNode"
 // Hooks
 import useColabNode from "./hooks/useColabNode"
 import useIPFS from "./hooks/useIPFS"
@@ -97,7 +98,7 @@ const Pollinations = () => {
 
           <Route
             path="envisioning"
-            element={<Envisioning />}
+            element={<Envisioning navigateToNode={navigateToNode} />}
           />
           <Route
             path="p/:contentID/*"
@@ -119,11 +120,36 @@ const Pollinations = () => {
   )
 }
 
-const Envisioning = () => {
+const Envisioning = ({navigateToNode}) => {
+  
   const ipfs = useIPFS("QmZ9aFQN1Pi8D5XDmxYNwG4HUAnH3ZbDjrYUAaehLfAeBq")
+  const { node, overrideNodeID, overrideContentID } = useAWSNode()
+
+  const dispatchInput = useIPFSWrite(ipfs, node)
+
+  const dispatch = useCallback(
+    async (inputs) => {
+      debug("aws dispatching inputs", inputs)
+      const contentID = await dispatchInput(inputs)
+      debug("aws dispatched Form")
+      if (overrideContentID) overrideContentID(contentID)
+      navigateToNode()
+    },
+    [ipfs?.input, dispatchInput]
+  )
+
+  
+  debug("got aws node", node)
   return (<div>
       <h1>Envisioning</h1>
-      <Creator ipfs={ipfs} node={{connected: true}} businessEndpoint={true}/>
+      <Creator 
+              ipfs={ipfs} 
+              node={node} 
+              businessEndpoint={true} 
+              dispatch={dispatch}
+              overrideContentID={overrideContentID} 
+              navigateToNode={navigateToNode}
+              />
       </div>
   )
 }

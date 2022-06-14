@@ -47,6 +47,7 @@ export default React.memo(function Create({ ipfs, node, dispatch, businessEndpoi
               connected={connected}
               metadata={metadata}
               onSubmit={dispatch}
+              businessEndpoint={businessEndpoint}
             />
             
           </div> 
@@ -63,7 +64,7 @@ export default React.memo(function Create({ ipfs, node, dispatch, businessEndpoi
         </TwoColumns>
 
         {/* NOTEBOOK DESCRIPTION */}
-        <div style={{marginTop: '3em'}}>
+        { !businessEndpoint && <div style={{marginTop: '3em'}}>
           <Typography variant="h5" gutterBottom>
           Details
           </Typography>
@@ -73,7 +74,7 @@ export default React.memo(function Create({ ipfs, node, dispatch, businessEndpoi
             open in colab
           </a> 
           }
-        </div>
+        </div> }
           
     </Box>
 });
