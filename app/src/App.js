@@ -1,6 +1,7 @@
 import Container from "@material-ui/core/Container"
 import awaitSleep from "await-sleep"
 import Debug from "debug"
+import fetch from "node-fetch"
 import { useCallback, useEffect } from "react"
 import { Navigate, Route, Routes, useNavigate, useParams } from "react-router"
 import { BrowserRouter } from "react-router-dom"
@@ -21,7 +22,6 @@ import Feed from "./pages/Feed"
 import Home from "./pages/Home"
 import Models from "./pages/Models"
 import ResultViewer from "./pages/ResultViewer"
-
 
 const debug = Debug("AppContainer")
 
@@ -62,7 +62,7 @@ const Pollinations = () => {
 
   const navigate = useNavigate()
 
-  const navigateToNode = useCallback(() => {
+  const navigateToNode = useCallback((node=node) => {
     if (node.nodeID) navigate(`/n/${node.nodeID}`)
     else {
       console.error("For some reason NodeID is not set...", node)
@@ -127,15 +127,28 @@ const Envisioning = ({navigateToNode}) => {
 
   const dispatchInput = useIPFSWrite(ipfs, node)
 
+  
   const dispatch = useCallback(
     async (inputs) => {
       debug("aws dispatching inputs", inputs)
       const contentID = await dispatchInput(inputs)
-      debug("aws dispatched Form")
-      if (overrideContentID) overrideContentID(contentID)
-      navigateToNode()
+      debug("aws dispatched Form", contentID)
+      if (overrideContentID) 
+        overrideContentID(contentID)
+      // POST contentID to Eleph-beecl-1OHF1H6OP0ANU-1012574990.us-east-1.elb.amazonaws.com/pollen/
+      const response = await fetch("https://eleph-beecl-1OHF1H6OP0ANU-1012574990.us-east-1.elb.amazonaws.com/pollen", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({"notebook":"latent-diffusion","ipfs":contentID})
+      })
+      debug("waiting for response",response)
+      debug("aws response", await response.text())
+      
+      navigateToNode(node)
     },
-    [ipfs?.input, dispatchInput]
+    [ipfs?.input, dispatchInput, node]
   )
 
   
