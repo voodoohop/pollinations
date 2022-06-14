@@ -1,21 +1,12 @@
-import { Button, IconButton } from "@material-ui/core"
 import GpuInfo from "../molecules/GpuInfo"
 import styled from '@emotion/styled'
-
-const ToolBarHeader = ({ go2Pollen, isConnected }) => <div style={{
-        display: isConnected ? 'flex' : 'none',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start'
-    }} >
-    <Button onClick={go2Pollen} children='[ Current Pollen ]' />            
-</div>
-
-
+import Button from "@material-ui/core/Button"
 
 const ToolBar = ({ node, showNode }) => <HideOnMobile>
         
      <div style={{
         display: node?.connected ? 'flex' : 'none',
+        justifyContent: 'space-between',
         alignItems: 'center',
         position: 'fixed',
         bottom: 0,
@@ -27,10 +18,7 @@ const ToolBar = ({ node, showNode }) => <HideOnMobile>
         backgroundColor: '#222',
         padding: '1.3em',
     }} >
-        <ToolBarHeader 
-            go2Pollen={showNode} 
-            node={node} />
-
+        <Button onClick={showNode} children='[ Current Pollen ]' />
         <GpuInfo {...node} />
     </div>
 </HideOnMobile>
