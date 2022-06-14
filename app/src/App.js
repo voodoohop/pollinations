@@ -4,11 +4,11 @@ import Debug from "debug"
 import { useCallback, useEffect } from "react"
 import { Navigate, Route, Routes, useNavigate, useParams } from "react-router"
 import { BrowserRouter } from "react-router-dom"
+import Footer from "./components/Footer"
+import PageTemplate from "./components/PageTemplate"
 // Components
 import ToolBar from "./components/ToolBar"
 import TopBar from "./components/TopBar"
-import Footer from "./components/Footer"
-
 // Hooks
 import useColabNode from "./hooks/useColabNode"
 import useIPFS from "./hooks/useIPFS"
@@ -18,9 +18,9 @@ import usePollenDone from "./hooks/usePollenDone"
 import Creator from "./pages/Create"
 import Feed from "./pages/Feed"
 import Home from "./pages/Home"
-import ResultViewer from "./pages/ResultViewer"
-import PageTemplate from "./components/PageTemplate"
 import Models from "./pages/Models"
+import ResultViewer from "./pages/ResultViewer"
+
 
 const debug = Debug("AppContainer")
 
@@ -88,15 +88,16 @@ const Pollinations = () => {
             ))
           }
 
-          {/* <Route exact path={ROUTES.myPollens.to} element={<LocalPollens node={node} />} /> */}
-          {/* <Route exact path={ROUTES.expo.to} element={<ExpoPage />} /> */}
-          {/* <Route exact path={ROUTES.expo.to + "/:expoId"} element={<ExpoItemPage />} /> */}
-
           <Route path="c/:selected" element={<Models />} />
 
           <Route
             path="n/:nodeID"
             element={<NodeWithData node={node} overrideNodeID={overrideNodeID} />}
+          />
+
+          <Route
+            path="envisioning"
+            element={<Envisioning />}
           />
           <Route
             path="p/:contentID/*"
@@ -115,6 +116,15 @@ const Pollinations = () => {
 
       <ToolBar node={node} showNode={navigateToNode} />
     </>
+  )
+}
+
+const Envisioning = () => {
+  const ipfs = useIPFS("QmZ9aFQN1Pi8D5XDmxYNwG4HUAnH3ZbDjrYUAaehLfAeBq")
+  return (<div>
+      <h1>Envisioning</h1>
+      <Creator ipfs={ipfs} node={{connected: true}} businessEndpoint={true}/>
+      </div>
   )
 }
 

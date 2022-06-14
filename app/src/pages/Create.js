@@ -15,7 +15,7 @@ import { getNotebookMetadata } from "../utils/notebookMetadata";
 
 const debug = Debug("Create");
 
-export default React.memo(function Create({ ipfs, node, dispatch }) {
+export default React.memo(function Create({ ipfs, node, dispatch, businessEndpoint }) {
 
   const contentID = ipfs[".cid"]
 
@@ -52,12 +52,14 @@ export default React.memo(function Create({ ipfs, node, dispatch }) {
           </div> 
 
           {/* OUTPUTS */}
-          <div>
+          { 
+          !businessEndpoint && <div>
             <Typography variant="h5" gutterBottom>
               Instructions
             </Typography>
             <video class='video_container' src="/help.mp4" frameborder="0" allowfullscreen="true" controls/>
           </div>  
+          } 
         </TwoColumns>
 
         {/* NOTEBOOK DESCRIPTION */}
