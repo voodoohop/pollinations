@@ -1,141 +1,53 @@
-import Box from '@material-ui/core/Box'
-import Button from '@material-ui/core/Button'
-import Card from '@material-ui/core/Card'
-import CardContent from '@material-ui/core/CardContent'
-import CardHeader from '@material-ui/core/CardHeader'
-import Typography from '@material-ui/core/Typography'
+import Box from "@material-ui/core/Box"
 import Debug from "debug"
-import { useMemo } from "react"
+import { textContent } from "../assets"
 import MarkdownContent from "../components/molecules/MarkDownContent"
-import RouterLink from "../components/molecules/RouterLink"
-import NotebookImage from '../components/organisms/markdownParsers/NotebookImage'
-import NotebookInfo from '../components/organisms/markdownParsers/NotebookInfo'
-import TopAlert from '../components/organisms/TopAlert'
-import { getNotebooks } from "../data/notebooks"
-import useFilter from "../hooks/useFilter"
-import useIPFS from '../hooks/useIPFS'
-import { CardContainerStyle } from "./styles/card"
-
-
-const debug = Debug("home");
+import Logo from '../components/Logo'
+import PageTemplate from "../components/PageTemplate"
+import { StartHereButton } from "../components/molecules/LaunchColabButton"
+import { Button } from "@material-ui/core"
+import { useNavigate } from "react-router-dom"
 
 export default function Home() {
 
-  const ipfs = useIPFS("/ipns/k51qzi5uqu5dhl19ih5j7ghhgte01hoyvraq86gy0zab98iv5sd1dr3i9huvb1");
 
-  const notebooks = useMemo(() => getNotebooks(ipfs), [ipfs]);
-  const { notebookList, options, option } = useFilter(notebooks)
+  const navigate = useNavigate()
 
-  debug("got notebooks", notebooks);
   return <>
-    <TopAlert options={options}/>
-    <HeroSection />
+    <Box 
+      paddingTop={4} 
+      display='flex' 
+      flexDirection='column' 
+      alignItems='center'>
+      
+      <Logo/>
+      
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="flex-start"
+        alignItems="center"
+        // gridTemplateColumns="repeat(auto-fill, minmax(300px, 2fr))"
+        gridGap="1em"
+        minHeight="calc(100vh - 350px)"
+        maxHeight="100vh"
+        // padding="0em 0"
+        margin='2em'
+      >
+        <MarkdownContent url={textContent.landingLeft} />
+        <Button 
+            style={{marginTop: '3em'}}
+            variant='outlined'
+            onClick={()=> navigate('/c')}
+            color="primary"  
+            target="colab">
+            Create
+        </Button>
 
-    <Box margin='calc(1.5em + 50px) 0 1.5em 0'>
-      {
-        options.length ?
-          <>
-            <Typography
-              className='Lato'
-              align='center'
-              variant="h3" gutterBottom
-              style={{ marginBottom: '0.8em' }}>
+      </Box>
 
-              What do you want to create?
+      <PageTemplate label='landing' />
 
-            </Typography>
-
-            <Box display='flex' justifyContent='center' marginBottom='8em'>
-              {
-                options?.map(opt =>
-                  <Button key={opt}
-                    style={{ margin: '0 0.5em' }}
-                    variant={opt === option.selected ? 'contained' : 'outlined'}
-                    color={opt === option.selected ? 'secondary' : 'primary'}
-                    onClick={() => option.setSelected(opt)} >
-                    {opt}
-                  </Button>
-                )
-              }
-            </Box>
-          </>
-          :
-          <></>
-      }
-    </Box>
-
-    <Box display='grid' gridGap='2em' gridTemplateColumns='repeat(auto-fill, minmax(300px, 1fr))'>
-      {
-        notebookList
-          .map(notebook =>
-            <NotebookCard key={notebook.name} notebook={notebook} />
-          )
-      }
     </Box>
   </>
 }
-
-
-
-
-
-
-
-
-
-// HERO 
-// Component
-const HeroSection = props => <Box paddingTop={3}>
-  <Typography align='center' variant='h1' gutterBottom>
-
-    pollinations.ai
-
-  </Typography>
-
-  <Box display='grid' gridTemplateColumns='repeat(auto-fill, minmax(300px, 2fr))'
-    gridGap='2em' minHeight='30vh' paddingTop='3em'>
-
-    <div style={{ gridColumnStart: 1, gridColumnEnd: 3 }}>
-      <MarkdownContent id="landingLeft" />
-    </div>
-
-    <MarkdownContent id="landingRight" />
-
-  </Box>
-</Box>
-
-// Cards 
-// Component
-
-const NotebookCard = ({ notebook }) => {
-
-  let { category, name, path, description } = notebook
-  
-  // remove credits etc (they are separated by a horizontal rule)
-  description = description.split("---")[0]
-  
-  return <Box>
-    <Card style={CardContainerStyle}>
-
-      <CardHeader
-        subheader={<CardTitle children={name?.slice(2)} to={path} variant='h4' />}
-        title={<CardTitle children={category?.slice(2)} to={path} variant='h6' />} />
-
-      <NotebookImage metadata={notebook} style={{width: '100%'}}/>
-      
-      <CardContent>
-        <NotebookInfo description={description} noImg/>
-      </CardContent>
-
-    </Card>
-  </Box>
-}
-
-const CardTitle = ({ to, children, variant }) => <>
-  <Typography className='Lato noMargin' variant={variant} gutterBottom>
-    <RouterLink to={to}>
-      {children}
-    </RouterLink>
-  </Typography>
-</>
-
