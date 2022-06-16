@@ -3,11 +3,11 @@ import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Debug from "debug";
 import React from "react";
-import CustomFormikForm from '../components/form/CustomFormik';
+import FormikForm from '../components/form/Formik';
 import NotebookTitle from "../components/NotebookTitle";
 import useIPFSWrite from '../hooks/useIPFSWrite';
 
-const API_URL = "http://Eleph-beecl-1X0LYRP1ZKOBL-1049606691.us-east-1.elb.amazonaws.com/pollen/"
+const API_URL = "https://worker-prod.pollinations.ai/pollen/"
 
 const debug = Debug("Envisioning");
 
@@ -42,7 +42,7 @@ export default React.memo(function Create({navigateToNode}) {
               Inputs
             </Typography>
 
-            <CustomFormikForm inputs={inputs} onSubmit={async (values) => {
+            <FormikForm inputs={inputs} onSubmit={async (values) => {
               
               // adding customEndpoint is just a way to be able to redirect back to this page from the results viewer
               // can be removed if we replace results viewer with something custom
