@@ -4,113 +4,121 @@ import Typography from "@material-ui/core/Typography";
 import Debug from "debug";
 import React from "react";
 import FormikForm from '../components/form/Formik';
+import {MediaViewer} from '../components/MediaViewer';
 import NotebookTitle from "../components/NotebookTitle";
-import useIPFSWrite from '../hooks/useIPFSWrite';
+import { getMedia } from '../data/media';
+import useColabNode from '../hooks/useColabNode';
+import useIPFS from '../hooks/useIPFS';
+import useIPFSInputWrite from '../hooks/useIPFSInputWrite';
+import { submitToAWS } from '../network/aws';
+import { writer } from '../network/ipfsConnector';
 
-const API_URL = "https://worker-prod.pollinations.ai/pollen/"
 
 const debug = Debug("Envisioning");
 
-export default React.memo(function Create({navigateToNode}) {
-
-  const ipfsWriter = useIPFSWrite()
-
-  const inputs = {
-    "Prompt": {
-      type: "string",
-      default: null,
-      title: "Prompt",
-      description: "The image you want to be generated",
-    },
-    "Modifiers": {
-      type: "string",
-      default: "cyber",
-      title: "Style",
-      enum: ['cyber', 'cgsociety', 'pixar'],
-      description: "The style you choose",
-    }
+const inputs = {
+  "Prompt": {
+    type: "string",
+    default: null,
+    title: "Prompt",
+    description: "The image you want to be generated",
+  },
+  "Modifiers": {
+    type: "string",
+    default: "cyber",
+    title: "Style",
+    enum: ['cyber', 'cgsociety', 'pixar'],
+    description: "The style you choose",
   }
+}
 
-  return <Box my={2}>
+export default React.memo(function Create() {
 
-      
-        <CenterContent>
-          <div>
+  const { overrideNodeID, node } = useColabNode()
 
-            <NotebookTitle name='Envisioning "API"' />
-            <Typography variant="h5" gutterBottom>
-              Inputs
-            </Typography>
+  return <PageLayout >
+        <InputBarStyle>
+          <Typography variant='h5' children='Envisioning' />
+          <Controls overrideNodeID={overrideNodeID} />
+        </InputBarStyle>
 
-            <FormikForm inputs={inputs} onSubmit={async (values) => {
-              
-              // adding customEndpoint is just a way to be able to redirect back to this page from the results viewer
-              // can be removed if we replace results viewer with something custom
-              values = {...values, customEndpoint: "/envisioning"}
-
-              const nodeID = await submitToAWS(values, ipfsWriter);
-              navigateToNode(nodeID);
-            }}/>
-          </div> 
-        </CenterContent>
-
-          
-    </Box>
+        <RowStyle>
+        <Previewer contentID={node.contentID}/>   
+        </RowStyle>
+    </PageLayout>
 });
 
 
-// Functions
+const Controls = ({ overrideNodeID }) => {
 
-async function submitToAWS(values, ipfsWriter) {
-    debug ("onSubmit", values)  
+  const ipfsWriter = writer()
 
-    // in real life submit parameters do IPFS and return the folder hash
-    const ipfs_hash = await UploadInputstoIPFS(values, ipfsWriter);
 
-    // debug payload
-    let payload = {
-      "notebook": "envisioning",
-      "ipfs": ipfs_hash
-    };
+  return <FormikForm inputs={inputs} onSubmit={async (values) =>{
       
-    try {
-      const response = await fetch(
-          API_URL, { 
-          method: "POST",
-          mode: 'cors',
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        }
-      );
-      const data = await response.json();
-      debug("json response", data)
-      return data.pollen_id
-    } catch (error) {
-      debug("fetch error", error)
-      return error
+    // adding customEndpoint is just a way to be able to redirect back to this page from the results viewer
+    // can be removed if we replace results viewer with something custom
+    values = {...values, customEndpoint: "/envisioning"}
+
+    const nodeID = await submitToAWS(values, ipfsWriter);
+    // navigateToNode(nodeID);
+    overrideNodeID(nodeID);
+  }}  />
+}
+
+const Previewer = ({ contentID }) => {
+
+  const ipfs = useIPFS(contentID)
+  console.log(ipfs)
+
+  if (!ipfs.output) return null;
+  let images = getMedia(ipfs.output);
+  return <>
+    <Typography children={`${ipfs.input.Modifiers} preset`}/>
+    <PreviewerStyle>
+    {
+      images?.map(([filename, url, type]) => (
+        <MediaViewer 
+          content={url} 
+          filename={filename} 
+          type={type}
+        />
+      ))
     }
-  }
+    </PreviewerStyle>
 
-
-async function UploadInputstoIPFS(values, { add, mkDir, cid}){
-  debug("adding values to ipfs", values)
-  
-  await mkDir("/input")
-  for (let key in values) {
-    await add(`/input/${key}`, values[key])
-  }
-
-  return await cid()
+  </>
 }
 
 // STYLES
-const CenterContent = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-width: 100%;
-margin-top: 1em;
+const PageLayout = styled.div`
+
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+
+grid-gap: 0.4em;
 `;
+
+const InputBarStyle = styled.div`
+display: flex;
+flex-direction: column;
+`
+
+const PreviewerStyle = styled.div`
+width: 100%;
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+grid-gap: 0.5em;
+
+`
+
+const RowStyle = styled.div`
+
+
+grid-column: 2 / end;
+@media (max-width: 640px) {
+  grid-column: 1 / 1;
+}
+
+`
 

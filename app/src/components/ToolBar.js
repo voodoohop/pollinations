@@ -2,6 +2,7 @@ import styled from "@emotion/styled"
 import { Box, Typography } from "@material-ui/core"
 import Debug from "debug"
 import { useMemo } from "react"
+import { useLocation } from "react-router-dom"
 import { mediaToDisplay } from "../data/media"
 import useIPFS from "../hooks/useIPFS"
 import { MediaViewer } from "./MediaViewer"
@@ -13,13 +14,23 @@ import ToolBarContainer from "./organisms/Toolbar"
 
 const debug= Debug("ToolBar")
 
-const HideOnMobile = styled.div`
+const HideToolBar = styled.div`
+display: ${props => props.hideAnyway ? 'none' : 'block'};
 @media (max-width: 600px) {
     display: none;
 }
 `
+// routes that will hide the toolbar
+const ROUTESOUT = [
+    '/envisioning',
+    '/'
+]
 
-const ToolBar = ({ node, showNode }) => <HideOnMobile>
+const ToolBar = ({ node, showNode }) => {
+
+const location = useLocation();
+
+return <HideToolBar hideAnyway={ROUTESOUT.some(path => location.pathname === path )}>
     <ToolBarContainer node={node} showNode={showNode}>
     {
         node?.connected ?  <>
@@ -32,9 +43,8 @@ const ToolBar = ({ node, showNode }) => <HideOnMobile>
         : <Instructions />
     }
     </ToolBarContainer>
-</HideOnMobile>
-
-
+</HideToolBar>
+}
 const OutputPreview = ({ contentID }) => {
     
     const ipfs = useIPFS(contentID)
