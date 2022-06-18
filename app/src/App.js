@@ -101,11 +101,11 @@ const Pollinations = () => {
           />
           <Route
             path="envisioning/:nodeID"
-            element={<Envisioning navigateToNode={navigateToNode}/>}
+            element={<Envisioning />}
           />
           <Route
             path="envisioning"
-            element={<Envisioning navigateToNode={navigateToNode}/>}
+            element={<Envisioning />}
           />
           <Route
             path="p/:contentID/*"
