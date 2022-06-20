@@ -21,13 +21,6 @@ const form = {
     default: "",
     title: "Prompt",
     description: "The image you want to be generated",
-  },
-  "Modifiers": {
-    type: "string",
-    default: "cyber",
-    title: "Style",
-    enum: ['cyber', 'cgsociety', 'pixar'],
-    description: "The style you choose",
   }
 }
 
@@ -50,6 +43,7 @@ export default React.memo(function Create() {
   const loading = nodeID && !ipfs?.output?.done
 
   const dispatch = async (values) => {
+    navigateTo("/envisioning/submit")
     const {nodeID, contentID} = await submitToAWS(values, ipfsWriter);
     debug("submitted",contentID, "to AWS. Got nodeID", nodeID)
     setContentID(contentID)
