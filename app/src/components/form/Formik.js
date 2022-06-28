@@ -7,11 +7,10 @@ import { FormActions, InputField } from './InputsUI';
 
 const debug = Debug("Formik")
 
-const FormikForm = ({ inputs, onSubmit, isDisabled }) => {
+const FormikForm = ({ inputs, onSubmit, isDisabled, extraAction }) => {
 
     if (!inputs)
     return null;
-
 
 
   const keys = Object.keys(inputs);
@@ -37,7 +36,8 @@ const FormikForm = ({ inputs, onSubmit, isDisabled }) => {
         <InputField
           key={key}
           {...inputs[key]}
-          {...formik}
+          enum={formik.enum}
+          setFieldValue={formik.setFieldValue}
           fullWidth
           disabled={isDisabled}
           id={key}
@@ -83,6 +83,7 @@ const FormikForm = ({ inputs, onSubmit, isDisabled }) => {
       </Accordion> }
        
     <FormActions 
+      extraAction={extraAction}
       isDisabled={isDisabled} 
       formik={formik}  />
 

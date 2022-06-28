@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
-import { LinearProgress } from '@material-ui/core';
+import { Button, IconButton, LinearProgress } from '@material-ui/core';
 import Typography from "@material-ui/core/Typography";
 import Debug from "debug";
 import React from "react";
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import FormikForm from '../components/form/Formik';
 import { overrideDefaultValues } from "../components/form/helpers";
 import { MediaViewer } from '../components/MediaViewer';
@@ -12,6 +12,8 @@ import useAWSNode from '../hooks/useAWSNode';
 import useIPFS from '../hooks/useIPFS';
 import useIPFSWrite from '../hooks/useIPFSWrite';
 import { submitToAWS } from "../network/aws.js";
+import { GlobalSidePadding } from '../styles/global';
+import ReplayIcon from '@material-ui/icons/Replay';
 
 const debug = Debug("Envisioning");
 
@@ -50,7 +52,7 @@ export default React.memo(function Create() {
 
   const dispatch = async (values) => {
     navigateTo("/dalle/submit")
-    const {nodeID, contentID} = await submitToAWS(values, ipfsWriter, "voodoohop/dalle-playground");
+    const {nodeID, contentID} = await submitToAWS(values, ipfsWriter, "voodoohop/dalle-playground", false);
     debug("submitted",contentID, "to AWS. Got nodeID", nodeID)
     setContentID(contentID)
     navigateTo(`/dalle/${nodeID}`)
@@ -74,9 +76,23 @@ export default React.memo(function Create() {
 
 const Controls = ({dispatch , loading, inputs }) => {
 
-  return <FormikForm inputs={inputs} isDisabled={loading} onSubmit={async (values) =>{
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { pathname } = location;
+
+  return <FormikForm 
+    inputs={inputs} 
+    isDisabled={loading} 
+    onSubmit={async (values) =>{
       dispatch(values)
-  }}  />
+    }}  
+    extraAction={<>
+      <IconButton
+      onClick={()=> navigate(`/${pathname.split('/')[1]}`) }
+      variant='outlined'
+      children={<ReplayIcon/>}/>
+    </>}
+    />
 }
 
 const Previewer = ({ ipfs }) => {
@@ -106,12 +122,12 @@ const Previewer = ({ ipfs }) => {
 
 // STYLES
 const PageLayout = styled.div`
-
+padding: ${GlobalSidePadding};
+margin-top: 1em;
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 grid-gap: 0.4em;
 
-padding: 0.5em 0;
 `;
 
 const InputBarStyle = styled.div`

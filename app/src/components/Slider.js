@@ -1,13 +1,34 @@
 import styled from '@emotion/styled';
+import { Button, LinearProgress } from '@material-ui/core';
+import React, { useEffect } from 'react';
 import RouterLink from './molecules/RouterLink';
 import { NotebookImgUrl } from './organisms/markdownParsers/NotebookImage';
 
-const Slider = (props) => <Row>
+const Slider = (props) => {
+
+const [position, setPosition] = React.useState(0);
+const element = document.getElementById('Slider');
+
+useEffect(() => {
+
+  if (!element) return;
+  
+  const updatePosition = () => {
+    setPosition((element.scrollLeft / element.scrollLeftMax)*100)
+  }
+  element.addEventListener("scroll", updatePosition);
+  updatePosition();
+  return () => element.removeEventListener("scroll", updatePosition);
+},[element]);
+
+return <>
+  <Row id='Slider'>
     <SliderContainer>
       {props.children}
     </SliderContainer>
-</Row>
-
+  </Row>
+</> 
+}
 export default Slider;
 
 
@@ -57,14 +78,11 @@ const ModelIMG = ({ metadata }) => <ModelImgStyle src={NotebookImgUrl(metadata)}
 const ModelImgStyle = styled.div`
 background: url(${props => props.src});
 background-size: cover;
-width: 300px;
+width: ${window.innerWidth * 0.25}px;
 max-height: 500px;
 object-fit: cover;
-// max-width: 300px;
 height: 300px;
 aspect-ratio: 1/1;
-// img{
-// }
 `
 
 
@@ -73,16 +91,21 @@ const Row = styled.div`
  
   overflow-y: hidden;
   overflow-x: scroll;
+  
 
   ::-webkit-scrollbar {
-    display: none;
+    display: none ;
   }
+
+  // implement fallback
+  scrollbar-width: none;
+  
 `
 
 const SliderContainer = styled.div`
   
   display: flex;
   flex-grow: 1;
-
+  
   div { padding: 0.25rem; }  
 `
