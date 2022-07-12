@@ -3,6 +3,8 @@
   "homepage": "https://pollinations.ai",
   "version": "0.4.8",
   "private": false,
+
+  "type": "module",
   "dependencies": {
     "@cto.af/textdecoder": "0.0.0",
     "@emotion/react": "^11.9.0",
@@ -29,9 +31,6 @@
     "front-matter": "^4.0.2",
     "fs-extra": "^10.0.0",
     "i": "^0.3.7",
-    "ipfs-http-client": "^56.0.3",
-    "ipfs-utils": "^9.0.6",
-    "is-ipfs": "^6.0.2",
     "is-port-reachable": "^3.0.0",
     "it-all": "^1.0.6",
     "it-concat": "^2.0.0",
@@ -45,8 +44,6 @@
     "markdown-to-jsx": "^7.1.7",
     "markdown-to-text": "^0.1.1",
     "mime-types": "github:voodoohop/mime-types",
-    "multicodec": "^3.1.0",
-    "multiformats": "^9.5.2",
     "mz": "^2.7.0",
     "native-abort-controller": "^1.0.4",
     "node-abort-controller": "^3.0.1",
