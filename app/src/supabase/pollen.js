@@ -1,4 +1,5 @@
 import supabase from "./client.js";
+import url from 'url'
 
 export function getAllPollens() {
     return supabase.from("baseapp_pollen").select("*").order("id", {ascending: false}).then(response => {
@@ -40,4 +41,18 @@ export function deletePollen(id) {
     return supabase.from("baseapp_pollen").delete().match({"id": id}).then(response => {
         return response.data
     })
+}
+
+// if run from command line
+
+
+
+if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
+  // module was not imported but called directly
+    console.log("cli");
+
+    (async () => {
+        const allPollens = await getAllPollens();
+        console.log(allPollens);
+    })()
 }
