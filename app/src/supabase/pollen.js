@@ -7,12 +7,12 @@ export function getAllPollens() {
     })
 }
 
-export function createPollen(search_text, inputs, outputs, model_name, cid, ipns) {
+export function createPollen( cid, ipns) {
     return supabase.from("baseapp_pollen").insert([{
-        "search_text": search_text,
-        "inputs": inputs,
-        "outputs": outputs,
-        "model_name": model_name,
+//        "search_text": search_text,
+//        "inputs": inputs,
+//        "outputs": outputs,
+//        "model_name": model_name,
         "cid": cid,
         "ipns": ipns,
         "created": new Date(),
@@ -52,6 +52,7 @@ if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
     console.log("cli");
 
     (async () => {
+        await createPollen("1234","abcd")
         const allPollens = await getAllPollens();
         console.log(allPollens);
     })()
