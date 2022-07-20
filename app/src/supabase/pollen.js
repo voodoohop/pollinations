@@ -52,7 +52,8 @@ if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
     console.log("cli");
 
     (async () => {
-        await createPollen("1234","abcd")
+       console.log(await createPollen("1234","abcd"))
+        //await awaitSleep(1000)
         const allPollens = await getAllPollens();
         console.log(allPollens);
     })()

@@ -3,7 +3,6 @@
   "homepage": "https://pollinations.ai",
   "version": "0.4.8",
   "private": false,
-
   "type": "module",
   "dependencies": {
     "@cto.af/textdecoder": "0.0.0",
