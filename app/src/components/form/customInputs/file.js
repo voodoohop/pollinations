@@ -3,8 +3,8 @@ import { Button } from '@material-ui/core';
 import Debug from 'debug';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import useIPFSWrite from '../../../hooks/useIPFSWrite';
-import { getWebURL } from '../../../network/ipfsConnector';
+import useIPFSWrite from '@pollinations/ipfs/reactHooks/useIPFSWrite';
+import { getWebURL } from  "@pollinations/ipfs/ipfsConnector";
 import Thumbs from '../../atoms/Thumb';
 
 const debug = Debug('formfile');

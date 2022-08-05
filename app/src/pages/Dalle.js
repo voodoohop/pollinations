@@ -3,22 +3,20 @@ import { Button, IconButton, LinearProgress } from '@material-ui/core';
 import Typography from "@material-ui/core/Typography";
 import Debug from "debug";
 import React from "react";
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import FormikForm from '../components/form/Formik';
 import { overrideDefaultValues } from "../components/form/helpers";
 import { MediaViewer } from '../components/MediaViewer';
 import { getMedia } from '../data/media';
-import useAWSNode from '../hooks/useAWSNode';
-import useIPFS from '../hooks/useIPFS';
-import useIPFSWrite from '../hooks/useIPFSWrite';
-import { submitToAWS } from "../network/aws.js";
+import useAWSNode from '@pollinations/ipfs/reactHooks/useAWSNode';
 import { GlobalSidePadding } from '../styles/global';
 import ReplayIcon from '@material-ui/icons/Replay';
-
+import { SEOMetadata } from '../components/Helmet';
+ 
 const debug = Debug("Envisioning");
 
 const form = {
-  "prompt": {
+  "Prompt": {
     type: "string",
     default: "",
     title: "Prompt",
@@ -34,37 +32,30 @@ const form = {
 
 export default React.memo(function Create() {
 
-  const { setContentID, nodeID, contentID } = useAWSNode();
+  const params = useParams()
+  const { submitToAWS, ipfs, isLoading } = useAWSNode(params);
   // const loading = useState(false)
   
   const navigateTo = useNavigate();
-  
-  const ipfs = useIPFS(contentID);
-  const ipfsWriter = useIPFSWrite()
 
-  debug("nodeID", nodeID);
-
-  
   const inputs = ipfs?.input ? overrideDefaultValues(form, ipfs?.input) : form;
   
   debug("run overrideDefaultValues on",form,ipfs?.input,"result",inputs)
-  const loading = nodeID && !ipfs?.output?.done
 
   const dispatch = async (values) => {
     navigateTo("/dalle/submit")
-    const {nodeID, contentID} = await submitToAWS(values, ipfsWriter, "voodoohop/dalle-playground", false);
-    debug("submitted",contentID, "to AWS. Got nodeID", nodeID)
-    setContentID(contentID)
+    const { nodeID } = await submitToAWS(values, "voodoohop/dalle-playground", false);
     navigateTo(`/dalle/${nodeID}`)
   }
   
   return <PageLayout >
+        <SEOMetadata title='DALL E' />
         <InputBarStyle>
           <Typography variant='h5' children='DALLE Mega' />
-          {loading && 
+          {isLoading && 
           <LinearProgress style={{margin: '0.5em 0'}} />
           }
-          <Controls dispatch={dispatch} loading={loading} inputs={inputs} />
+          <Controls dispatch={dispatch} loading={isLoading} inputs={inputs} />
         </InputBarStyle>
 
         <RowStyle>

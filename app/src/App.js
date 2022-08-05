@@ -11,33 +11,37 @@ import ToolBar from "./components/ToolBar"
 import TopBar from "./components/TopBar"
 // Hooks
 import useColabNode from "./hooks/useColabNode"
-import useIPFS from "./hooks/useIPFS"
-import useIPFSWrite from "./hooks/useIPFSInputWrite"
+import useIPFS from "@pollinations/ipfs/reactHooks/useIPFS"
+import useIPFSWrite from "@pollinations/ipfs/reactHooks/useIPFSInputWrite"
 import usePollenDone from "./hooks/usePollenDone"
 // Pages
 import Creator from "./pages/Create"
 import Dalle from "./pages/Dalle"
 import Envisioning from "./pages/Envisioning"
 import Feed from "./pages/Feed"
-import Home from "./pages/Home"
+import Home from "./pages/Home/"
 import Models from "./pages/Models"
 import ResultViewer from "./pages/ResultViewer"
-
-import ImageContainer from "./components/BackgroundImage"
 
 import { 
   ROUTES, 
   MARKDOWN_ROUTES, 
-  MAIN_NAV_ROUTES } from "./routes/publicRoutes"
+  MAIN_NAV_ROUTES, 
+  OWNGPU_ROUTES} from "./routes/publicRoutes"
+import Integrate from "./pages/Integrate"
+import About from "./pages/About"
+import ScrollToTop from './utils/ScrollToTop'
 
+import CreateModel from './pages/Create/'
 
 const debug = Debug("AppContainer")
 
 
-
 const App = () => (
   <BrowserRouter>
-    <Pollinations />
+    <ScrollToTop>
+      <Pollinations />
+    </ScrollToTop>
   </BrowserRouter>
 )
 
@@ -61,15 +65,17 @@ const Pollinations = () => {
       {/* Children that get IPFS state */}
         <Routes>
           <Route exact path='/' element={<Home />} />
-
+          <Route exact path='about' element={<About/>}/>
+          <Route exact path='integrate' element={<Integrate/>}/>
           <Route exact path={ROUTES.feed.to} element={<Feed />} />
+
           {
             MARKDOWN_ROUTES.map( route => (
               <Route 
-                key={route.label}
+                key={route.id}
                 exact
                 path={route.to}
-                element={<PageTemplate label={route.label} />}
+                element={<PageTemplate label={route.id} />}
               />
             ))
           }
@@ -87,6 +93,7 @@ const Pollinations = () => {
             path="envisioning"
             element={<Envisioning navigateToNode={navigateToNode}/>}
           />
+
           <Route
             path="dalle/:nodeID"
             element={<Dalle navigateToNode={navigateToNode}/>}
@@ -95,6 +102,16 @@ const Pollinations = () => {
             path="dalle"
             element={<Dalle navigateToNode={navigateToNode}/>}
           />
+          
+          {/* Create with our GPU */}
+          <Route path="create" element={<CreateModel />} >
+            {/* Disco, majesty, etc... */}
+            <Route path=':Model'>
+              {/* Hash associated with the content created */}
+              <Route path=':MediaId' />
+            </Route>
+          </Route>
+
           <Route
             path="p/:contentID/*"
             element={
@@ -109,7 +126,7 @@ const Pollinations = () => {
         </Routes>
       
       <Footer />
-      <ImageContainer/>
+      {/* <ImageContainer/> */}
       
       <ToolBar node={node} showNode={navigateToNode} />
     </>
