@@ -2,6 +2,7 @@ import { Accordion, AccordionSummary } from "@material-ui/core";
 import Add from '@material-ui/icons/Add';
 import styled from '@emotion/styled';
 import ParameterViewer from './InputsUI/';
+import { MOBILE_BREAKPOINT } from "../../../styles/global";
 
 const CustomizeParameters = ({ formik, isDisabled, inputs }) => { 
 
@@ -14,32 +15,38 @@ const CustomizeParameters = ({ formik, isDisabled, inputs }) => {
                 Customize
             </AccordionSummary>
 
-            <ParametersStyle children={Object.keys(formik.values)
-            .filter((key, idx, array) => {
-                if (!inputs[key]) return array;
-                return inputs[key]['x-order'] !== 0
-            })
-            .map(key => <>
-                <ParameterViewer
-                key={key}
-                id={key}
-                {...inputs[key]}
-                disabled={isDisabled}
-                label={inputs[key]?.title}
-                helperText={inputs[key]?.description}
-                value={formik.values[key]}
-                onChange={formik.handleChange}
-                setFieldValue={formik.setFieldValue}
-                />
-                </>
-            )} />
+            <ParametersStyle>
+                {
+                Object.keys(formik.values)
+                .filter((key, idx, array) => {
+                    if (!inputs[key]) return array;
+                    return inputs[key]['x-order'] !== 0
+                })
+                .map(key => 
+                    <ParameterViewer
+                        key={key}
+                        id={key}
+                        {...inputs[key]}
+                        disabled={isDisabled}
+                        label={inputs[key]?.title}
+                        helperText={inputs[key]?.description}
+                        value={formik.values[key]}
+                        onChange={formik.handleChange}
+                        setFieldValue={formik.setFieldValue}
+                    />
+                )} 
+            </ParametersStyle>
         </Accordion>
     </Styles>
 }
 
 const Styles = styled.div`
-
-width: 100%;
+width: 30%;
+@media (max-width: ${MOBILE_BREAKPOINT}) {
+    width: 100%;
+}
+padding: 0 1em;
+margin-bottom: 2em;
 
 // MUI overrides 
 .MuiPaper-root{
@@ -50,6 +57,10 @@ width: 100%;
     transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     background-color: #0F0F13 !important;
     padding: 1em;
+
+    max-height: 60vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
 
 }
 .MuiAccordion-root{
@@ -65,12 +76,29 @@ width: 100%;
     
     color: #B1B1B1;
 }
+
+// .styled-scrollbars {
+    /* Foreground, Background */
+    scrollbar-color: #D8E449 #383838;
+//   }
+  ::-webkit-scrollbar {
+    width: 10px; /* Mostly for vertical scrollbars */
+    height: 10px; /* Mostly for horizontal scrollbars */
+  }
+  ::-webkit-scrollbar-thumb { /* Foreground */
+    background: #D8E449;
+  }
+  ::-webkit-scrollbar-track { /* Background */
+    background: #383838;
+    // box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.37);
+    // border-radius: 3px;
+  }
 `
 const ParametersStyle = styled.div`
-display: flex;
-flex-direction: column;
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 width: 100%;
-gap: 2em;
+gap: 5em;
 `
 
 export default CustomizeParameters;

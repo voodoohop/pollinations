@@ -7,9 +7,10 @@ import SelectModel from './SelectModel';
 import PrimaryInput from './PrimaryInput';
 import { getInitialValues, getInputs } from './utils';
 import { useGPUModels } from '../../../hooks/useGPUModels';
+import { CreateButton } from '../../Home/TryOut';
 
 
-const Form = ({ 
+const Form = ({ ipfs, Results,
     onSubmit, isDisabled, 
     selectedModel, onSelectModel, hasSelect }) => {
 
@@ -21,17 +22,26 @@ const Form = ({
   const { models } = useGPUModels();
 
   useEffect(()=>{
+
     const { inputs, primary_input } = getInputs(models, selectedModel);
+    const values = getInitialValues(inputs, primary_input)
 
     // add other fields to the form when user selects the desired model.
     formik.setValues({ 
       // all parameters for the form
-      ...getInitialValues(inputs, primary_input),
+      ...values,
       
       // override the primary_input value with the old one.
       [primary_input.key]: formik.values[Object.keys(formik.values)[0]]
     })
   },[selectedModel, models])
+
+  
+
+  useEffect(()=>{
+    if (!ipfs.input) return;
+    formik.setValues({ ...formik.values, ...ipfs.input });
+  },[ipfs?.input])
     
   return <StyledForm onSubmit={formik.handleSubmit} >
 
@@ -52,16 +62,17 @@ const Form = ({
           models={models}
           selectedModel={selectedModel}
         />
+        
+        <ParametersAndResultsStyled>
 
-        <CustomizeParameters
-          isDisabled={isDisabled}
-          inputs={models[selectedModel?.key]?.components.schemas.Input.properties}
-          formik={formik}
-        />
+        {Results}
+          <CustomizeParameters
+            isDisabled={isDisabled}
+            inputs={models[selectedModel?.key]?.components.schemas.Input.properties}
+            formik={formik}
+            />
+        </ParametersAndResultsStyled>
 
-        <PrimaryButton type='submit' disabled={isDisabled} marginLeft>
-          { formik.isSubmitting ? 'Creating...' : 'Create' }
-        </PrimaryButton>  
       </>
 
 
@@ -77,3 +88,10 @@ align-items: center;
 gap: 2em;
 width: 100%;
 `
+
+const ParametersAndResultsStyled = styled.div`
+width: 100%;
+display: flex;
+flex-wrap: wrap;
+`
+

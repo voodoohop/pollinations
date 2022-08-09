@@ -7,7 +7,7 @@ import { MediaViewer } from '../../components/MediaViewer';
 import { getMedia } from '../../data/media';
 import useAWSNode from '@pollinations/ipfs/reactHooks/useAWSNode';
 import useIPFS from '@pollinations/ipfs/reactHooks/useIPFS';
-import { GlobalSidePadding } from '../../styles/global';
+import { GlobalSidePadding, MOBILE_BREAKPOINT } from '../../styles/global';
 
 // take it away
 import { useFormik } from 'formik';
@@ -44,18 +44,41 @@ export default React.memo(function TryOut() {
   const inputs = ipfs?.input ? overrideDefaultValues(form, ipfs?.input) : form;
 
   const dispatch = async (values) => {
-    await submitToAWS(values, "pollinations/preset-frontpage", false);
+    await submitToAWS(values, "614871946825.dkr.ecr.us-east-1.amazonaws.com/pollinations/preset-frontpage", false);
   }
   
   return <PageLayout >
+        <HeroSubHeadLine>
+        Explain your vision with words and watch it come to life!
+      </HeroSubHeadLine>
 
-        <Controls dispatch={dispatch} loading={isLoading} inputs={inputs} />
 
-        <Previewer ipfs={ipfs} />   
+      <Controls dispatch={dispatch} loading={isLoading} inputs={inputs} />
 
-    </PageLayout>
+      <Previewer ipfs={ipfs} />   
+
+</PageLayout>
 });
 
+const HeroSubHeadLine = styled.p`
+font-family: 'DM Sans';
+font-style: normal;
+font-weight: 500;
+font-size: 46px;
+line-height: 60px;
+text-align: center;
+
+max-width: 55%;
+@media (max-width: ${MOBILE_BREAKPOINT}) {
+  max-width: 90%;
+}
+
+color: #FFFFFF;
+/* identical to box height */
+
+text-align: center;
+
+`
 
 const Controls = ({dispatch , loading, inputs, currentID }) => {
 
@@ -102,10 +125,10 @@ const CreateForm = styled.form`
 display: flex;
 align-items: center;
 `
-
-const CreateInput = styled.input`
+// move to own component
+export const CreateInput = styled.input`
 width: 53vw;
-@media (max-width: 768px) {
+@media (max-width: ${MOBILE_BREAKPOINT}) {
     width: 90vw;    
 }
 height: 65px;
@@ -122,10 +145,13 @@ display: flex;
 align-items: center;
 
 color: #FFFFFF;
+:disabled {
+  color: grey;
+}
 padding-left: 1rem;
 margin: 1em 0;
 `
-
+// move to own component
 export const CreateButton = styled.button`
 
 width: 129px;
@@ -133,7 +159,7 @@ height: 52;
 background: #D8E449;
 border-radius: 40px;
 
-margin-left: calc(-129px - 0.5em);
+margin-left: ${props => props.marginLeft || 'calc(-129px - 0.5em)'};
 
 border: none;
 
