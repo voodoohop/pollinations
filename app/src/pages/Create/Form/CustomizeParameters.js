@@ -3,8 +3,9 @@ import Add from '@material-ui/icons/Add';
 import styled from '@emotion/styled';
 import ParameterViewer from './InputsUI/';
 import { MOBILE_BREAKPOINT } from "../../../styles/global";
+import CreditsView from "./Credits";
 
-const CustomizeParameters = ({ formik, isDisabled, inputs }) => { 
+const CustomizeParameters = ({ formik, isDisabled, inputs, credits }) => { 
 
     if (!inputs) return null;
     if (!Object.keys(inputs).length) return null;
@@ -37,6 +38,7 @@ const CustomizeParameters = ({ formik, isDisabled, inputs }) => {
                 )} 
             </ParametersStyle>
         </Accordion>
+        <CreditsView credits={credits}/>
     </Styles>
 }
 
@@ -98,7 +100,7 @@ const ParametersStyle = styled.div`
 display: grid;
 grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 width: 100%;
-gap: 5em;
+gap: 2em;
 `
 
 export default CustomizeParameters;

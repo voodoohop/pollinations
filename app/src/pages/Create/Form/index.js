@@ -40,7 +40,9 @@ const Form = ({ ipfs, Results,
 
   useEffect(()=>{
     if (!ipfs.input) return;
-    formik.setValues({ ...formik.values, ...ipfs.input });
+    const { model_image, ...values} = ipfs.input;
+
+    formik.setValues({ ...formik.values, ...values });
   },[ipfs?.input])
     
   return <StyledForm onSubmit={formik.handleSubmit} >
@@ -70,6 +72,7 @@ const Form = ({ ipfs, Results,
             isDisabled={isDisabled}
             inputs={models[selectedModel?.key]?.components.schemas.Input.properties}
             formik={formik}
+            credits={selectedModel?.credits}
             />
         </ParametersAndResultsStyled>
 
