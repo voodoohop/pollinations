@@ -13,6 +13,12 @@ import { CircularProgress } from '@material-ui/core';
 
 import Debug from 'debug';
 import Examples from '../../components/organisms/Examples';
+import { IpfsLog } from '../../components/Logs';
+import { NotebookProgress } from '../../components/NotebookProgress';
+import { FailureViewer } from '../../components/FailureViewer';
+import useLocalStorage from '../../hooks/useLocalStorage';
+import { getPollens } from '@pollinations/ipfs/awsPollenRunner';
+
 
 const debug = Debug("pages/Create/index");
 
@@ -23,16 +29,31 @@ export default React.memo(function Create() {
     const params = useParams();
     const { Model } = params;
 
+
     // aws stuff
-    const { submitToAWS, ipfs, isLoading } = useAWSNode(params);
+    const { submitToAWS, ipfs, isLoading, setNodeID } = useAWSNode(params);
 
     // current model, should move to url
     const [ selectedModel, setSelectedModel ] = React.useState({ key: '', url: '' });
+
+    const [showLogs, _] = useLocalStorage('showLogs', false);
 
     debug("selected model", selectedModel);
     
     const navigateTo = useNavigate();
 
+
+    useEffect(() => {
+        if (!params.nodeID && selectedModel.key) {
+            (async () => {
+                debug("getting pollens for model", selectedModel.key);
+                const pollens = await getPollens({image:selectedModel.key, success:true});
+                // select random pollen
+                const {input} = pollens[Math.floor(Math.random()*pollens.length)];
+                setNodeID(input);
+            })();
+        }
+    }, [params.nodeID, selectedModel]);
 
     // set selected model with DropDown
     const onSelectModel = e => setSelectedModel({
@@ -71,7 +92,7 @@ export default React.memo(function Create() {
             </h2>
             { isLoading && <CircularProgress thickness={2} size={20} /> }
             </FlexBetween>
-            
+            { isLoading && <NotebookProgress output={ipfs?.output} /> }
             {/* { isLoading && <LinearProgress style={{margin: '1.5em 0'}} /> } */}
             
             <Form 
@@ -83,6 +104,7 @@ export default React.memo(function Create() {
                 onSubmit={async (values) => dispatch(values) } 
                 Results={
                 <ResultsArea>
+                    { ipfs?.output?.success === false && <FailureViewer ipfs={ipfs} contentID={ipfs[".cid"]}/>}
                     <Previewer ipfs={ipfs}  /> 
                 </ResultsArea>
                 }
@@ -90,7 +112,7 @@ export default React.memo(function Create() {
             
         </ParametersArea>
 
-    
+        { showLogs && <IpfsLog ipfs={ipfs} contentID={ipfs[".cid"]} /> }
         
     </PageLayout>
 });
