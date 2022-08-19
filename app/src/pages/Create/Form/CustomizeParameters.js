@@ -5,11 +5,11 @@ import ParameterViewer from './InputsUI/';
 import { MOBILE_BREAKPOINT } from "../../../styles/global";
 import CreditsView from "./Credits";
 
-const CustomizeParameters = ({ formik, isDisabled, inputs, credits }) => { 
+const CustomizeParameters = ({ formik, isDisabled, inputs, credits, extrainfo }) => { 
 
     if (!inputs) return null;
     if (!Object.keys(inputs).length) return null;
-
+    console.log(inputs)
     return <Styles>
         <Accordion elevation={0} fullWidth>
             <AccordionSummary expandIcon={<Add />} fullWidth>
@@ -39,6 +39,9 @@ const CustomizeParameters = ({ formik, isDisabled, inputs, credits }) => {
             </ParametersStyle>
         </Accordion>
         <CreditsView credits={credits}/>
+        {
+            extrainfo && <CreditsView credits={extrainfo} title='More Info'/>
+        }
     </Styles>
 }
 

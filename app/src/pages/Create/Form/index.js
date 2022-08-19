@@ -74,6 +74,7 @@ const Form = ({ ipfs, Results,
             isDisabled={isDisabled}
             inputs={inputs}
             formik={formik}
+            extrainfo={selectedModel?.extrainfo}
             credits={selectedModel?.credits}
             />
         </ParametersAndResultsStyled>
