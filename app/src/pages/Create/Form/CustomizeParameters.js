@@ -40,7 +40,7 @@ const CustomizeParameters = ({ formik, isDisabled, inputs, credits, extrainfo })
         </Accordion>
         <CreditsView credits={credits}/>
         {
-            extrainfo && <CreditsView credits={extrainfo} title='More Info'/>
+            extrainfo && <CreditsView credits={extrainfo} title='More Info' isMarkdown/>
         }
     </Styles>
 }

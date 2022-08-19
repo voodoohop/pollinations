@@ -1,3 +1,5 @@
+import dreamfieldsextrainfo from '../assets/modelsextrainfo/dreamfields.md'
+
 export const MODELS_MAP = {
     'dreamfields': {
         featured: true,
@@ -8,7 +10,7 @@ export const MODELS_MAP = {
         name: "Dreamfields",
         description: "<img src=\"https://i.imgur.com/a9hByt4.png\" width=\"300\">\n\n\n\n Dreamfields is a deep neural network that can be used to predict the growth of your baby's weight. It is a powerful tool for predicting the future of your baby's weight.",
         category: "0 Featured",
-        extrainfo: 'Credits: [@gandamu](https://twitter.com/gandamu_ml)x, [@somnai_dreams](https://twitter.com/somnai_dreams), [Katherine Crowson](https://twitter.com/RiversHaveWings), [Adam Letts](https://twitter.com/gandamu_ml)',
+        extrainfo: dreamfieldsextrainfo,
     },
     'discodiffusion':{
         featured: true,
