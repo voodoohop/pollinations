@@ -1,13 +1,12 @@
 import styled from '@emotion/styled';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import useAWSNode from '@pollinations/ipfs/reactHooks/useAWSNode';
-import Debug from "debug";
+// import useAWSNode from '@pollinations/ipfs/reactHooks/useAWSNode';
+
 import React from "react";
 import CreateButtonBase from '../../components/atoms/CreateButton';
 import { overrideDefaultValues } from "../../components/form/helpers";
 import { MediaViewer } from '../../components/MediaViewer';
 import { getMedia } from '../../data/media';
-import { Colors, Fonts, GlobalSidePadding, MOBILE_BREAKPOINT } from '../../styles/global';
+import { Colors, MOBILE_BREAKPOINT } from '../../styles/global';
 
 // take it away
 import { Button } from '@material-ui/core';
@@ -17,9 +16,10 @@ import { IpfsLog } from '../../components/Logs';
 import { useIsAdmin } from '../../hooks/useIsAdmin';
 import { useRandomPollen } from '../../hooks/useRandomPollen';
 
-import PollenProgress from '../../components/PollenProgress'
+import PollenProgress from '../../components/PollenProgress';
+import usePollinationsAPI from '../../hooks/usePollinationsAPI.mjs';
 
-const MODEL = "614871946825.dkr.ecr.us-east-1.amazonaws.com/pollinations/pimped-diffusion";
+const MODEL = "replicate:misbahsy/woolitize-diffusion";
 
 const form = {
   "prompt": {
@@ -34,21 +34,22 @@ const form = {
 export default React.memo(function TryOut() {
 
 
-  const { submitToAWS, isLoading, ipfs, updatePollen, nodeID, setNodeID } = useAWSNode({});
+  const { submit, isLoading, output } = usePollinationsAPI({});
 
+  console.log("isLoading", isLoading, "output" , output)
+  // useRandomPollen(nodeID, MODEL, setNodeID);
 
-  useRandomPollen(nodeID, MODEL, setNodeID);
-
-  const inputs = ipfs?.input ? overrideDefaultValues(form, ipfs?.input) : form;
-
+  // const inputs = ipfs?.input ? overrideDefaultValues(form, ipfs?.input) : form;
+  const inputs = form;
   const dispatch = async (values) => {
-    await submitToAWS({...values, seed: Math.floor(Math.random() * 100000)}, MODEL, false, {priority: 1});
+    console.log("submitting", values)
+    await submit({...values, seed: Math.floor(Math.random() * 100000)}, MODEL);
   }
 
   const [isAdmin, _] = useIsAdmin();
 
-  const hasImageInRoot = ipfs?.output && Object.keys(ipfs.output).find(key => key.endsWith(".jpg") || key.endsWith(".png"));
-  const stableDiffOutput = hasImageInRoot ? ipfs?.output : ipfs?.output && ipfs?.output["stable-diffusion"];
+  // const hasImageInRoot = ipfs?.output && Object.keys(ipfs.output).find(key => key.endsWith(".jpg") || key.endsWith(".png"));
+  // const stableDiffOutput = hasImageInRoot ? ipfs?.output : ipfs?.output && ipfs?.output["stable-diffusion"];
   
 
   return <Style>
@@ -63,17 +64,18 @@ export default React.memo(function TryOut() {
 
     <Controls dispatch={dispatch} loading={isLoading} inputs={inputs} />
 
-    { isAdmin && (ipfs?.output?.done === true) && 
+    {/* { isAdmin && (ipfs?.output?.done === true) && 
       <Button variant="contained" color="primary" onClick={() => updatePollen({example: true})}>
         Add to Examples
       </Button>
-    }
+    } */}
 
-    { isLoading ? <PollenProgress log={ipfs?.output?.log} /> : <></>}
+    <pre>{JSON.stringify(output, null, 2)}</pre>
+    {/* { isLoading ? <PollenProgress log={ipfs?.output?.log} /> : <></>} */}
     
-    <Previewer output={stableDiffOutput} />   
+    {/* <Previewer output={stableDiffOutput} />    */}
 
-    {isAdmin && <IpfsLog ipfs={ipfs} contentID={ipfs[".cid"]} /> }
+    {/* {isAdmin && <IpfsLog ipfs={ipfs} contentID={ipfs[".cid"]} /> } */}
       
     </PageLayout>
   </Style>
