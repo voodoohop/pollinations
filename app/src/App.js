@@ -9,6 +9,7 @@ import SITE_METADATA from "./siteMetadata"
 
 ReactGA.initialize(SITE_METADATA.analytics);
 
+ReactGA.send({ hitType: 'pageview', page: window.location.pathname });
 const AppRoutes = [
   {
     exact: true,
