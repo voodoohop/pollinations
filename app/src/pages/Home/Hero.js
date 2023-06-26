@@ -46,11 +46,12 @@ function GenerativeImageFeed() {
       const imageFeedSource = new EventSource("https://image.pollinations.ai/feed");
       imageFeedSource.onmessage = evt => {
         const data = JSON.parse(evt.data);
-        if (data["nsfw"])
-          return;
+
         // console.log("got message", data);
         if (data["imageURL"]) {
           setImagesGenerated(no => no + 1);
+          if (!data["nsfw"])
+            return;
           const matureWord = isMature(data["prompt"]) && false;
           if (matureWord) {
             console.log("skipping mature word:", matureWord, data["prompt"]);
@@ -81,7 +82,7 @@ function GenerativeImageFeed() {
   }, [setImage, setServerLoad]);
 
   return (
-      <div>
+      <div style={{wordBreak:"break-all"}}>
         <br /><br /><br /><br /><br />
         <GenerativeImageURLContainer>
         <ImageURLHeading>Image URL Feed</ImageURLHeading>
@@ -115,7 +116,7 @@ const PromptInput = () => {
   const [prompt, setPrompt] = useState("");
 
   return <div>
-    <Input type="text" value={prompt} onChange={evt => setPrompt(evt.target.value)} style={{width:"100%"}} placeholder='Or type your prompt here'/>
+    <Input type="text" value={prompt} onChange={evt => setPrompt(evt.target.value)} style={{width:"100%"}} placeholder='Or type your prompt here (any language)'/>
     {/* right aligned button */}
     <div style={{textAlign:"right"}}>
       <Button onClick={() => window.open(`https://image.pollinations.ai/prompt/${prompt}`)}>Create</Button>
