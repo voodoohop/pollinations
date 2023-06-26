@@ -15,9 +15,16 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>Pollinations.AI</title>  
       <!-- Global site tag (gtag.js) - Google Analytics -->
-      
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-JCH86D57H8"></script>
+
     <!-- <script defer data-domain="pollinations.ai" src="https://plausable.zencraft.studio/js/pl.js"></script> -->
-   
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-JCH86D57H8');
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
