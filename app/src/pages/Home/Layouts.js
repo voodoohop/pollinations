@@ -3,6 +3,8 @@ import React from "react";
 import { Colors, MOBILE_BREAKPOINT, HUGE_BREAKPOINT, BaseContainer } from '../../styles/global';
 import TopBandPresetsDesign from '../../assets/imgs/presets-linha.png'
 import { BackgroundImage, LinkStyle } from './components';
+import SITE_METADATA from '../../siteMetadata';
+
 import { Link } from 'react-router-dom';
 
 
@@ -12,7 +14,7 @@ let WhoWeAreContent = () => <>
       profoundly involved <br/> <i><b> in the AI ecosystem.</b></i>
     </h2>
     <p>
-      To talk to us, reach out on <LinkStyle to="https://discord.com/invite/8HqSRhJVxn">Discord</LinkStyle> or at hello@pollinations.ai
+      To talk to us, reach out on <LinkStyle to="https://discord.com/invite/8HqSRhJVxn">Discord</LinkStyle> or at hello@{SITE_METADATA.domain}
     </p>
 </>
 

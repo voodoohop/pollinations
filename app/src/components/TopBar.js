@@ -12,6 +12,7 @@ import Logo from './Logo'
 import NavigationItems from "./NavigationItems"
 import { SocialLinks } from './Social'
 import { MAIN_NAV_ROUTES } from '../routes/publicRoutes'
+import SITE_METADATA from '../siteMetadata';
 
 
 
@@ -69,7 +70,7 @@ const MobileMenu = ({drawerState, navRoutes}) => <TemporaryDrawer drawerState={d
       <CTAStyle>
           Let's talk 
           <br/>
-          <span> hello@pollinations.ai </span>
+          <span> hello@{SITE_METADATA.domain} </span>
       </CTAStyle>
       <SocialLinks small gap='1em' />
     </div>

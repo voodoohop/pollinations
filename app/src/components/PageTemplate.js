@@ -1,7 +1,7 @@
 import { textContent } from "../assets"
 import MarkDownContent from "./MarkDownContent"
 import { BackGroundImage, MarkDownStyle, SmallContainer } from "../styles/global"
-import { SEOImage, SEOMetadata } from "./Helmet"
+import { SEOMetadata } from "./Helmet"
 import heroBGOverlay from '../assets/imgs/bgherooverlay.jpeg'
 
 const PageTemplate = ({ label }) => {
@@ -14,7 +14,6 @@ const PageTemplate = ({ label }) => {
     <SmallContainer>
       <MarkDownStyle>
         <SEOMetadata title={`${label[0].toUpperCase()}${label.slice(1)}`} />
-        <SEOImage />
         <MarkDownContent url={textContent[label]} />
       </MarkDownStyle>
       <BackGroundImage 

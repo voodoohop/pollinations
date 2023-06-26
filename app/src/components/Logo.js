@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import LogoLight from '../assets/logo_lusti.png'
+import SITE_METADATA from '../siteMetadata';
 
 
 const LogoImg = styled.img`
@@ -9,6 +9,6 @@ const LogoImg = styled.img`
         max-width: ${ props => props.small || '90%'};
     }
 `;
-const Logo = props => <LogoImg src={LogoLight} size='75%' {...props}/>;
+const Logo = props => <LogoImg src={SITE_METADATA.logo} size='75%' {...props}/>;
 
 export default Logo;

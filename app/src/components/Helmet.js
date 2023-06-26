@@ -1,27 +1,16 @@
 import React from "react";
 import { Helmet } from "react-helmet";
 import removeMarkdown from "markdown-to-text";
-import { getCoverImage } from "../data/media";
-import { getPostData } from "../data/summaryData";
 import Debug from "debug";
+import SITE_METADATA from "../siteMetadata";
 
 const debug = Debug("Helmet");
 
 const DESCRIPTION = 'Pollinations is a platform to generate media with the help of AI. Here you can create customized, royalty-free pieces of audio, images, 3D objects and soon fully immersive 3D environments on the fly.';
 
-export const SEOImage = ({url}) => {
 
-    const finalUrl = url ? url : '/pollinations_landscape.jpg';
-
-    return (<Helmet >
-         <meta name="image" content={finalUrl} />
-         <meta property="og:image" content={finalUrl} />
-         <meta property="twitter:image" content={finalUrl} />
-    </Helmet>)
-};
-
-export const SEOMetadata= ({ title, description, url }) => {
-    title = title ? `Pollinations - ${title}` : 'Pollinations';
+export const SEOMetadata= ({ description, url }) => {
+    const title = SITE_METADATA.title;
 
     // não é a coisa mais bonita do mundo mas é o que temos de melhor
     url = url ? url : window.location.href;
@@ -41,15 +30,9 @@ export const SEOMetadata= ({ title, description, url }) => {
             </Helmet>;
 }
 
-export const SEO = ({ipfs, cid}) => {
-    
-    if (!ipfs?.output || !ipfs?.input || !ipfs?.input["notebook.ipynb"]) 
-        return null;
-    
-    const { coverImage, title, post: description, url } = getPostData(ipfs, cid, true);
-    debug("SEO", {coverImage, title, description, url});
+export const SEO = () => {
+
     return <>
-        <SEOMetadata title={title} description={description} url={url} />
-        {coverImage && <SEOImage url={coverImage} /> }
+        <SEOMetadata title={SITE_METADATA.title} description={description} url={`https://${SITE_METADATA.domain}}`}/>
     </>;  
 }

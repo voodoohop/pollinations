@@ -8,6 +8,7 @@ import { MAIN_NAV_ROUTES } from '../routes/publicRoutes'
 
 import { SocialLinks } from './Social'
 import { Colors, MOBILE_BREAKPOINT, HUGE_BREAKPOINT, BaseContainer } from '../styles/global'
+import SITE_METADATA from '../siteMetadata';
 
 const Footer = () => {
 
@@ -16,7 +17,7 @@ return <OuterContainer>
         <LetsTalkStyle>
             Let's talk 
             <br/>
-            <span> hello@pollinations.ai </span>
+            <span> hello@{SITE_METADATA.domain} </span>
         </LetsTalkStyle>
         <SocialContainer>
             <SocialLinks gap='17px' />
