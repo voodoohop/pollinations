@@ -41,11 +41,12 @@ function GenerativeImageFeed() {
           setImagesGenerated(no => no + 1);
           if (!data["nsfw"])
             return;
-          const matureWord = isMature(data["prompt"]) && false;
-          if (matureWord) {
-            console.log("skipping mature word:", matureWord, data["prompt"]);
+          if (data["isChild"]) {
+            console.log("got suspected child image. not showing", data["prompt"]);
             return;
           }
+
+          
           setImage(data);
           setNextPrompt(data["originalPrompt"]);
         }
@@ -86,7 +87,7 @@ function GenerativeImageFeed() {
           </AdvisoryText>
         )}
         <br />
-
+        
         {image && !showAdvisory && (
           <div style={{ wordBreak: "break-all" }}>
             <ImageStyle
