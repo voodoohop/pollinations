@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import LogoLight from '../assets/logo_light_4.png'
+import LogoLight from '../assets/logo_lusti.png'
 
 
 const LogoImg = styled.img`
@@ -11,4 +11,4 @@ const LogoImg = styled.img`
 `;
 const Logo = props => <LogoImg src={LogoLight} size='75%' {...props}/>;
 
-export default Logo
+export default Logo;

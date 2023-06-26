@@ -8,10 +8,10 @@ import MusicVideo from './MusicVideo'
 export default function Solutions() {
   return <Style>
     <Hero />
-    <ActivityUpdate />
+    {/* <ActivityUpdate /> */}
     {/* <Dreamachine /> */}
     {/* <MusicVideo /> */}
-    <WhoWeAre />
+    {/* <WhoWeAre /> */}
     <Discord />
   </Style>
 }

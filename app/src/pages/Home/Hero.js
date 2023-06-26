@@ -16,7 +16,7 @@ const Hero = props => <Style>
       
   </Container> */}
   <HeroContainer>
-    <Player src='https://streamable.com/w9p5rz' />
+    {/* <Player src='https://streamable.com/w9p5rz' /> */}
     <GenerativeImageFeed />
   </HeroContainer>
   {/* <BackgroundImage 
