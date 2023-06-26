@@ -5,6 +5,7 @@ const SITE_METADATA = {
     "domain": "lusti.xyz",
     "logo": LogoLight,
     "analytics": "G-LPZ9GEJVHR",
+    "discordInvite": "https://discord.gg/8HqSRhJVxn",
 }
 
 

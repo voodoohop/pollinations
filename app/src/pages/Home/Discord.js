@@ -5,18 +5,19 @@ import Star6Img from '../../assets/imgs/star_6.png'
 import { Colors, MOBILE_BREAKPOINT, Fonts } from '../../styles/global'
 import { Star as StarBase, LinkStyle, Container as ContainerBase } from './components'
 import { Link } from 'react-router-dom'
+import SITE_METADATA from '../../siteMetadata'
 
 const DiscordSection = props => {
 
     return <Style>
     <Container>
-      <Link to="https://discord.gg/8HqSRhJVxn'"><DiscordLogo src={DiscordIMG} alt="discord"  /></Link>
+      <Link to={SITE_METADATA.discordInvite}><DiscordLogo src={DiscordIMG} alt="discord"  /></Link>
       <Body>
         Discuss, get help and <br/>
         contribute on Discord.
         <br/>
         <br/>
-        <LinkStyle href='https://discord.gg/8HqSRhJVxn' style={{zIndex: 10}}>
+        <LinkStyle href={SITE_METADATA.discordInvite} style={{zIndex: 10}}>
             join our discord
         </LinkStyle>
       </Body>

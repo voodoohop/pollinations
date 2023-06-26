@@ -4,13 +4,14 @@ import YoutubeLogo from '../assets/icons/youtube.png'
 import InstagramLogo from '../assets/icons/instagram.png'
 import TwitterLogo from '../assets/icons/twitter.png'
 import GithubLogo from '../assets/icons/github.png'
+import SITE_METADATA from '../siteMetadata'
 
 export const SOCIAL_LINKS = {
   discord: {
     label: 'Discord',
     icon: ICONS.discord,
     icon_img: DiscordLogo,
-    url: 'https://discord.gg/8HqSRhJVxn',
+    url: SITE_METADATA.discordInvite,
   },
   github: {
     label: 'GitHub',
