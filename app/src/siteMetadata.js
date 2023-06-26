@@ -4,6 +4,7 @@ const SITE_METADATA = {
     "title": "lusti.xyz",
     "domain": "lusti.xyz",
     "logo": LogoLight,
+    "analytics": "G-LPZ9GEJVHR",
 }
 
 
