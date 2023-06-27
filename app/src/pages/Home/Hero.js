@@ -41,10 +41,10 @@ function GenerativeImageFeed() {
           setImagesGenerated(no => no + 1);
           if (!data["nsfw"])
             return;
-          // if (data["isChild"]) {
-          //   console.log("got suspected child image. not showing", data["prompt"]);
-          //   return;
-          // }
+          if (data["isChild"]) {
+            console.log("got suspected child image. not showing", data["prompt"]);
+            return;
+          }
 
           
           setImage(data);
