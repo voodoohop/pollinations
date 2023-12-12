@@ -6,14 +6,17 @@ import Dreamachine from './Dreamachine'
 import MusicVideo from './MusicVideo'
 import TwitchSection from "./DreamSection"
 import { GenerativeImageFeed } from "./GenerativeImageFeed"
+import ChatWindow from "../../components/AIChat/AIChatwindow"
+
 
 export default function Solutions() {
   return <Style>
     <Hero />
     {/* <TwitchSection /> */}
-    <DarkLayout style={{height:"100vh"}}>
-      <GenerativeImageFeed />
-    </DarkLayout>
+    {/* <DarkLayout style={{height:"100vh"}}> */}
+      {/* <GenerativeImageFeed /> */}
+      <ChatWindow />
+    {/* </DarkLayout> */}
     <Discord />
     <ActivityUpdate />
     {/* <Dreamachine /> */}
