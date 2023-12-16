@@ -24,7 +24,7 @@ import torch
 import re
 from instaflow.pipeline_rf import RectifiedFlowPipeline
 from safety_checker.censor import check_safety
-
+from cog import BasePredictor, Path
 
 
 import os
@@ -64,7 +64,7 @@ app = Flask(__name__)
 # create lock
 lock = threading.Lock()
 
-class Predictor:
+class Predictor(BasePredictor):
     def __init__(self):
         # self.instaflow_pipe = self._load_instaflow_model()
         self.turbo_pipe = self._load_turbo_model()
@@ -206,7 +206,7 @@ class Predictor:
         print("Pipeline compiled.")
         return compiled_pipe
 
-    def predict_batch(self, batch_data):
+    def predict(self, batch_data):
 
         results = []
         print("batch_data:", batch_data)
@@ -353,7 +353,7 @@ def predict_endpoint():
     
     # Start timing for predict_batch
 
-    response, predict_duration = predictor.predict_batch(data)
+    response, predict_duration = predictor.predict(data)
 
     accumulated_predict_duration += predict_duration
 
