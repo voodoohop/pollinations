@@ -6,7 +6,7 @@ import { useScroll } from 'react-use'; // Importing react-use hook for scrolling
 
 // import ./conversation_log_20231211_141146.json
 
-import rawConversation from './conversation_log_20231211_203402.json';
+import rawConversation from './conversation_log_20231211_043928.json';
 import chatGPTIcon from './chatgpt.png'; // Importing the chatgpt icon
 import yiIcon from './yi.svg'; // Importing the yi icon
 
