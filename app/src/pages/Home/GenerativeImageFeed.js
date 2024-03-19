@@ -15,9 +15,13 @@ export function GenerativeImageFeed() {
 
 
   const handleParamChange = (param, value) => {
+    let newValue = value;
+    if (param === 'seed') {
+      newValue = parseInt(value, 10);
+    }
     const newImage = {
       ...image,
-      [param]: value,
+      [param]: newValue,
     };
     const imageURL = `https://pollinations.ai/p/${encodeURIComponent(newImage.prompt)}?width=${newImage.width}&height=${newImage.height}${newImage.seed ? `&seed=${newImage.seed}` : ''}&nofeed=true`
     updateImage({
@@ -73,6 +77,7 @@ function ImageData({ image, handleParamChange }) {
                   value={value}
                   onChange={(e) => handleParamChange(key, e.target.value)}
                   onFocus={() => handleParamChange(key, value)}
+                  type={key === 'seed' ? 'number' : 'text'}
                 />
               </TableCell>
             </TableRow>
@@ -84,7 +89,7 @@ function ImageData({ image, handleParamChange }) {
                 value={width || 1024}
                 onChange={(e, newValue) => handleParamChange('width', newValue)}
                 aria-labelledby="width-slider"
-                valueLabelDisplay="auto"
+                valueLabelDisplay="on"
                 step={1}
                 marks
                 min={16}
@@ -99,7 +104,7 @@ function ImageData({ image, handleParamChange }) {
                 value={height || 1024}
                 onChange={(e, newValue) => handleParamChange('height', newValue)}
                 aria-labelledby="height-slider"
-                valueLabelDisplay="auto"
+                valueLabelDisplay="on"
                 step={1}
                 marks
                 min={16}
