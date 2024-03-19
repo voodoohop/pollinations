@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { debounce } from 'lodash';
+import { useInterval } from 'usehooks-ts'
 
 export function useImageSlideshow() {
-  const [image, setImage] = useState(null);
-  const [nextPrompt, setNextPrompt] = useState("");
+  const [image, setImage] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [loadedImages, setLoadedImages] = useState([]);
   const [isStopped, stop] = useState(false);
@@ -13,27 +13,31 @@ export function useImageSlideshow() {
     setLoadedImages(loadedImages => {
     console.log("imgs", loadedImages, isStopped)
       if (loadedImages.length > 0) {
-        const [nextImage, ...newLoadedImages] = loadedImages;
-        setImage(nextImage);
-        setNextPrompt(nextImage["originalPrompt"]);
+        const [img, ...newLoadedImages] = loadedImages;
+        setImage(img);
         return newLoadedImages;
       }
       return loadedImages;
     })
 
-    if (!isStopped)
-      setTimeout(nextImage, 2000);
-
   }, [loadedImages, isStopped]);
 
+  useInterval(() => {
+    if (!isStopped)
+      nextImage();
+  }, 3000);
+  
+  
   const onNewImage = useCallback((newImage, emptyQueue=false) => {
     return new Promise((resolve, reject) => {
-      console.log("loading new image", newImage.prompt);
+      console.log("loading new image", newImage.prompt, emptyQueue);
       const img = new Image();
       img.src = newImage.imageURL;
       img.onload = () => {
         console.log("loaded new image", newImage.prompt);
-        setLoadedImages(images => emptyQueue ? [newImage] : [...images, newImage]);
+        setLoadedImages(images => [...images, newImage]);
+        if (emptyQueue)
+          setImage(newImage);
         resolve();
       };
       img.onerror = (error) => {
@@ -44,18 +48,18 @@ export function useImageSlideshow() {
   }, [setLoadedImages]);
 
   const debouncedUpdateImage = useCallback(debounce(async (newImage) => {
-    setIsLoading(true);
     await onNewImage(newImage, true);
     setIsLoading(false);
-  }, 3000), [onNewImage]);
+  }, 5000), [onNewImage]);
 
   const updateImage = useCallback((newImage) => {
-    console.log("calling update image", newImage)
+    console.log("calling update image", newImage);
+    setImage(newImage);
+    setIsLoading(true);
     stop(true);
     debouncedUpdateImage(newImage);
   }, [stop, debouncedUpdateImage]); // Debounce time of 3000ms
 
-  useEffect(()=> nextImage(),[]);
 
-  return { image, nextPrompt, updateImage, isLoading, onNewImage };
+  return { image, updateImage, isLoading, onNewImage };
 }

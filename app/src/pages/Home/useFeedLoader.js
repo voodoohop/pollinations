@@ -11,10 +11,10 @@ export function useFeedLoader(onNewImage) {
       imageFeedSource.onmessage = evt => {
         const data = JSON.parse(evt.data);
         setServerLoad(data["concurrentRequests"]);
-        // if (data["nsfw"]) {
-        //   console.log("Skipping NSFW content:", data["nsfw"], data);
-        //   return;
-        // }
+        if (data["nsfw"]) {
+          console.log("Skipping NSFW content:", data["nsfw"], data);
+          return;
+        }
         if (data["imageURL"]) {
           setImagesGenerated(no => no + 1);
           const matureWord = isMature(data["prompt"]) && false;

@@ -1,101 +1,110 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Typography, Link, Box, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow, TextField, CircularProgress } from  '@material-ui/core';
+import { Typography, Link, Box, Paper, Table, TableBody, TableCell, TableRow, TextField, CircularProgress, Slider, TableContainer } from  '@material-ui/core';
 import { debounce } from 'lodash';
 import { CodeExamples } from './CodeExamples';
 import { useFeedLoader } from './useFeedLoader';
 import { useImageSlideshow } from './useImageSlideshow';
 import { GenerativeImageURLContainer, ImageURLHeading, ImageContainer, ImageStyle } from './styles';
+import { shorten } from './shorten';
 
 export function GenerativeImageFeed() {
-  const { image, nextPrompt, updateImage, isLoading, onNewImage } = useImageSlideshow();
-  const { queuedImages, serverLoad, imagesGenerated } = useFeedLoader(onNewImage);
-  const [prompt, setPrompt] = useState('');
+  // const [overrideImage, setOverrideImage] = useState({});
 
-  useEffect(() => {
-    setPrompt(nextPrompt);
-  }, [nextPrompt]);
+  const { image, updateImage, isLoading, onNewImage } = useImageSlideshow();
+  const { serverLoad, imagesGenerated } = useFeedLoader(onNewImage);
 
 
-  useEffect(() => {
-    if (prompt) {
-      updateImage({
-        imageURL:`https://pollinations.ai/p/${encodeURIComponent(prompt)}?width=1080&height=720&nofeed=true&nologo=true`
-      });
-    }
-  }, [prompt, updateImage]);
+  const handleParamChange = (param, value) => {
+    const newImage = {
+      ...image,
+      [param]: value,
+    };
+    const imageURL = `https://pollinations.ai/p/${encodeURIComponent(newImage.prompt)}?width=${newImage.width}&height=${newImage.height}${newImage.seed ? `&seed=${newImage.seed}` : ''}&nofeed=true`
+    updateImage({
+      ...newImage,
+      imageURL
+    });
+  };
 
   return (
     <Box>
       <GenerativeImageURLContainer>
         <ImageURLHeading>Image Feed</ImageURLHeading>
-        <ImageContainer>
+        <ImageContainer style={{ display: 'flex', justifyContent: 'center' }}>
           {image ? (
+            <Box maxWidth="600px">
+            <ServerLoadAndGenerationInfo {...{serverLoad, imagesGenerated}} />
             <Link href={image["imageURL"]} target="_blank" rel="noopener noreferrer">
               <ImageStyle
                 src={image["imageURL"]}
                 alt="generative_image"
               />
             </Link>
+            </Box>
           ) : (
             <Typography variant="h6" color="textSecondary">Loading image...</Typography>
           )}
         {isLoading && <CircularProgress color="secondary" />}
         </ImageContainer>
-        <ImageData {...{prompt, setPrompt, image, imagesGenerated, serverLoad}} />
+        <ImageData {...{image, handleParamChange}} />
         <br />
         <CodeExamples {...image } />
-        <br />
-        <Link href={`https://pollinations.ai/p/${encodeURIComponent(nextPrompt)}?width=1080&height=720&nofeed=true&nologo=true`} underline="none">Generate Image</Link>
       </GenerativeImageURLContainer>
     </Box>
   );
 }
 
-const shorten = (str) => str.length > 60 ? str.slice(0, 60) + "..." : str;
-
-function ImageData({ prompt, setPrompt, image, imagesGenerated, serverLoad }) {
+function ImageData({ image, handleParamChange }) {
+  const { prompt, width, height, seed, imageURL } = image;
+  if (!imageURL) {
+    return <Typography variant="body2" color="textSecondary">Loading...</Typography>;
+  }
   return <Box style={{ width: "600px", position: "relative" }}>
-    <TableContainer component={Paper}>
-      <Table aria-label="image info table" size="small">
+    <TableContainer component={Paper} style={{ border: 'none', boxShadow: 'none' }}>
+      <Table aria-label="image info table" size="small" style={{ borderCollapse: 'collapse' }}>
         <TableBody>
-          <TableRow>
-            <TableCell component="th" scope="row">Prompt</TableCell>
-            <TableCell align="right">
-              <TextField
-                fullWidth
-                variant="outlined"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
+          {Object.entries({prompt, seed}).map(([key, value]) => (
+            <TableRow key={key} style={{ borderBottom: 'none' }}>
+              <TableCell component="th" scope="row" style={{ borderBottom: 'none', width: '20%' }}>{key}</TableCell>
+              <TableCell align="right" style={{ borderBottom: 'none' }}>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  value={value}
+                  onChange={(e) => handleParamChange(key, e.target.value)}
+                  onFocus={() => handleParamChange(key, value)}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+          <TableRow key="width" style={{ borderBottom: 'none' }}>
+            <TableCell component="th" scope="row" style={{ borderBottom: 'none', width: '20%' }}>width</TableCell>
+            <TableCell align="right" style={{ borderBottom: 'none' }}>
+              <Slider
+                value={width || 1024}
+                onChange={(e, newValue) => handleParamChange('width', newValue)}
+                aria-labelledby="width-slider"
+                valueLabelDisplay="auto"
+                step={1}
+                marks
+                min={16}
+                max={2048}
               />
             </TableCell>
           </TableRow>
-          <TableRow>
-            <TableCell component="th" scope="row">Link</TableCell>
-            <TableCell align="right">
-              {image ? (
-                <Link href={image["imageURL"]} target="_blank" rel="noopener noreferrer" style={{ color: 'deepSkyBlue' }}>
-                  {shorten(image["imageURL"])}
-                </Link>
-              ) : (
-                <Typography color="textSecondary">No image loaded</Typography>
-              )}
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell component="th" scope="row">Dimensions</TableCell>
-            <TableCell align="right">{image ? `${image.width}x${image.height}, Seed: ${image.seed}` : 'N/A'}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell component="th" scope="row">Model</TableCell>
-            <TableCell align="right">{image ? image.model : 'N/A'}</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell component="th" scope="row">Generations</TableCell>
-            <TableCell align="right">
-              <ServerLoadDisplay concurrentRequests={serverLoad} />, &nbsp;&nbsp;
-              <Typography variant="body1" component="span" style={{ fontWeight: 'bold', color: 'deepSkyBlue' }}>
-                # {formatImagesGenerated(imagesGenerated)}
-              </Typography>
+          <TableRow key="height" style={{ borderBottom: 'none' }}>
+            <TableCell component="th" scope="row" style={{ borderBottom: 'none', width: '20%' }}>height</TableCell>
+            <TableCell align="right" style={{ borderBottom: 'none' }}>
+              <Slider
+                value={height || 1024}
+                onChange={(e, newValue) => handleParamChange('height', newValue)}
+                aria-labelledby="height-slider"
+                valueLabelDisplay="auto"
+                step={1}
+                marks
+                min={16}
+                max={2048}
+              />
             </TableCell>
           </TableRow>
         </TableBody>
@@ -104,17 +113,26 @@ function ImageData({ prompt, setPrompt, image, imagesGenerated, serverLoad }) {
   </Box>;
 }
 
+function ServerLoadAndGenerationInfo({ serverLoad, imagesGenerated }) {
+  return (
+    <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+      <ServerLoadDisplay concurrentRequests={serverLoad} />
+      <Typography variant="body1" component="span">
+        #: <b style={{color:'deepskyblue'}}>{formatImagesGenerated(imagesGenerated)}</b>
+      </Typography>
+    </Box>
+  );
+}
+
 function ServerLoadDisplay({ concurrentRequests }) {
   concurrentRequests = Math.round(concurrentRequests/2);
   const max = 5;
   const load = Math.min(max, concurrentRequests);
   const loadDisplay = "▁▃▅▇▉".slice(1, load + 2);
 
-  return <>Load: {loadDisplay}</>;
+  return <span>Server Load: <b style={{color:'deepskyblue'}}>{loadDisplay}</b></span>;
 }
 
 const formatImagesGenerated = (num) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
-
-
