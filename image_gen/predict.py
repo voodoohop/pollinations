@@ -53,6 +53,7 @@ tinyAutoencoder = AutoencoderTiny.from_pretrained("madebyollin/taesdxl", torch_d
 tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-small")
 pimper_model = T5ForConditionalGeneration.from_pretrained("roborovski/superprompt-v1", device_map="auto")
 
+BATCH_SIZE=16
 
 def get_aesthetic_model(clip_model="vit_l_14"):
     """load the aethetic model"""
@@ -149,7 +150,7 @@ class Predictor:
             model_id_or_path=model_id_or_path,
             # lora_dict=lora_dict,
             t_index_list=T_INDEX_LIST,
-            frame_buffer_size=1,
+            frame_buffer_size=BATCH_SIZE,
             width=width,
             height=height,
             warmup=10,
@@ -229,12 +230,7 @@ class Predictor:
 
         # make all prompts maximum 250 characters
         prompts = [prompt[:250] for prompt in prompts]
-        max_batch_size = 1
-        if model == "pixart":
-            model = "realvis"
-            # replace all non alpha numeric characters from prompts with spaces
-            # prompts = [re.sub(r'([^\s\w]|_)+', ' ', prompt) for prompt in prompts]
-        # if model != "deliberate" and model != "dreamshaper" and model != "juggernaut":
+        max_batch_size = BATCH_SIZE
         model = "turbo"
 
         # if model == "formulaxl":
@@ -275,11 +271,11 @@ class Predictor:
                             height=height,
                             negative_prompt=None
                         )
-                    for _ in range(self.streamdiffusion.batch_size - 1):
-                        self.streamdiffusion()
-
-                    batch_results = [self.streamdiffusion()]
-
+                    # for ib in range(self.streamdiffusion.batch_size):
+                    #     print("batchi",ib)
+                    rs = self.streamdiffusion()
+                    print("rs", rs)
+                    batch_results = batch_results + rs
                 except Exception as e:
                     print("Exception occurred:", e)
                     # print stack
@@ -398,35 +394,22 @@ def embeddings_endpoint():
 
     prompts = data["prompts"]
 
-    embeddings = []
-    start_time = time.time()
-
-    aesthetics_scores = []
-    # for prompt in prompts:
-    token = clip.tokenize(prompts, truncate=True).to(device)
-    with torch.no_grad():
-        embeddings = clip_model.encode_text(token)
-        aesthetics_scores = aesthetic_model(embeddings)
-        # squash last dimeinsion of aesthetics_scores
-        aesthetics_scores = aesthetics_scores.squeeze(-1)
-        print("aesthetics_score:", aesthetics_scores)
-    end_time = time.time()
-    print(f"Time to calculate embeddings: {(end_time - start_time)*1000} milliseconds")
-    print("Returning embeddings for one request.", len(embeddings))
-
-
-    return jsonify({
-        "embeddings": embeddings.cpu().numpy().tolist(),
-        "aesthetics_scores": aesthetics_scores.cpu().numpy().tolist()
-    })
-
-# import uform
-
-# model = uform.get_model('unum-cloud/uform-vl-english') # Just English
-
-# @app.route('/embeddings', methods=['POST'])
-# def embeddings_endpoint():
-#     data = request.json
+#@profile
+def test_predict(prompt_base, n=100, chunk_size=32):
+    total_start_time = time.time()
+    for i in range(0, n, chunk_size):
+        print("i",i)
+        prompts = [f"{prompt_base} {j}" for j in range(i, min(i + chunk_size, n))]
+        print(f"Generating for prompts: {prompts}")
+        start_time = time.time()
+        batch = {"prompts": prompts, "model": "turbo", "width": 1024, "height": 1024, "seed": 42, "steps": 50, "negative_prompt":"", "refine":False}
+        results = predictor.predict_batch(batch)
+        print("resultsss", results)
+        # time.sleep(10)
+        print(f"Time for images {i} to {min(i + chunk_size, n)}: {time.time() - start_time} seconds")
+    total_time = time.time() - total_start_time
+    print(f"Total time for {n} images: {total_time} seconds")
+    print(f"Average time per image: {total_time / n} seconds")
 
 #     prompts = data["prompts"]
 
@@ -460,6 +443,7 @@ def prompt_pimping(input_text):
 import os
 if __name__ == "__main__":
     print("Starting Flask app...")
-    # from env PORT or 5555
-    app.run(debug=False, host="0.0.0.0", port=os.environ.get("PORT", 5555))
 
+    test_predict("hello kitty", n=96)
+    # profile.print_stats()
+    # app.run(debug=False, host="0.0.0.0", port=os.environ.get("PORT", 5555))

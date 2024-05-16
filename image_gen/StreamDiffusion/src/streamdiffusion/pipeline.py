@@ -370,13 +370,47 @@ class StreamDiffusion:
             t_list = torch.concat([t_list, t_list], dim=0)
         else:
             x_t_latent_plus_uc = x_t_latent
-        model_pred = self.unet(
-            x_t_latent_plus_uc,
-            t_list,
-            encoder_hidden_states=self.prompt_embeds,
-            added_cond_kwargs=added_cond_kwargs,
-            return_dict=False,
-        )[0]
+        
+        
+        cond2 = added_cond_kwargs.copy()
+        cond2["time_ids"] = added_cond_kwargs["time_ids"].repeat(self.batch_size,1,1)
+
+        model_preds = self.unet(x_t_latent_plus_uc, t_list, encoder_hidden_states=self.prompt_embeds, added_cond_kwargs=cond2, return_dict=False)
+        
+
+        # model_preds = []
+        # print("start unet batch", x_t_latent_plus_uc.shape[0])
+        # breakpoint()
+        # for i in range(x_t_latent_plus_uc.shape[0]):
+        #     x_t_latent_input = x_t_latent_plus_uc[i:i+1]
+        #     t_list_input = t_list[i:i+1]
+        #     encoder_hidden_states_input = self.prompt_embeds[i:i+1]
+        #     added_cond_kwargs_input = added_cond_kwargs.copy()
+        #     added_cond_kwargs_input["text_embeds"] = added_cond_kwargs_input["text_embeds"][i:i+1]
+            
+        #     # print(f"x_t_latent_input shape: {x_t_latent_input.shape}")
+        #     # print(f"t_list_input shape: {t_list_input.shape}")
+        #     # print(f"encoder_hidden_states_input shape: {encoder_hidden_states_input.shape}")
+        #     # # time.sleep(5)
+        #     # for key, value in added_cond_kwargs_input.items():
+        #     #     if hasattr(value, 'shape'):
+        #     #         print(f"subkey {key} shape: {value.shape}")
+        #     #     else:
+        #     #         print(f"subkey {key} does not have a shape attribute")
+
+        #     model_pred = self.unet(
+        #         x_t_latent_input,
+        #         t_list_input,
+        #         encoder_hidden_states=encoder_hidden_states_input,
+        #         added_cond_kwargs=added_cond_kwargs_input,
+        #         return_dict=False,
+        #     )[0]
+        #     model_preds.append(model_pred)
+        print("done unet")
+        model_pred = torch.cat(model_preds, dim=0)
+
+
+
         if self.guidance_scale > 1.0 and (self.cfg_type == "initialize"):
             noise_pred_text = model_pred[1:]
             self.stock_noise = torch.concat(
@@ -503,6 +537,7 @@ class StreamDiffusion:
                     self.frame_bff_size,
                 )
                 added_cond_kwargs = {"text_embeds": self.add_text_embeds.to(self.device), "time_ids": self.add_time_ids.to(self.device)}
+                print("running unet on", x_t_latent.shape, t.shape, idx, t)
                 x_0_pred_batch, model_pred = self.unet_step(x_t_latent, t, added_cond_kwargs=added_cond_kwargs, idx=idx)
                 
                 if idx < len(self.sub_timesteps_tensor) - 1:
