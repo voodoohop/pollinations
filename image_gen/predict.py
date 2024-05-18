@@ -159,8 +159,8 @@ class Predictor:
             use_denoising_batch=use_denoising_batch,
             cfg_type="none",
             seed=seed,
-            use_tiny_vae=True,
-            use_lcm_lora=True,
+            use_tiny_vae=False,
+            use_lcm_lora=False,
             # textual_inversions_dict=textual_inversions_dict,
         )
 
