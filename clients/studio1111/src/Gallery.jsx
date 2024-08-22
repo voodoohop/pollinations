@@ -10,61 +10,18 @@ import {
   loadingStyle,
   galleryStyle,
 } from "./galleryStyles";
-
-function usePredictions(initialVisibleCount = 10) {
-  const [predictions, setPredictions] = useState([]);
-  const [visiblePredictionCount, setVisiblePredictionCount] =
-    useState(initialVisibleCount);
-  const [nextUrl, setNextUrl] = useState(null);
-
-  useEffect(() => {
-    console.log(
-      "predictions",
-      predictions.length,
-      visiblePredictionCount,
-      nextUrl
-    );
-    if (predictions.length <= visiblePredictionCount) {
-      (async () => {
-        const [ps, nextUrll] = await getPredictionList(nextUrl);
-
-        console.log("got predictions ", ps, nextUrl);
-        // collect all gifs in output lists
-        const outputs = ps
-          .map(({ id, output, input }) => ({
-            id,
-            output,
-            input,
-          }))
-          .filter(({ output, input }) => output && input?.animation_prompts);
-
-        if (nextUrl !== nextUrll) {
-          setPredictions((prevPredictions) => [...prevPredictions, ...outputs]);
-          setNextUrl(nextUrll);
-        }
-      })();
-    }
-  }, [visiblePredictionCount, nextUrl]);
-
-  const uniquePredictions = lodash.uniqBy(predictions, ({ output }) => output);
-
-  return {
-    predictions: uniquePredictions,
-    visiblePredictionCount,
-    setVisiblePredictionCount,
-  };
-}
+import { usePredictions } from "./usePredictions"; // Import usePredictions
 
 export function Gallery() {
-  const { predictions, visiblePredictionCount, setVisiblePredictionCount } =
-    usePredictions();
-
+  const predictions = usePredictions();
+  console.log("got predictions", predictions);
+  const [visiblePredictionCount, setVisiblePredictionCount] = useState(10);
   console.log("visiblePredictions", visiblePredictionCount);
+
   const images = predictions
+    .filter(({ input }) => input?.animation_prompts)
     .slice(0, visiblePredictionCount)
-    .map(({ id, output, input }, i) => (
-      <HoveredVideo key={`${id}_${i}`} output={output} input={input} />
-    ));
+    .map((props, i) => <HoveredVideo key={`${props.id}_${i}`} {...props} />);
 
   return (
     <div style={galleryContainerStyle}>

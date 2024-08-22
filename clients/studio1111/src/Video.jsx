@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { cloudfrontify } from "./Gallery";
 import { itemStyle, captionStyle } from "./galleryStyles";
+import lodash from "lodash";
 
 const MAX_WIDTH = 960;
 const MAX_HEIGHT = 960;
@@ -81,8 +82,41 @@ const imgStyle = {
   // margin: "auto",
   padding: "10px",
 };
-export const HoveredVideo = ({ output, input }) => {
+
+const sanitizeFilename = (filename) => {
+  return filename.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+};
+
+export const HoveredVideo = ({ output, input, upscaledUrl }) => {
+  console.log("upscaledUrl", upscaledUrl);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const sanitizedPrompt = input?.animation_prompts
+    ? sanitizeFilename(input.animation_prompts.substring(0, 100))
+    : "video";
+
+  const downloadFilename = `${sanitizedPrompt}.mp4`;
+
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    try {
+      const response = await fetch(upscaledUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = downloadFilename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download failed", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <div
@@ -92,6 +126,17 @@ export const HoveredVideo = ({ output, input }) => {
     >
       <VideoHolder src={cloudfrontify(output)} />
       <p style={{ ...captionStyle, fontWeight: isHovered ? "bold" : "normal" }}>
+        {upscaledUrl && isHovered && (
+          <div>
+            <button
+              style={{ marginBottom: "15px", fontSize: "16px" }}
+              onClick={handleDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? "Downloading..." : "Download High Res"}
+            </button>
+          </div>
+        )}
         {isHovered
           ? input?.animation_prompts
           : input?.animation_prompts?.length > 100
