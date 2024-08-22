@@ -132,7 +132,7 @@ const galleryStyle = {
 };
 
 const itemStyle = {
-  margin: "10px",
+  margin: "80px 10px 10px 10px", // Added more space above each image
   flexBasis: "calc(33.333% - 20px)",
 };
 
@@ -141,6 +141,7 @@ const captionStyle = {
   lineHeight: "1.2",
   marginTop: "5px",
   color: "#ccc",
+  maxWidth: "960px",
 };
 
 const loadingStyle = {
