@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@uidotdev/usehooks": "^2.4.1",
     "await-sleep": "^0.0.1",
     "lodash": "^4.17.21",
     "node-fetch": "^2.7.0",

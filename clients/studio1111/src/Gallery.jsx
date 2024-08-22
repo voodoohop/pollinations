@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 import { getPredictionList } from "./replicate";
 import InfiniteScroll from "react-infinite-scroller";
-import { VideoHolder } from "./Video";
+import { HoveredVideo } from "./Video";
 import lodash from "lodash";
+import {
+  galleryContainerStyle,
+  headerStyle,
+  subHeaderStyle,
+  loadingStyle,
+  galleryStyle,
+} from "./galleryStyles";
 
-const blacklist = ["pdotkw3bbyry5jd7efofjfiw4e"];
-
-export function Gallery() {
+function usePredictions(initialVisibleCount = 10) {
   const [predictions, setPredictions] = useState([]);
-  const [visiblePredictionCount, setVisiblePredictionCount] = useState(10);
+  const [visiblePredictionCount, setVisiblePredictionCount] =
+    useState(initialVisibleCount);
   const [nextUrl, setNextUrl] = useState(null);
 
   useEffect(() => {
@@ -20,7 +26,6 @@ export function Gallery() {
     );
     if (predictions.length <= visiblePredictionCount) {
       (async () => {
-        console.log("calling getPredictionList with url");
         const [ps, nextUrll] = await getPredictionList(nextUrl);
 
         console.log("got predictions ", ps, nextUrl);
@@ -31,7 +36,7 @@ export function Gallery() {
             output,
             input,
           }))
-          .filter(({ output, input }) => output && input?.prompt);
+          .filter(({ output, input }) => output && input?.animation_prompts);
 
         if (nextUrl !== nextUrll) {
           setPredictions((prevPredictions) => [...prevPredictions, ...outputs]);
@@ -39,15 +44,26 @@ export function Gallery() {
         }
       })();
     }
-  }, [visiblePredictionCount, predictions]);
+  }, [visiblePredictionCount, nextUrl]);
 
-  // filter unique by .gif property
   const uniquePredictions = lodash.uniqBy(predictions, ({ output }) => output);
+
+  return {
+    predictions: uniquePredictions,
+    visiblePredictionCount,
+    setVisiblePredictionCount,
+  };
+}
+
+export function Gallery() {
+  const { predictions, visiblePredictionCount, setVisiblePredictionCount } =
+    usePredictions();
+
   console.log("visiblePredictions", visiblePredictionCount);
-  const images = uniquePredictions
+  const images = predictions
     .slice(0, visiblePredictionCount)
     .map(({ id, output, input }, i) => (
-      <HoveredVideo key={`${id}_${i}`} id={id} output={output} input={input} />
+      <HoveredVideo key={`${id}_${i}`} output={output} input={input} />
     ));
 
   return (
@@ -78,74 +94,9 @@ export function Gallery() {
   );
 }
 
-const HoveredVideo = ({ id, output, input }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      key={id}
-      style={itemStyle}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <VideoHolder src={cloudfrontify(output)} />
-      <p style={{ ...captionStyle, fontWeight: isHovered ? "bold" : "normal" }}>
-        {isHovered
-          ? input?.prompt
-          : input?.prompt?.length > 100
-          ? input.prompt.substring(0, 100) + "..."
-          : input?.prompt}
-      </p>
-    </div>
-  );
-};
-
-const cloudfrontify = (url) => {
+export const cloudfrontify = (url) => {
   return url.replace(
     "https://dev-media.soundmosaic.pixelynx-ai.com/",
     "https://d1uiyten9tviek.cloudfront.net/"
   );
-};
-
-const galleryContainerStyle = {
-  maxWidth: "1200px",
-  margin: "0 auto",
-  padding: "20px",
-};
-
-const headerStyle = {
-  textAlign: "center",
-  fontSize: "2.5rem",
-  marginBottom: "10px",
-};
-
-const subHeaderStyle = {
-  display: "block",
-  textAlign: "center",
-  marginBottom: "20px",
-};
-
-const galleryStyle = {
-  // display: "flex",
-  // flexWrap: "wrap",
-  justifyContent: "center",
-};
-
-const itemStyle = {
-  margin: "80px 10px 10px 10px", // Added more space above each image
-  flexBasis: "calc(33.333% - 20px)",
-};
-
-const captionStyle = {
-  fontSize: "1.2rem",
-  lineHeight: "1.2",
-  marginTop: "5px",
-  color: "#ccc",
-  maxWidth: "960px",
-};
-
-const loadingStyle = {
-  fontSize: "2rem",
-  textAlign: "center",
-  marginTop: "50px",
 };

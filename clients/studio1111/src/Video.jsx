@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { cloudfrontify } from "./Gallery";
+import { itemStyle, captionStyle } from "./galleryStyles";
 
 const MAX_WIDTH = 960;
 const MAX_HEIGHT = 960;
@@ -78,4 +80,24 @@ const imgStyle = {
   maxHeight: `${MAX_HEIGHT}px`,
   // margin: "auto",
   padding: "10px",
+};
+export const HoveredVideo = ({ output, input }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <div
+      style={itemStyle}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <VideoHolder src={cloudfrontify(output)} />
+      <p style={{ ...captionStyle, fontWeight: isHovered ? "bold" : "normal" }}>
+        {isHovered
+          ? input?.animation_prompts
+          : input?.animation_prompts?.length > 100
+          ? input.animation_prompts.substring(0, 100) + "..."
+          : input?.animation_prompts}
+      </p>
+    </div>
+  );
 };
