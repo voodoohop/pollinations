@@ -1,1 +1,3 @@
 
+[build]
+    node_version = "16"
