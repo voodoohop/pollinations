@@ -56,18 +56,24 @@ export function Gallery() {
       <i style={subHeaderStyle}>
         Click on any of the images to tweak (coming soon)
       </i>
-      <InfiniteScroll
-        pageStart={0}
-        loadMore={() => setVisiblePredictionCount((prevCount) => prevCount + 5)}
-        hasMore={visiblePredictionCount < predictions.length}
-        loader={
-          <div className="loader" key={0}>
-            Loading ...
-          </div>
-        }
-      >
-        <div style={galleryStyle}>{images}</div>
-      </InfiniteScroll>
+      {predictions.length === 0 ? (
+        <div style={loadingStyle}>Loading...</div>
+      ) : (
+        <InfiniteScroll
+          pageStart={0}
+          loadMore={() =>
+            setVisiblePredictionCount((prevCount) => prevCount + 5)
+          }
+          hasMore={visiblePredictionCount < predictions.length}
+          loader={
+            <div className="loader" key={0}>
+              Loading ...
+            </div>
+          }
+        >
+          <div style={galleryStyle}>{images}</div>
+        </InfiniteScroll>
+      )}
     </div>
   );
 }
@@ -83,7 +89,7 @@ const HoveredVideo = ({ id, output, input }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <VideoHolder src={cloudfrontify(output)} />
-      <p style={captionStyle}>
+      <p style={{ ...captionStyle, fontWeight: isHovered ? "bold" : "normal" }}>
         {isHovered
           ? input?.prompt
           : input?.prompt?.length > 100
@@ -120,8 +126,8 @@ const subHeaderStyle = {
 };
 
 const galleryStyle = {
-  display: "flex",
-  flexWrap: "wrap",
+  // display: "flex",
+  // flexWrap: "wrap",
   justifyContent: "center",
 };
 
@@ -135,4 +141,10 @@ const captionStyle = {
   lineHeight: "1.2",
   marginTop: "5px",
   color: "#ccc",
+};
+
+const loadingStyle = {
+  fontSize: "2rem",
+  textAlign: "center",
+  marginTop: "50px",
 };

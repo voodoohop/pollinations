@@ -7,8 +7,8 @@ export const VideoHolder = ({ src, style }) => {
   const [isInView, setIsInView] = useState(false);
   console.log("isInView", isInView);
   const [dimensions, setDimensions] = useState({
-    width: "100%",
-    height: "100%",
+    width: "960px",
+    height: "128px",
   });
   const videoRef = useRef();
 
