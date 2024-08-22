@@ -120,9 +120,13 @@ export const HoveredVideo = ({ output, input, upscaledUrl }) => {
 
   return (
     <div
-      style={itemStyle}
+      style={{
+        ...itemStyle,
+        border: isDownloading ? "3px solid rgba(255,0,0,0.5)" : "none",
+        borderRadius: isDownloading ? "10px" : "0px",
+      }}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => !isDownloading && setIsHovered(false)}
     >
       <VideoHolder src={cloudfrontify(output)} />
       <p style={{ ...captionStyle, fontWeight: isHovered ? "bold" : "normal" }}>
