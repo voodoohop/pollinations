@@ -122,31 +122,27 @@ export const HoveredVideo = ({ output, input, upscaledUrl }) => {
     <div
       style={{
         ...itemStyle,
-        border: isDownloading ? "3px solid rgba(255,0,0,0.5)" : "none",
-        borderRadius: isDownloading ? "10px" : "0px",
+        border: isDownloading
+          ? "3px solid red"
+          : isHovered
+          ? "3px solid white"
+          : "none",
+        borderRadius: isDownloading || isHovered ? "10px" : "0px",
+        cursor: "pointer", // Change cursor to pointer
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => !isDownloading && setIsHovered(false)}
+      onClick={handleDownload} // Trigger download on click
     >
       <VideoHolder src={cloudfrontify(output)} />
       <p style={{ ...captionStyle, fontWeight: isHovered ? "bold" : "normal" }}>
-        {upscaledUrl && isHovered && (
-          <div>
-            <button
-              style={{ marginBottom: "15px", fontSize: "16px" }}
-              onClick={handleDownload}
-              disabled={isDownloading}
-            >
-              {isDownloading ? "Downloading..." : "Download High Res"}
-            </button>
-          </div>
-        )}
         {isHovered
           ? input?.animation_prompts
           : input?.animation_prompts?.length > 100
           ? input.animation_prompts.substring(0, 100) + "..."
           : input?.animation_prompts}
       </p>
+      {isDownloading && <div>downloading...</div>}
     </div>
   );
 };

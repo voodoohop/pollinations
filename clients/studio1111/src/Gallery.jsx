@@ -27,7 +27,7 @@ export function Gallery() {
     <div style={galleryContainerStyle}>
       <h1 style={headerStyle}>Studio 1111 Gallery</h1>
       <i style={subHeaderStyle}>
-        Click on any of the images to tweak (coming soon)
+        Click on any of the images to download the high res version
       </i>
       {predictions.length === 0 ? (
         <div style={loadingStyle}>Loading...</div>
