@@ -1,9 +1,9 @@
 import React from 'react';
-import { Grid, Typography, FormControl, Select, MenuItem, TextField, Box, Checkbox, Tooltip, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@material-ui/core';
-import InfoIcon from '@material-ui/icons/Info';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Grid, Typography, FormControl, Select, MenuItem, TextField, Box, Checkbox, Tooltip, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Colors } from '../../../styles/global';
-import { Link } from '@material-ui/core';
+import { Link } from '@mui/material';
 
 export function AdvancedOptions({ image, handleParamChange, handleFocus, isLoading }) {
     const { width, height, seed, nofeed, nologo, model } = image;

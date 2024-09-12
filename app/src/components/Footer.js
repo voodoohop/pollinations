@@ -1,9 +1,10 @@
-import styled from "@emotion/styled"
+import { Container, Link, Typography } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { NavLink } from "react-router-dom"
 import { SocialLinks } from "./Social"
 import { Colors, MOBILE_BREAKPOINT, HUGE_BREAKPOINT, BaseContainer } from "../styles/global"
 import { LinkStyle } from "../pages/Home/components"
-import DescriptionIcon from "@material-ui/icons/Description"
+import DescriptionIcon from "@mui/icons-material/Description"
 import { ImageURLHeading } from "../pages/Home/styles"
 
 const Footer = () => {
@@ -18,7 +19,7 @@ const Footer = () => {
           </StyledLink>
         </LetsTalkStyle>
         <SocialContainer>
-          <SocialLinks small gap='1em' invert/>
+          <SocialLinks small gap='1em' invert />
         </SocialContainer>
         <LogoContainer>
           <NavLink to="/">
@@ -41,131 +42,130 @@ const Footer = () => {
 }
 export default Footer
 
-const OuterContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  background-color: ${Colors.background_body};
-`
-const SocialContainer = styled.div`
-  grid-area: social;
-  justify-self: flex-start;
-  @media only screen and (max-width: ${MOBILE_BREAKPOINT}){
-    justify-self: center;
-  }
-`
-const LogoContainer = styled.div`
-  grid-area: logo;
-  justify-self: flex-end;
-  padding-top: 0em;
-  display: flex;
-  align-items: center;
-  @media only screen and (max-width: ${MOBILE_BREAKPOINT}) {
-    justify-self: center;
-    padding-top: 2em;
-  }
-`
-const NavigationContainer = styled.div`
-  grid-area: navigation_footer;
-  justify-self: flex-end;
+const OuterContainer = styled('div')(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  backgroundColor: theme.palette.background.default,
+}));
 
-  @media only screen and (max-width: ${MOBILE_BREAKPOINT}) {
-    justify-self: center;
-  }
-`
+const SocialContainer = styled('div')(({ theme }) => ({
+  gridArea: 'social',
+  justifySelf: 'flex-start',
+  [theme.breakpoints.down('sm')]: {
+    justifySelf: 'center',
+  },
+}));
 
-const TermsLinkContainer = styled.div`
-  grid-area: terms;
-  justify-self: flex-end;
-  margin-bottom: 2em;
-  color: ${Colors.offblack};
-  @media only screen and (max-width: ${MOBILE_BREAKPOINT}) {
-    justify-self: center;
-    margin-top: 2em;
-  }
-`
+const LogoContainer = styled('div')(({ theme }) => ({
+  gridArea: 'logo',
+  justifySelf: 'flex-end',
+  paddingTop: '0em',
+  display: 'flex',
+  alignItems: 'center',
+  [theme.breakpoints.down('sm')]: {
+    justifySelf: 'center',
+    paddingTop: '2em',
+  },
+}));
 
-const LetsTalkStyle = styled.p`
-  grid-area: lets-talk;
-  justify-self: flex-start;
-  font-style: normal;
-  font-weight: 500;
-  span {
-    color: ${Colors.offblack};
-  }   
-  font-size: 28px;
-  line-height: 42px;
-  color: ${Colors.offblack};
-  @media only screen and (max-width: ${MOBILE_BREAKPOINT}){
-    justify-self: center;
-    padding-bottom: 0em;
-  }
-`
+const NavigationContainer = styled('div')(({ theme }) => ({
+  gridArea: 'navigation_footer',
+  justifySelf: 'flex-end',
+  [theme.breakpoints.down('sm')]: {
+    justifySelf: 'center',
+  },
+}));
+
+const TermsLinkContainer = styled('div')(({ theme }) => ({
+  gridArea: 'terms',
+  justifySelf: 'flex-end',
+  marginBottom: '2em',
+  color: theme.palette.grey[800],
+  [theme.breakpoints.down('sm')]: {
+    justifySelf: 'center',
+    marginTop: '2em',
+  },
+}));
+
+const LetsTalkStyle = styled('p')(({ theme }) => ({
+  gridArea: 'lets-talk',
+  justifySelf: 'flex-start',
+  fontStyle: 'normal',
+  fontWeight: 500,
+  fontSize: '28px',
+  lineHeight: '42px',
+  color: theme.palette.grey[800],
+  [theme.breakpoints.down('sm')]: {
+    justifySelf: 'center',
+    paddingBottom: 0,
+  },
+  '& span': {
+    color: theme.palette.grey[800],
+  },
+}));
 
 const Items = ({ items, renderComponent, columns }) =>
   split(Object.keys(items), columns).map((col) => (
     <ItemsStyle>{col.map(renderComponent)}</ItemsStyle>
-  ))
-const ItemsStyle = styled.div`
-  display: flex;
-  gap: 3em;
-  width: 100%;
-`
+  ));
+
+const ItemsStyle = styled('div')(({ theme }) => ({
+  display: 'flex',
+  gap: '3em',
+  width: '100%',
+}));
 
 function split(array, cols) {
-  if (cols === 1) return [array]
-  var size = Math.ceil(array.length / cols)
-  return [array.slice(0, size)].concat(split(array.slice(size), cols - 1))
+  if (cols === 1) return [array];
+  var size = Math.ceil(array.length / cols);
+  return [array.slice(0, size)].concat(split(array.slice(size), cols - 1));
 }
 
-const FooterStyle = styled(BaseContainer)`
-  padding: 3em 86px 0 86px;
-
-  width: 100%;
-  padding-bottom: 30px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-
-  grid-template-areas:
+const FooterStyle = styled(Container)(({ theme }) => ({
+  padding: '3em 86px 0 86px',
+  width: '100%',
+  paddingBottom: '30px',
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gridTemplateAreas: `
     "lets-talk logo"
     "social terms"
-    "navigation_footer navigation_footer";
-
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-    grid-template-columns: 1fr;
-    grid-template-areas:
+    "navigation_footer navigation_footer"
+  `,
+  [theme.breakpoints.down('sm')]: {
+    gridTemplateColumns: '1fr',
+    gridTemplateAreas: `
       "logo"
       "navigation_footer"
       "lets-talk"
       "social"
-      "terms";
-    padding: 0;
-    margin-bottom: 2em;
-    max-width: 414px;
-  }
+      "terms"
+    `,
+    padding: 0,
+    marginBottom: '2em',
+    maxWidth: '414px',
+  },
+  fontStyle: 'normal',
+  fontWeight: 400,
+  fontSize: '18px',
+  lineHeight: '23px',
+  color: theme.palette.grey[800],
+  '& a': {
+    color: theme.palette.grey[800],
+  },
+}));
 
-  font-style: normal;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 23px;
+const StyledLink = styled(LinkStyle)(({ theme }) => ({
+  transition: 'color 0.3s ease',
+  '&:hover': {
+    color: theme.palette.primary.main,
+  },
+}));
 
-  color: ${Colors.offblack};
-
-  a {
-    color: ${Colors.offblack}; // Ensure the text color matches the style in Layouts.js
-  }
-`
-
-const StyledLink = styled(LinkStyle)`
-  transition: color 0.3s ease;
-  &:hover {
-    color: ${Colors.primary};
-  }
-`
-
-const StyledNavLink = styled(NavLink)`
-  transition: color 0.3s ease;
-  &:hover {
-    color: ${Colors.primary};
-  }
-`
+const StyledNavLink = styled(NavLink)(({ theme }) => ({
+  transition: 'color 0.3s ease',
+  '&:hover': {
+    color: theme.palette.primary.main,
+  },
+}));

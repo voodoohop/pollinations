@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Typography, Tooltip, IconButton, AppBar, Tabs, Tab, Box, Link } from '@material-ui/core';
+import { Typography, Tooltip, IconButton, AppBar, Tabs, Tab, Box, Link } from '@mui/material';
 import { Code, CodeBlock, CopyBlock, a11yLight, arta, dracula, irBlack } from 'react-code-blocks';
 import { URLExplanation } from './styles';
 import { Colors } from '../../styles/global';

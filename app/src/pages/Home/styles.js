@@ -1,5 +1,5 @@
 import styled from "@emotion/styled"
-import { Box, Container, Paper } from "@material-ui/core"
+import { Box, Container, Paper } from "@mui/material"
 import { Colors, Fonts, MOBILE_BREAKPOINT } from "../../styles/global"
 import { useMemo } from "react"
 

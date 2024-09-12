@@ -1,16 +1,16 @@
-import React from "react"
-import IconButton from "@material-ui/core/IconButton"
-import { NavLink } from "react-router-dom"
-import TemporaryDrawer from "./Drawer"
-import styled from "@emotion/styled"
-import { MOBILE_BREAKPOINT, HUGE_BREAKPOINT, BaseContainer, Colors } from "../styles/global"
-import { CloseOutlined } from "@material-ui/icons"
-import MobileMenuIcon from "../assets/menuIcon.svg"
-import { SocialLinks } from "./Social"
-import { ImageURLHeading } from "../pages/Home/styles"
+import React from "react";
+import { IconButton, useMediaQuery } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { NavLink } from "react-router-dom";
+import TemporaryDrawer from "./Drawer";
+import { MOBILE_BREAKPOINT, HUGE_BREAKPOINT, BaseContainer, Colors } from "../styles/global";
+import { CloseOutlined } from "@mui/icons-material";
+import MobileMenuIcon from "../assets/menuIcon.svg";
+import { SocialLinks } from "./Social";
+import { ImageURLHeading } from "../pages/Home/styles";
 
 const TopBar = () => {
-  const drawerState = React.useState(false)
+  const drawerState = React.useState(false);
 
   return (
     <OuterContainer>
@@ -19,34 +19,33 @@ const TopBar = () => {
       </TopContainer>
       <MobileMenu drawerState={drawerState} />
     </OuterContainer>
-  )
-}
+  );
+};
 
 const PublicNav = ({ drawerState }) => (
   <>
-  <LogoContainer>
-  <ImageURLHeading
-    whiteText={false}
-    width={300}
-    height={100}
-    customPrompt={`an image with the text "Pollinations" displayed in an elegant, decorative serif font. The font has high contrast between thick and thin strokes, that give the text a sophisticated and stylized appearance. The text is in black, set against a solid white background, creating a striking and bold visual contrast. Incorporate elements related to pollinations, digital circuitry, such as flowers, chips, insects, wafers, and other organic forms into the design of the font. Each letter features unique, creative touches that make the typography stand out. Incorporate elements related to pollinations, digital circuitry, and organic forms into the design of the font. The text should take all the space without any margins.`}
-  />
-</LogoContainer>
-  <NavBarStyle>
-
-    <SocialLinks small hideOnMobile gap="1em" invert />
-    <MenuButton>
-      <IconButton onClick={() => drawerState[1](true)}>
-        <img
-          src={MobileMenuIcon}
-          style={{ position: "absolute", top: "25%", left: "25%", width: "50%", height: "50%" }}
-        />
-        <CloseOutlined style={{ position: "relative", color: "transparent" }} />
-      </IconButton>
-    </MenuButton>
-  </NavBarStyle>
+    <LogoContainer>
+      <ImageURLHeading
+        whiteText={false}
+        width={300}
+        height={100}
+        customPrompt={`an image with the text "Pollinations" displayed in an elegant, decorative serif font. The font has high contrast between thick and thin strokes, that give the text a sophisticated and stylized appearance. The text is in black, set against a solid white background, creating a striking and bold visual contrast. Incorporate elements related to pollinations, digital circuitry, such as flowers, chips, insects, wafers, and other organic forms into the design of the font. Each letter features unique, creative touches that make the typography stand out. Incorporate elements related to pollinations, digital circuitry, and organic forms into the design of the font. The text should take all the space without any margins.`}
+      />
+    </LogoContainer>
+    <NavBarStyle>
+      <SocialLinks small hideOnMobile gap="1em" invert />
+      <MenuButton>
+        <IconButton onClick={() => drawerState[1](true)}>
+          <img
+            src={MobileMenuIcon}
+            style={{ position: "absolute", top: "25%", left: "25%", width: "50%", height: "50%" }}
+          />
+          <CloseOutlined style={{ position: "relative", color: "transparent" }} />
+        </IconButton>
+      </MenuButton>
+    </NavBarStyle>
   </>
-)
+);
 
 const MobileMenu = ({ drawerState }) => (
   <TemporaryDrawer drawerState={drawerState}>
@@ -64,15 +63,15 @@ const MobileMenu = ({ drawerState }) => (
       <SocialLinks medium gap="1em" />
     </MobileMenuStyle>
   </TemporaryDrawer>
-)
+);
 
-const OuterContainer = styled.div`
+const OuterContainer = styled('div')`
   width: 100%;
   display: flex;
   justify-content: center;
-`
+`;
 
-const MobileMenuStyle = styled.div`
+const MobileMenuStyle = styled('div')`
   position: relative;
   width: 100%;
   height: 100%;
@@ -81,9 +80,9 @@ const MobileMenuStyle = styled.div`
   justify-content: space-evenly;
   align-items: center;
   padding: 1em 1em 3em;
-`
+`;
 
-const MobileCloseIconStyle = styled.div`
+const MobileCloseIconStyle = styled('div')`
   position: absolute;
   top: 1em;
   right: 1em;
@@ -91,9 +90,9 @@ const MobileCloseIconStyle = styled.div`
     background-color: white;
     color: black;
   }
-`
+`;
 
-const CTAStyle = styled.p`
+const CTAStyle = styled('p')`
   font-style: normal;
   font-weight: 500;
   font-size: 24px;
@@ -104,8 +103,9 @@ const CTAStyle = styled.p`
   span {
     color: ${Colors.lime};
   }
-`
-const TopContainer = styled.div`
+`;
+
+const TopContainer = styled('div')`
   position: absolute;
   top: 0;
   z-index: 1;
@@ -116,7 +116,7 @@ const TopContainer = styled.div`
   @media (max-width: ${MOBILE_BREAKPOINT}) {
     padding: 0;
   }
-`
+`;
 
 const NavBarStyle = styled(BaseContainer)`
   width: 100%;
@@ -134,26 +134,14 @@ const NavBarStyle = styled(BaseContainer)`
   @media (max-width: ${MOBILE_BREAKPOINT}) {
     grid-template-areas: "logo nav mobilebutton social";
   }
-`
+`;
 
-const LogoContainer = styled.div`
-  grid-area: logo;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
+const LogoContainer = styled('div')(({ theme }) => ({
+  // ... styles
+}));
 
-`
+const MenuButton = styled('div')(({ theme }) => ({
+  // ... styles
+}));
 
-const MenuButton = styled.div`
-  grid-area: mobilebutton;
-  justify-self: flex-end;
-  @media (min-width: ${MOBILE_BREAKPOINT}) {
-    display: none;
-  }
-  .MuiIconButton-root:hover {
-    background-color: white;
-    filter: invert(100%);
-  }
-`
-
-export default TopBar
+export default TopBar;

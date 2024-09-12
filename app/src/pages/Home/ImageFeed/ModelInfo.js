@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Link } from '@material-ui/core';
+import { Typography, Link } from '@mui/material';
 import { Colors } from '../../../styles/global';
 
 export function ModelInfo({ model, wasPimped, referrer }) {

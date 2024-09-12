@@ -1,11 +1,12 @@
 import React from 'react';
-import { Container, useMediaQuery, Link, Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Container, useMediaQuery, Link, Table, TableBody, TableCell, TableRow, Typography } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles'; // Import useTheme from @mui/material/styles
 import { ImageURLHeading } from './styles';
 import { Colors } from '../../styles/global';
 import Markdown from 'markdown-to-jsx';
 
-const useStyles = makeStyles((theme) => ({
+// Replace makeStyles with styled components
+const useStyles = styled((theme) => ({
     root: {
         maxWidth: '100%',
         margin: '0 auto',

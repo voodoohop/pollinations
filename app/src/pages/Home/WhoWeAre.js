@@ -1,65 +1,63 @@
-import styled from "@emotion/styled"
-import React from "react"
-import { Colors, MOBILE_BREAKPOINT, HUGE_BREAKPOINT, BaseContainer } from "../../styles/global"
-import { LinkStyle } from "./components"
-import DescriptionIcon from "@material-ui/icons/Description"
-import { keyframes } from "@emotion/react"
-import { PollinationsText } from "pollinations-react"
+import styled from "@emotion/styled";
+import React from "react";
+import { Colors, MOBILE_BREAKPOINT, HUGE_BREAKPOINT, BaseContainer } from "../../styles/global";
+import { LinkStyle } from "./components";
+import DescriptionIcon from "@mui/icons-material/Description";
+import { keyframes } from "@emotion/react";
+import { PollinationsText } from "pollinations-react";
 
 const StyledLink = styled(LinkStyle)`
   transition: color 0.3s ease;
   &:hover {
     color: ${(props) => (props.dark ? Colors.accent : Colors.primary)};
   }
-`
+`;
 
 const WhoWeAreContent = () => (
-    <>
-        <h2>
-            {/* We are a team of <b>machine-learning specialists</b>, <b>artists</b> and <b>futurists </b>{" "}
-        deeply engaged in the <b>open source</b> AI ecosystem. */}
-            <PollinationsText>
-                We are a team of <b>machine-learning specialists</b>, <b>artists</b> and <b>futurists </b>
-                deeply engaged in the <b>open source</b> AI ecosystem.
-            </PollinationsText>
-        </h2>
-        <ContactWrapper>
-            <p>
-                To talk to us, reach out on{" "}
-                <StyledLink href="https://discord.gg/k9F7SyTgqn">
-                    <b>Discord</b>
-                </StyledLink>{" "}
-                <span className="mobile-break">or at </span>
-                <StyledLink href="mailto:hello@pollinations.ai">
-                    <b>hello@pollinations.ai</b>
-                </StyledLink>
-            </p>
-            <p>
-                <StyledLink href="/readme">
-                    <b>README</b>
-                    <DescriptionIcon style={{ fontSize: "inherit", verticalAlign: "middle" }} />{" "}
-                </StyledLink>{" "}
-                to learn more.
-            </p>
-        </ContactWrapper>
-    </>
-)
+  <>
+    <h2>
+      <PollinationsText>
+        We are a team of <b>machine-learning specialists</b>, <b>artists</b> and <b>futurists </b>
+        deeply engaged in the <b>open source</b> AI ecosystem.
+      </PollinationsText>
+    </h2>
+    <ContactWrapper>
+      <p>
+        To talk to us, reach out on{" "}
+        <StyledLink href="https://discord.gg/k9F7SyTgqn">
+          <b>Discord</b>
+        </StyledLink>{" "}
+        <span className="mobile-break">or at </span>
+        <StyledLink href="mailto:hello@pollinations.ai">
+          <b>hello@pollinations.ai</b>
+        </StyledLink>
+      </p>
+      <p>
+        <StyledLink href="/readme">
+          <b>README</b>
+          <DescriptionIcon style={{ fontSize: "inherit", verticalAlign: "middle" }} />{" "}
+        </StyledLink>{" "}
+        to learn more.
+      </p>
+    </ContactWrapper>
+  </>
+);
 
 export default function WhoWeAre() {
-    return (
-        <Style>
-            <PageLayout long={false}>
-                <WhoWeAreContent />
-            </PageLayout>
-        </Style>
-    )
+  return (
+    <Style>
+      <PageLayout long={false}>
+        <WhoWeAreContent />
+      </PageLayout>
+    </Style>
+  );
 }
 
 // STYLES
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
-`
+`;
 
 const PageLayout = styled(BaseContainer)`
   width: 100%;
@@ -122,7 +120,7 @@ const PageLayout = styled(BaseContainer)`
   p:last-child {
     margin-bottom: 0; // Remove bottom margin for the last paragraph
   }
-`
+`;
 
 const Style = styled.div`
   width: 100%;
@@ -130,7 +128,7 @@ const Style = styled.div`
   background-color: ${(props) => (props.dark ? "black" : Colors.background_body)};
   @media (max-width: ${MOBILE_BREAKPOINT}) {
   }
-`
+`;
 
 const ContactWrapper = styled.div`
   display: flex;
@@ -167,4 +165,4 @@ const ContactWrapper = styled.div`
   .mobile-break {
     display: inline;
   }
-`
+`;

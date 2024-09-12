@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, ButtonGroup, Grid, Link, Box, CircularProgress, useMediaQuery, Button } from '@material-ui/core';
+import { Typography, ButtonGroup, Grid, Link, Box, CircularProgress, useMediaQuery, Button } from '@mui/material';
 import { CodeExamples } from '../CodeExamples';
 import { useFeedLoader } from './useFeedLoader';
 import { useImageEditor, useImageSlideshow } from './useImageSlideshow';

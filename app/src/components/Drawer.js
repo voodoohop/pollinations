@@ -1,6 +1,6 @@
+import Drawer from '@mui/material/Drawer';
+import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import styled from '@emotion/styled';
-import Drawer from '@material-ui/core/Drawer';
 
 export default function TemporaryDrawer({ drawerState, children }) {
   const [state, setState] = drawerState;
@@ -20,6 +20,6 @@ export default function TemporaryDrawer({ drawerState, children }) {
   </Drawer>
 };
 
-const DrawerContainer = styled.div`
+const DrawerContainer = styled('div')`
 background-color: black;
 `;

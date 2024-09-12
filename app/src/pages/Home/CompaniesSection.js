@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
-import { Container, useMediaQuery } from "@material-ui/core"
-import { makeStyles, useTheme } from "@material-ui/core/styles"
+import { Container, useMediaQuery } from "@mui/material"
+import { styled } from "@mui/material/styles"
 import { ImageURLHeading } from "./styles"
 import { MOBILE_BREAKPOINT, Colors, Fonts } from "../../styles/global"
 
@@ -21,9 +21,9 @@ const CompaniesSection = () => {
     }
   }, [isMobile, screenWidth])
 
-  const useStyles = makeStyles((theme) => ({
+  const useStyles = styled((theme) => ({
     root: {
-      maxWidth: "800px", 
+      maxWidth: "800px",
       padding: theme.spacing(1),
       display: "flex",
       flexDirection: "column",
@@ -40,7 +40,7 @@ const CompaniesSection = () => {
       fontSize: "1.2em",
     },
     td: {
-      padding: theme.spacing(1), 
+      padding: theme.spacing(1),
       fontSize: "1.1em",
     },
     link: {
@@ -59,7 +59,7 @@ const CompaniesSection = () => {
 
   const logoPrefix = "minimalist logo"
   const imageDimension = 96
-  const seedValue = 41 + Math.floor(Math.random() * 3) 
+  const seedValue = 41 + Math.floor(Math.random() * 3)
 
   const companies = [
     {

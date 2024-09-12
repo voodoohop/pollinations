@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Paper, Grid, Typography, TextareaAutosize, Button, CircularProgress } from '@material-ui/core';
+import { Box, Paper, Grid, Typography, TextareaAutosize, Button, CircularProgress } from '@mui/material';
 import { Colors } from '../../../styles/global';
 import { AdvancedOptions } from './AdvancedOptions';
 

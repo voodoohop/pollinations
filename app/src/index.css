@@ -22,11 +22,10 @@
   background: #485ea4; /* Gecko Browsers */
 }
 body {
-  margin: 20px;
-  overflow-x: hidden;
+  margin: 0;
+  font-family: 'Uncut-Sans-Variable', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: black !important;
 }
 .MuiAccordionSummary-root {
   padding: 0 !important;
@@ -106,4 +105,8 @@ error {
   to {
     transform: translate(-50%, -50%) rotate(360deg);
   }
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
