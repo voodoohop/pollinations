@@ -1,65 +1,26 @@
-import React, { useEffect, useState } from "react"
-import { Container, useMediaQuery } from "@material-ui/core"
-import { makeStyles, useTheme } from "@material-ui/core/styles"
-import { ImageURLHeading } from "./styles"
-import { MOBILE_BREAKPOINT, Colors, Fonts } from "../../styles/global"
+import React, { useEffect, useState } from "react";
 
 const CompaniesSection = () => {
-  const isMobile = useMediaQuery(`(max-width:${MOBILE_BREAKPOINT})`)
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   useEffect(() => {
     const handleResize = () => {
-      setScreenWidth(window.innerWidth)
-    }
+      setScreenWidth(window.innerWidth);
+      setIsMobile(window.innerWidth <= 768);
+    };
 
-    window.addEventListener("resize", handleResize)
-    console.log("isMobile status:", isMobile, "Screen width:", screenWidth)
+    window.addEventListener("resize", handleResize);
+    console.log("isMobile status:", isMobile, "Screen width:", screenWidth);
 
     return () => {
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [isMobile, screenWidth])
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMobile, screenWidth]);
 
-  const useStyles = makeStyles((theme) => ({
-    root: {
-      maxWidth: "800px", 
-      padding: theme.spacing(1),
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-    },
-    table: {
-      maxWidth: "800px",
-      borderCollapse: "collapse",
-      marginBottom: "5em",
-      margin: isMobile ? "0 auto" : "0",
-    },
-    th: {
-      padding: theme.spacing(0),
-      fontSize: "1.2em",
-    },
-    td: {
-      padding: theme.spacing(1), 
-      fontSize: "1.1em",
-    },
-    link: {
-      fontFamily: Fonts.body,
-      fontStyle: "normal",
-      fontWeight: 500,
-      fontSize: "18px",
-      lineHeight: "22px",
-      textDecorationLine: "underline",
-      textTransform: "uppercase",
-      color: Colors.offwhite,
-    },
-  }))
-
-  const classes = useStyles()
-
-  const logoPrefix = "minimalist logo"
-  const imageDimension = 96
-  const seedValue = 41 + Math.floor(Math.random() * 3) 
+  const logoPrefix = "minimalist logo";
+  const imageDimension = 96;
+  const seedValue = 41 + Math.floor(Math.random() * 3);
 
   const companies = [
     {
@@ -92,22 +53,22 @@ const CompaniesSection = () => {
       url: "https://outlierventures.io/",
       description: "Accelerator",
     },
-  ]
+  ];
 
   const generateImageUrl = (name, description) =>
     `https://pollinations.ai/p/${encodeURIComponent(
       `${logoPrefix} ${name} ${description}`
-    )}?width=${imageDimension}&height=${imageDimension}&nologo=true&seed=${seedValue}`
+    )}?width=${imageDimension}&height=${imageDimension}&nologo=true&seed=${seedValue}`;
 
-  const tableRows = []
+  const tableRows = [];
   for (let i = 0; i < companies.length; i += isMobile ? 1 : 2) {
     tableRows.push(
       <tr key={i}>
-        <td className={classes.td}>
+        <td className="p-2">
           <img src={generateImageUrl(companies[i].name, companies[i].description)} alt={companies[i].name} />
         </td>
-        <td className={classes.td}>
-          <a href={companies[i].url} className={classes.link}>
+        <td className="p-2">
+          <a href={companies[i].url} className="underline text-white">
             {companies[i].name}
           </a>
           <br />
@@ -115,11 +76,11 @@ const CompaniesSection = () => {
         </td>
         {!isMobile && companies[i + 1] && (
           <>
-            <td className={classes.td}>
+            <td className="p-2">
               <img src={generateImageUrl(companies[i + 1].name, companies[i + 1].description)} alt={companies[i + 1].name} />
             </td>
-            <td className={classes.td}>
-              <a href={companies[i + 1].url} className={classes.link}>
+            <td className="p-2">
+              <a href={companies[i + 1].url} className="underline text-white">
                 {companies[i + 1].name}
               </a>
               <br />
@@ -128,17 +89,17 @@ const CompaniesSection = () => {
           </>
         )}
       </tr>
-    )
+    );
   }
 
   return (
-    <Container className={classes.root}>
-      <ImageURLHeading>Supported By</ImageURLHeading>
-      <table className={classes.table}>
+    <div className="container mx-auto p-4">
+      <h2 className="text-2xl font-semibold text-lime mt-4 mb-2 text-center">Supported By</h2>
+      <table className="min-w-full bg-white">
         <tbody>{tableRows}</tbody>
       </table>
-    </Container>
-  )
-}
+    </div>
+  );
+};
 
-export default CompaniesSection
+export default CompaniesSection;

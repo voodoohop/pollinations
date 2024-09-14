@@ -1,29 +1,28 @@
-import { Typography, Box } from '@material-ui/core';
-import { Colors } from '../../../styles/global';
+import React from 'react';
 
 export function ServerLoadAndGenerationInfo({ lastImage, imagesGenerated, image }) {
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center" maxWidth="600px" margin="0 auto">
+    <div className="flex justify-between items-center max-w-lg mx-auto">
       <ServerLoadDisplay concurrentRequests={lastImage?.concurrentRequests || 0} />
-      <Typography variant="body1" component="span">
-        #: <b style={{ color: Colors.lime }}>{formatImagesGenerated(imagesGenerated)}</b>
-      </Typography >
+      <span className="text-lime">#: <b>{formatImagesGenerated(imagesGenerated)}</b></span>
       <TimingInfo image={lastImage} />
-    </Box >
+    </div>
   );
 }
+
 function ServerLoadDisplay({ concurrentRequests }) {
   const max = 5;
   const load = Math.min(max, Math.round(concurrentRequests / 4));
   const loadDisplay = "▁▃▅▇▉".slice(1, load + 2);
 
-  return <span>Load: <b style={{ color: Colors.lime }}>{loadDisplay}</b> <i>({concurrentRequests})</i></span>;
+  return <span>Load: <b className="text-lime">{loadDisplay}</b> <i>({concurrentRequests})</i></span>;
 }
+
 const formatImagesGenerated = (num) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
+
 function TimingInfo({ image }) {
-  // console.log("image", image);
   const timeMs = image?.generationTime || image?.timingInfo?.[5]?.timestamp;
-  return <Typography variant="body2" component="i">Generation time:<span style={{ color: Colors.lime }}><b> {Math.round(timeMs / 100) / 10} s</b></span></Typography>;
+  return <span>Generation time:<span className="text-lime"><b> {Math.round(timeMs / 100) / 10} s</b></span></span>;
 }

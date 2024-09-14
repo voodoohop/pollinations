@@ -1,62 +1,5 @@
 import React from 'react';
-import { Container, useMediaQuery, Link, Table, TableBody, TableCell, TableRow, Typography } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ImageURLHeading } from './styles';
-import { Colors } from '../../styles/global';
 import Markdown from 'markdown-to-jsx';
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        maxWidth: '100%',
-        margin: '0 auto',
-        padding: theme.spacing(1),
-        overflowX: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    table: {
-        width: '100%',
-        maxWidth: '800px',
-        borderCollapse: 'separate',
-        borderSpacing: '0 0', // Reduced vertical space between rows
-    },
-    tableRow: {
-        '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.05)', // Slight highlight on hover
-        },
-    },
-    tableCell: {
-        border: 'none', // Removes cell borders
-        padding: '8px 16px', // Tighter padding
-        fontSize: '1.1em', // Larger text size
-        '&:first-child': {
-            paddingLeft: 0, // Removes left padding for the first cell
-        },
-        '&:last-child': {
-            paddingRight: 0, // Removes right padding for the last cell
-        },
-    },
-    projectImage: {
-        width: '48px', // Smaller image size
-        height: '48px',
-        objectFit: 'cover',
-    },
-    sectionHeading: {
-        color: Colors.lime,
-        marginTop: theme.spacing(4),
-        marginBottom: theme.spacing(2),
-        textAlign: 'center',
-        width: '100%',
-    },
-    listProjectText: {
-        color: Colors.white,
-        textAlign: 'center',
-        marginTop: theme.spacing(4),
-        marginBottom: theme.spacing(4),
-        fontSize: '1.1em',
-    },
-}));
 
 const logoPrefix = "minimalist  logo";
 const imageDimension = 96;
@@ -187,108 +130,137 @@ const projects = {
 const generateImageUrl = (name) => `https://pollinations.ai/p/${encodeURIComponent(`${logoPrefix} ${name}`)}?width=${imageDimension}&height=${imageDimension}&nologo=true&seed=${seedValue}`;
 
 const ProjectsSection = () => {
-    const classes = useStyles();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-    const renderProjects = (projectList) => (
-        <Table className={classes.table}>
-            <TableBody>
-                {projectList.map((project, index) => (
-                    <TableRow key={index} className={classes.tableRow}>
-                        <TableCell className={classes.tableCell}>
-                            {!isMobile && (
-                                <img
-                                    src={generateImageUrl(project.name)}
-                                    alt={project.name}
-                                    className={classes.projectImage}
-                                />
-                            )}
-                        </TableCell>
-                        <TableCell className={classes.tableCell}>
-                            {renderProjectLink(project)}
-                            {project.author && (
-                                <span style={{ marginLeft: '8px', color: Colors.white, fontSize: '1em' }}>
-                                    by {project.author}
+    return (
+        <div className="container mx-auto p-4">
+            <h2 className="text-2xl font-semibold text-lime mt-4 mb-2 text-center">Chat Integrations</h2>
+            <table className="min-w-full bg-white">
+                <tbody>
+                    {projects.llmIntegration.map((project, index) => (
+                        <tr key={index} className="hover:bg-gray-100">
+                            <td className="px-4 py-2">
+                                <img src={generateImageUrl(project.name)} alt={project.name} className="w-12 h-12 object-cover" />
+                            </td>
+                            <td className="px-4 py-2">
+                                <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-lime font-bold hover:underline">
+                                    {project.name}
+                                </a>
+                                {project.author && (
+                                    <span className="ml-2 text-white text-base">by {project.author}</span>
+                                )}
+                            </td>
+                            <td className="px-4 py-2">
+                                <span className="text-white text-base">
+                                    <Markdown>{project.description}</Markdown>
                                 </span>
-                            )}
-                        </TableCell>
-                        <TableCell className={classes.tableCell}>
-                            <span style={{ color: Colors.white, fontSize: '1em' }}>
-                                <Markdown>{project.description}</Markdown>
-                            </span>
-                            {project.repo && renderRepoLink(project.repo)}
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    );
+                                {project.repo && (
+                                    <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-lime hover:underline ml-2">
+                                        GitHub
+                                    </a>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
 
-    return (
-        <Container className={classes.root}>
-            <ImageURLHeading>Integrations</ImageURLHeading>
+            <h2 className="text-2xl font-semibold text-lime mt-4 mb-2 text-center">Social Bots</h2>
+            <table className="min-w-full bg-white">
+                <tbody>
+                    {projects.socialBots.map((project, index) => (
+                        <tr key={index} className="hover:bg-gray-100">
+                            <td className="px-4 py-2">
+                                <img src={generateImageUrl(project.name)} alt={project.name} className="w-12 h-12 object-cover" />
+                            </td>
+                            <td className="px-4 py-2">
+                                <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-lime font-bold hover:underline">
+                                    {project.name}
+                                </a>
+                                {project.author && (
+                                    <span className="ml-2 text-white text-base">by {project.author}</span>
+                                )}
+                            </td>
+                            <td className="px-4 py-2">
+                                <span className="text-white text-base">
+                                    <Markdown>{project.description}</Markdown>
+                                </span>
+                                {project.repo && (
+                                    <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-lime hover:underline ml-2">
+                                        GitHub
+                                    </a>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
 
-            <Typography variant="h5" className={classes.sectionHeading}>Chat Integrations</Typography>
-            {renderProjects(projects.llmIntegration)}
+            <h2 className="text-2xl font-semibold text-lime mt-4 mb-2 text-center">Mobile & Web Applications</h2>
+            <table className="min-w-full bg-white">
+                <tbody>
+                    {projects.apps.map((project, index) => (
+                        <tr key={index} className="hover:bg-gray-100">
+                            <td className="px-4 py-2">
+                                <img src={generateImageUrl(project.name)} alt={project.name} className="w-12 h-12 object-cover" />
+                            </td>
+                            <td className="px-4 py-2">
+                                <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-lime font-bold hover:underline">
+                                    {project.name}
+                                </a>
+                                {project.author && (
+                                    <span className="ml-2 text-white text-base">by {project.author}</span>
+                                )}
+                            </td>
+                            <td className="px-4 py-2">
+                                <span className="text-white text-base">
+                                    <Markdown>{project.description}</Markdown>
+                                </span>
+                                {project.repo && (
+                                    <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-lime hover:underline ml-2">
+                                        GitHub
+                                    </a>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
 
-            <Typography variant="h5" className={classes.sectionHeading}>Social Bots</Typography>
-            {renderProjects(projects.socialBots)}
+            <h2 className="text-2xl font-semibold text-lime mt-4 mb-2 text-center">Tutorials</h2>
+            <table className="min-w-full bg-white">
+                <tbody>
+                    {projects.tutorials.map((project, index) => (
+                        <tr key={index} className="hover:bg-gray-100">
+                            <td className="px-4 py-2">
+                                <img src={generateImageUrl(project.name)} alt={project.name} className="w-12 h-12 object-cover" />
+                            </td>
+                            <td className="px-4 py-2">
+                                <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-lime font-bold hover:underline">
+                                    {project.name}
+                                </a>
+                                {project.author && (
+                                    <span className="ml-2 text-white text-base">by {project.author}</span>
+                                )}
+                            </td>
+                            <td className="px-4 py-2">
+                                <span className="text-white text-base">
+                                    <Markdown>{project.description}</Markdown>
+                                </span>
+                                {project.repo && (
+                                    <a href={project.repo} target="_blank" rel="noopener noreferrer" className="text-lime hover:underline ml-2">
+                                        GitHub
+                                    </a>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
 
-            <Typography variant="h5" className={classes.sectionHeading}>Mobile & Web Applications</Typography>
-            {renderProjects(projects.apps)}
-
-            <Typography variant="h5" className={classes.sectionHeading}>Tutorials</Typography>
-            {renderProjects(projects.tutorials)}
-
-            <Typography className={classes.listProjectText}>
+            <p className="text-white text-base text-center mt-8">
                 Have you created a project that integrates Pollinations? We'd love to feature it!<br />
-                Get in touch at <Link href="mailto:hello@pollinations.ai" style={{ color: Colors.lime }}>hello@pollinations.ai</Link>.
-            </Typography>
-
-        </Container>
-    );
-};
-
-const renderProjectLink = (project) => {
-    return (
-        <Link
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-                color: Colors.lime,
-                textDecoration: 'none',
-                fontWeight: 'bold',
-                fontSize: '1em', // Same text size as other text
-                '&:hover': {
-                    textDecoration: 'underline',
-                },
-            }}
-        >
-            {project.name}
-        </Link>
-    );
-};
-
-const renderRepoLink = (repoUrl) => {
-    return (
-        <Link
-            href={repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-                color: Colors.lime,
-                textDecoration: 'none',
-                marginLeft: '8px',
-                fontSize: '1.1em', // Larger text size
-                '&:hover': {
-                    textDecoration: 'underline',
-                },
-            }}
-        >
-            GitHub
-        </Link>
+                Get in touch at <a href="mailto:hello@pollinations.ai" className="text-lime">hello@pollinations.ai</a>.
+            </p>
+        </div>
     );
 };
 

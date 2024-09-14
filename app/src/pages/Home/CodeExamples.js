@@ -1,12 +1,6 @@
-import { useState } from 'react';
-import { Typography, Tooltip, IconButton, AppBar, Tabs, Tab, Box, Link } from '@material-ui/core';
-import { Code, CodeBlock, CopyBlock, a11yLight, arta, dracula, irBlack } from 'react-code-blocks';
-import { URLExplanation } from './styles';
-import { Colors } from '../../styles/global';
+import React, { useState } from 'react';
+import { CodeBlock, dracula } from 'react-code-blocks';
 
-
-
-// Code examples as an object
 const CODE_EXAMPLES = {
   api_description: () => `
 # Pollinations AI Image Generation API
@@ -204,54 +198,65 @@ export function CodeExamples(image) {
   // Add "api_description" as the first tab
   const allTabs = ["api_description", "link", "discord_bot", ...codeExampleTabs.filter(tab => tab !== "api_description")];
 
-  return <URLExplanation >
-    <AppBar position="static" style={{ color: "white", width: "auto", marginTop: "30px", boxShadow: 'none' }}>
-      <Tabs value={tabValue} onChange={handleChange} aria-label="simple tabs example" variant="scrollable" scrollButtons="on" TabIndicatorProps={{ style: { background: Colors.lime } }} >
-        {allTabs.map((key) => (
-          <Tab key={key} label={key === "api_description" ? "API Description" : key.charAt(0).toUpperCase() + key.slice(1)} />
-        ))}
-      </Tabs>
-    </AppBar>
-    <>
-      {allTabs.map((key, index) => {
+  return (
+    <div className="m-8">
+      <div className="flex justify-center">
+        <div className="tabs">
+          {allTabs.map((key, index) => (
+            <button
+              key={key}
+              className={`tab ${tabValue === index ? 'tab-active' : ''}`}
+              onClick={(e) => handleChange(e, index)}
+            >
+              {key === "api_description" ? "API Description" : key.charAt(0).toUpperCase() + key.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="mt-4">
+        {allTabs.map((key, index) => {
+          if (tabValue !== index) return null;
 
-        if (tabValue !== index)
-          return null;
+          if (!image.imageURL && key !== "discord_bot") return null;
 
-        if (!image.imageURL && key !== "discord_bot")
-          return null;
+          if (key === "link") {
+            return (
+              <div className="m-8 overflow-hidden">
+                <a href={image.imageURL} target="_blank" rel="noopener noreferrer" className="text-lime hover:underline break-all">
+                  {image.imageURL}
+                </a>
+              </div>
+            );
+          } else if (key === "discord_bot") {
+            return (
+              <div className="m-8 overflow-hidden">
+                <a href="https://discord.com/application-directory/1123551005993357342" target="_blank" rel="noopener noreferrer" className="text-lime hover:underline break-all">
+                  Discord Bot
+                </a>
+              </div>
+            );
+          }
 
-        if (key === "link") {
-          return (<Box margin="30px" overflow="hidden" >
-            <Link variant="body2" href={image.imageURL} target="_blank" rel="noopener noreferrer" style={{ fontSize: '1.0rem', wordBreak: 'break-all' }}>{image.imageURL}</Link>
-          </Box>);
-        } else if (key === "discord_bot") {
-          return (<Box margin="30px" overflow="hidden" >
-            <Link variant="body2" href="https://discord.com/application-directory/1123551005993357342" target="_blank" rel="noopener noreferrer" style={{ fontSize: '1.0rem', wordBreak: 'break-all' }}>Discord Bot</Link>
-          </Box>);
-        }
+          const text = CODE_EXAMPLES[key](image);
 
-        const text = CODE_EXAMPLES[key](image);
-
-        return (
-          tabValue === index && <CodeBlock
-            key={key}
-            text={text}
-            language={key}
-            theme={irBlack}
-            // wrapLongLines
-            showLineNumbers={text.split("\n").length > 1}
-            customStyle={{
-              backgroundColor: 'transparent',
-              color: Colors.offwhite,
-              scrollbarColor: 'transparent transparent', // scrollbar thumb and track colors
-            }} />
-        )
-      })}
-
-    </>
-  </URLExplanation>;
+          return (
+            <CodeBlock
+              key={key}
+              text={text}
+              language={key}
+              theme={dracula}
+              showLineNumbers={text.split("\n").length > 1}
+              customStyle={{
+                backgroundColor: 'transparent',
+                color: 'white',
+                scrollbarColor: 'transparent transparent',
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
 }
-
 
 const shorten = (str) => str.length > 60 ? str.slice(0, 60) + "..." : str;

@@ -1,40 +1,26 @@
 import { textContent } from "../assets"
 import MarkDownContent from "./MarkDownContent"
-import { BackGroundImage, MarkDownStyle, SmallContainer } from "../styles/global"
 import { SEOImage, SEOMetadata } from "./Helmet"
-import styled from "@emotion/styled"
 
 const PageTemplate = ({ label }) => {
-
   if (!label) return <></>
 
   return (
-    <CenteredContainer>
-      <SmallContainer style={{ marginTop: '100px' }}>
-        <MarkDownStyle >
+    <div className="flex justify-center w-full max-w-2xl mx-auto mt-24 relative">
+      <div className="p-4">
+        <div className="prose">
           <SEOMetadata title={`${label[0].toUpperCase()}${label.slice(1)}`} />
           <SEOImage />
           <MarkDownContent url={textContent[label]} />
-        </MarkDownStyle>
-        <BackGroundImage
+        </div>
+        <img
           src='gradient_background.png'
-          top='0'
-          position='fixed'
-          zIndex='-1'
-          opacity='50%'
-          transform='rotate(-180deg)'
-          alt="hero_bg_overlay" />
-      </SmallContainer>
-    </CenteredContainer>
+          className="fixed top-0 left-0 w-full h-full opacity-50 transform rotate-180 -z-10 object-cover"
+          alt="hero_bg_overlay"
+        />
+      </div>
+    </div>
   )
 }
-
-const CenteredContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-`
 
 export default PageTemplate

@@ -1,54 +1,36 @@
-import React from "react"
-import { Link, Box, Typography, Tooltip, IconButton } from "@material-ui/core"
-import FileCopyIcon from "@material-ui/icons/FileCopy"
-import { ImageContainer, ImageStyle } from "../styles"
-import { Colors } from "../../../styles/global"
-import { ModelInfo } from "./ModelInfo"
+import React from "react";
+import { ModelInfo } from "./ModelInfo"; // Ensure correct import
 
-export function ImageDisplay({ image, isMobile, handleCopyLink }) {
+export function ImageDisplay({ image, handleCopyLink }) {
   return (
-    <ImageContainer
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        position: "relative",
-      }}
-    >
+    <div className="flex flex-col items-center relative">
       {image ? (
         <>
-          <Link href={image["imageURL"]} target="_blank" rel="noopener noreferrer">
-            <Box>
-              <Box maxWidth="640px" position="relative">
-                <ImageStyle src={image["imageURL"]} alt="generative_image" />
-                <Tooltip title="Copy link">
-                  <IconButton
-                    onClick={handleCopyLink}
-                    style={{ color: Colors.lime, position: "absolute", top: 0, right: 0 }}
-                  >
-                    <FileCopyIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </Box>
-          </Link>
-          {!isMobile && (
-            <>
-              <Box display="flex" alignItems="center">
-                <ModelInfo
-                  model={image["model"]}
-                  wasPimped={image["wasPimped"]}
-                  referrer={image["referrer"]}
-                />
-              </Box>
-            </>
-          )}
+          <a href={image["imageURL"]} target="_blank" rel="noopener noreferrer">
+            <div className="relative max-w-lg">
+              <img src={image["imageURL"]} alt="generative_image" className="w-full h-auto" />
+              <button
+                onClick={handleCopyLink}
+                className="absolute top-0 right-0 text-lime"
+                title="Copy link"
+              >
+                <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h8m-4-4v8m-4-4h8m-4-4v8" />
+                </svg>
+              </button>
+            </div>
+          </a>
+          <div className="flex items-center">
+            <ModelInfo
+              model={image["model"]}
+              wasPimped={image["wasPimped"]}
+              referrer={image["referrer"]}
+            />
+          </div>
         </>
       ) : (
-        <Typography variant="h6" color="textSecondary">
-          Loading image...
-        </Typography>
+        <p className="text-gray-500">Loading image...</p>
       )}
-    </ImageContainer>
-  )
+    </div>
+  );
 }

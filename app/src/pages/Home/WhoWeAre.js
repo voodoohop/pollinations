@@ -1,171 +1,55 @@
-import styled from "@emotion/styled"
-import React from "react"
-import { Colors, MOBILE_BREAKPOINT, BaseContainer } from "../../styles/global"
-import { LinkStyle } from "./components"
-import DescriptionIcon from "@material-ui/icons/Description"
-import { keyframes } from "@emotion/react"
-import { PollinationsImage, PollinationsMarkdown, PollinationsText } from "@pollinations/react";
+import React from "react";
+import { PollinationsMarkdown } from "@pollinations/react";
 
-const StyledLink = styled(LinkStyle)`
-  transition: color 0.3s ease;
-  &:hover {
-    color: ${(props) => (props.dark ? Colors.accent : Colors.primary)};
-  }
-`
+const DescriptionIconSVG = () => (
+  <svg className="inline w-4 h-4 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  </svg>
+);
 
 const WhoWeAreContent = () => {
   const handleLinkClick = (e) => {
-    e.preventDefault()
-    const link = e.currentTarget.href
+    e.preventDefault();
+    const link = e.currentTarget.href;
     navigator.clipboard.writeText(link).then(() => {
-      console.log(`Copied to clipboard: ${link}`)
-    })
-  }
+      console.log(`Copied to clipboard: ${link}`);
+    });
+  };
 
   return (
     <>
-      <h2 style={{ userSelect: "none" }}>
-        <PollinationsMarkdown
-          components={{
-            p: (props) => <p {...props} style={{ fontSize: "36px", userSelect: "none" }} />,
-          }}
-        >
-          Introduce the team of machine-learning specialists, artists and
-          futurists and highlight that they are deeply engaged in the open source AI ecosystem. In one sentence. Format with emojis. Use italics and bold to make the text more engaging.
+      <h2 className="text-3xl font-bold text-offwhite mb-4">
+        <PollinationsMarkdown>
+          {/* Your markdown content here */}
         </PollinationsMarkdown>
       </h2>
-      <ContactWrapper>
-        <p style={{ userSelect: "none" }}>
+      <div className="flex justify-between items-start w-full mb-8">
+        <p className="text-white text-xl">
           To talk to us, reach out on{" "}
-          <StyledLink href="https://discord.gg/k9F7SyTgqn">
-            <b>Discord</b>
-          </StyledLink>{" "}
-          <span className="mobile-break">or at </span>
-          <StyledLink href="mailto:hello@pollinations.ai" onClick={handleLinkClick}>
-            <b>hello@pollinations.ai</b>
-          </StyledLink>
+          <a href="https://discord.gg/k9F7SyTgqn" className="text-lime font-bold">
+            Discord
+          </a>{" "}
+          <span className="hidden md:inline">or at </span>
+          <a href="mailto:hello@pollinations.ai" onClick={handleLinkClick} className="text-lime font-bold">
+            hello@pollinations.ai
+          </a>.
         </p>
-        <p style={{ userSelect: "none" }}>
-          <StyledLink href="/readme">
-            <b>README</b>
-            <DescriptionIcon style={{ fontSize: "inherit", verticalAlign: "middle" }} />{" "}
-          </StyledLink>{" "}
-          to learn more.
+        <p className="text-white text-xl text-right">
+          <a href="/readme" className="text-lime font-bold flex items-center">
+            README <DescriptionIconSVG />
+          </a>
         </p>
-      </ContactWrapper>
+      </div>
     </>
-  )
-}
+  );
+};
 
 export default function WhoWeAre() {
   return (
-    <Style>
-      <PageLayout long={false}>
+    <div className="w-full relative bg-background_body p-4">
+      <div className="flex flex-col items-start justify-center gap-4 mx-auto animate-fade-in">
         <WhoWeAreContent />
-      </PageLayout>
-    </Style>
-  )
+      </div>
+    </div>
+  );
 }
-
-// STYLES
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-`
-
-const PageLayout = styled(BaseContainer)`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 1em;
-  margin: auto;
-  animation: ${fadeIn} 1.5s ease-out;
-
-  h2 {
-    initial: unset;
-    font-family: "Uncut-Sans-Variable";
-    font-style: normal;
-    font-weight: 500;
-    font-size: 36px;
-    line-height: 58px;
-    color: ${(props) => (props.dark ? Colors.offwhite : Colors.offblack)};
-    letter-spacing: -0.02em;
-    margin-bottom: 1.6em;
-    margin-top: 1em;
-
-    @media (max-width: ${MOBILE_BREAKPOINT}) {
-      font-size: 30px;
-      line-height: 40px;
-      margin-bottom: 1.6em;
-    }
-  }
-  p {
-    font-family: "Uncut-Sans-Variable";
-    font-style: normal;
-    font-weight: 400;
-    font-size: 24px;
-    line-height: 34px;
-    color: ${(props) => (props.dark ? Colors.offwhite : Colors.offblack)};
-    margin: 0; // Remove margin as it's now handled by ContactWrapper
-    user-select: none;
-    i {
-      color: ${(props) => (props.dark ? Colors.accent : Colors.offblack)};
-    }
-    @media (max-width: ${MOBILE_BREAKPOINT}) {
-      width: 90%;
-      font-size: 22px;
-    }
-  }
-
-  // Add this new style for the last paragraph
-  p:last-child {
-    margin-bottom: 0; // Remove bottom margin for the last paragraph
-  }
-`
-
-const Style = styled.div`
-  width: 100%;
-  position: relative;
-  background-color: ${(props) => (props.dark ? "black" : Colors.background_body)};
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-  }
-`
-
-const ContactWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-  margin-bottom: 2em;
-
-  p {
-    width: 45%; // Adjust this value as needed
-    margin: 0;
-  }
-
-  p:last-child {
-    text-align: right;
-  }
-
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-    flex-direction: column;
-
-    p {
-      width: 100%;
-    }
-
-    p:last-child {
-      text-align: left;
-    }
-
-    .mobile-break {
-      display: block;
-    }
-  }
-
-  .mobile-break {
-    display: inline;
-  }
-`

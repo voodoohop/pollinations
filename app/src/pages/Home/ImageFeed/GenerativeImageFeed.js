@@ -1,16 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { Typography, Grid, Box, CircularProgress, useMediaQuery, Button, AppBar, Tabs, Tab } from '@material-ui/core';
-import { CodeExamples } from '../CodeExamples';
 import { useFeedLoader } from './useFeedLoader';
 import { useImageEditor, useImageSlideshow } from './useImageSlideshow';
 import { GenerativeImageURLContainer, ImageURLHeading } from '../styles';
-import debug from 'debug';
 import { ServerLoadAndGenerationInfo } from './ServerLoadAndGenerationInfo';
 import { ImageEditor } from './ImageEditor';
 import { ImageDisplay } from './ImageDisplay';
-import { Colors, MOBILE_BREAKPOINT } from '../../../styles/global';
-
-const log = debug("GenerativeImageFeed");
+import { CodeExamples } from '../CodeExamples';
 
 export function GenerativeImageFeed() {
   const [lastImage, setLastImage] = useState(null);
@@ -20,7 +15,6 @@ export function GenerativeImageFeed() {
   const { image: slideshowImage, onNewImage, stop } = useImageSlideshow();
   const { updateImage, image, isLoading } = useImageEditor({ stop, image: slideshowImage });
   const { imagesGenerated } = useFeedLoader(onNewImage, setLastImage);
-  const isMobile = useMediaQuery(`(max-width:${MOBILE_BREAKPOINT})`);
   const [isInputChanged, setIsInputChanged] = useState(false);
 
   useEffect(() => {
@@ -76,69 +70,55 @@ export function GenerativeImageFeed() {
   };
 
   return (
-    <GenerativeImageURLContainer style={{ paddingBottom: '3em' }}>
-      <Grid item style={{ margin: '3em 0' }}>
-        <ImageURLHeading>Image Feed</ImageURLHeading>
-      </Grid>
+    <GenerativeImageURLContainer className="p-4">
+      <h2 className="text-2xl font-semibold text-lime mb-4">Image Feed</h2>
       {!image["imageURL"] ? (
         <LoadingIndicator />
       ) : (
-        <Grid container spacing={4} direction="column">
-          <Grid item xs={12}>
+        <div className="flex flex-col space-y-4">
+          <div>
             <ServerLoadAndGenerationInfo {...{ lastImage, imagesGenerated, image }} />
-            <ImageDisplay image={image} isMobile={isMobile} handleCopyLink={handleCopyLink} />
-          </Grid>
-          <Grid item xs={12}>
+            <ImageDisplay image={image} handleCopyLink={handleCopyLink} />
+          </div>
+          <div>
             <TabSelector tabValue={tabValue} setTabValue={setTabValue} />
-            <Box>
-              {tabValue === 0 && (
-                <Box>
-                  {/* This tab is intentionally left empty */}
-                </Box>
-              )}
-              {tabValue === 1 && (
-                <ImageEditor
-                  image={imageParams}
-                  handleParamChange={handleParamChange}
-                  handleFocus={handleFocus}
-                  isLoading={isLoading}
-                  handleSubmit={handleSubmit}
-                  setIsInputChanged={setIsInputChanged}
-                />
-              )}
-              {tabValue === 2 && <CodeExamples {...image} />}
-            </Box>
-          </Grid>
-          <Grid item xs={12}>
-            <Box display="flex" justifyContent="center">
-              {ImagineButton(handleButtonClick, isLoading, isInputChanged)}
-              {isLoading && <CircularProgress color={'inherit'} style={{ color: Colors.lime }} />}
-            </Box>
-          </Grid>
-        </Grid>
+            {tabValue === 0 && (
+              <div>
+                {/* This tab is intentionally left empty */}
+              </div>
+            )}
+            {tabValue === 1 && (
+              <ImageEditor
+                image={imageParams}
+                handleParamChange={handleParamChange}
+                handleFocus={handleFocus}
+                isLoading={isLoading}
+                handleSubmit={handleSubmit}
+                setIsInputChanged={setIsInputChanged}
+              />
+            )}
+            {tabValue === 2 && <CodeExamples {...image} />}
+          </div>
+          <div className="flex justify-center">
+            <ImagineButton handleButtonClick={handleButtonClick} isLoading={isLoading} isInputChanged={isInputChanged} />
+            {isLoading && <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-lime"></div>}
+          </div>
+        </div>
       )}
     </GenerativeImageURLContainer>
   );
 }
 
-function ImagineButton(handleButtonClick, isLoading, isInputChanged) {
-  return <Button
-    variant="contained"
-    color="primary"
-    onClick={handleButtonClick}
-    disabled={isLoading}
-    style={{
-      backgroundColor: isInputChanged ? null : Colors.lime,
-      color: isInputChanged ? null : Colors.offblack,
-      display: isLoading ? 'none' : 'block',
-      fontSize: "1.5rem",
-      fontFamily: "Uncut-Sans-Variable",
-      fontStyle: "normal",
-      fontWeight: 400
-    }}
-  >
-    {isInputChanged ? 'Imagine' : 'Re-Imagine'}
-  </Button>;
+function ImagineButton({ handleButtonClick, isLoading, isInputChanged }) {
+  return (
+    <button
+      className={`bg-lime text-offblack px-4 py-2 rounded-md font-semibold ${isLoading ? 'hidden' : ''}`}
+      onClick={handleButtonClick}
+      disabled={isLoading}
+    >
+      {isInputChanged ? 'Imagine' : 'Re-Imagine'}
+    </button>
+  );
 }
 
 function getImageURL(newImage) {
@@ -159,36 +139,26 @@ function getImageURL(newImage) {
 
 function LoadingIndicator() {
   return (
-    <Grid container justifyContent="center" alignItems="center" style={{ marginBottom: "8em" }}>
-      <CircularProgress color={'inherit'} style={{ color: Colors.offwhite }} />
-    </Grid>
+    <div className="flex justify-center items-center h-40">
+      <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-offwhite"></div>
+    </div>
   );
 }
 
 function TabSelector({ tabValue, setTabValue }) {
+  const tabs = ['Feed', 'Edit', 'Integrate'];
+
   return (
-    <AppBar position="static" style={{ color: "white", width: "auto", boxShadow: 'none' }}>
-      <Box display="flex" justifyContent="center">
-        <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)} aria-label="simple tabs example" variant="scrollable" scrollButtons="on" TabIndicatorProps={{ style: { background: Colors.lime } }} >
-          {['Feed', 'Edit', 'Integrate'].map((label, index) => (
-            <Tab
-              key={label}
-              label={label}
-              style={{
-                color: tabValue === index ? Colors.lime : Colors.offwhite,
-                backgroundColor: tabValue === index ? "transparent" : "transparent",
-                boxShadow: 'none',
-                width: "200px",
-                fontSize: "1.5rem",
-                fontFamily: "Uncut-Sans-Variable",
-                fontStyle: "normal",
-                fontWeight: 400,
-                borderRadius: 0
-              }}
-            />
-          ))}
-        </Tabs>
-      </Box>
-    </AppBar>
+    <div className="flex justify-center">
+      {tabs.map((label, index) => (
+        <button
+          key={label}
+          className={`px-4 py-2 rounded-md font-semibold ${tabValue === index ? 'bg-lime text-offblack' : 'text-offwhite'}`}
+          onClick={() => setTabValue(index)}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
   );
 }
