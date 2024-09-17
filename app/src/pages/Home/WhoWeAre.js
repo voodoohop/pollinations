@@ -1,6 +1,8 @@
 import styled from "@emotion/styled"
 import React, { useState } from "react"
 import { Colors, MOBILE_BREAKPOINT, BaseContainer } from "../../styles/global"
+import { LinkStyle } from "./components"
+import DescriptionIcon from "@material-ui/icons/Description"
 import { keyframes } from "@emotion/react"
 import { PollinationsMarkdown } from "@pollinations/react"
 import { ImageURLHeading } from "./ImageHeading"
@@ -58,9 +60,17 @@ const WhoWeAreContent = () => {
     })
   }
 
+  const handleLinkClick = (e) => {
+    e.preventDefault()
+    const link = e.currentTarget.href
+    navigator.clipboard.writeText(link).then(() => {
+      console.log(`Copied to clipboard: ${link}`)
+    })
+  }
+
   return (
     <Box height={MOBILE_BREAKPOINT ? "640px" : "1200px"} width="100%">
-      <h2>
+      <h2 style={{ userSelect: "none" }}>
         <PollinationsMarkdown
           components={{
             p: (props) => <p {...props} style={{ fontSize: "36px", userSelect: "none" }} />,
@@ -242,6 +252,7 @@ const PageLayout = styled(BaseContainer)`
     font-size: 24px;
     line-height: 34px;
     color: ${(props) => (props.dark ? Colors.offwhite : Colors.offblack)};
+    margin: 0; // Remove margin as it's now handled by ContactWrapper
     user-select: none;
     i {
       color: ${(props) => (props.dark ? Colors.accent : Colors.offblack)};
@@ -263,7 +274,28 @@ const Style = styled.div`
 `
 
 const ContactWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 2em;
+
+  p {
+    width: 45%; // Adjust this value as needed
+    margin: 0;
+  }
+
+  p:last-child {
+    text-align: right;
+  }
+
   @media (max-width: ${MOBILE_BREAKPOINT}) {
+    flex-direction: column;
+
+    p {
+      width: 100%;
+    }
+
     p:last-child {
     }
 

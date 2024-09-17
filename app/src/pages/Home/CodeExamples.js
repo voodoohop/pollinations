@@ -3,9 +3,55 @@ import { AppBar, Tabs, Tab, Box, Link } from "@material-ui/core"
 import { CodeBlock, irBlack } from "react-code-blocks"
 import { ImageURLHeading, URLExplanation } from "./ImageHeading"
 import { Colors } from "../../styles/global"
+import ReactMarkdown from "react-markdown"
 
 // Code examples as an object
 const CODE_EXAMPLES = {
+  llm_prompt: () => `You will now act as a prompt generator. 
+I will describe an image to you, and you will create a prompt that could be used for image-generation. 
+Once I described the image, give a 5-word summary and then include the following markdown. 
+  
+![Image](https://image.pollinations.ai/prompt/{description}?width={width}&height={height})
+  
+where {description} is:
+{sceneDetailed}%20{adjective}%20{charactersDetailed}%20{visualStyle}%20{genre}%20{artistReference}
+  
+Make sure the prompts in the URL are encoded. Don't quote the generated markdown or put any code box around it.`,
+  llm_prompt_advanced: () => `
+# Image Generator Instructions
+
+You are an image generator. The user provides a prompt. Please infer the following parameters for image generation:
+
+    {
+      "prompt": "[prompt, max 50 words]",
+      "seed": [seed],
+      "width": [width],
+      "height": [height],
+      "model": "[model]"
+    }
+
+Key points:
+- If the user's prompt is short, add creative details to make it about 50 words suitable for an image generator AI.
+- Each seed value creates a unique image for a given prompt.
+- To create variations of an image without changing its content:
+  - Keep the prompt the same and change only the seed.
+- To alter the content of an image:
+  - Modify the prompt and keep the seed unchanged.
+- Infer width and height around 1024x1024 or other aspect ratios if it makes sense.
+- Infer the most appropriate model name based on the content and style described in the prompt.
+
+Default params:
+- prompt (required): The text description of the image you want to generate.
+- model (optional): The model to use for generation. Options: 'flux', 'flux-realism', 'any-dark', 'flux-anime', 'flux-3d', 'turbo' (default: 'flux')
+  - Infer the most suitable model based on the prompt's content and style.
+- seed (optional): Seed for reproducible results (default: random).
+- width/height (optional): Default 1024x1024.
+- nologo (optional): Set to true to disable the logo rendering.
+
+Additional instructions:
+- If the user specifies the /imagine command, return the parameters as JSON.
+- Response should be in valid JSON format only.
+`,
   api_description: () => `
 # Pollinations AI Image Generation API
 
@@ -31,16 +77,6 @@ https://image.pollinations.ai/prompt/A%20beautiful%20sunset%20over%20the%20ocean
 ## Response
 The API returns a raw image file (typically JPEG or PNG) as the response body. You can directly embed the image in your HTML or Markdown.
 `,
-  llm_prompt: () => `You will now act as a prompt generator. 
-I will describe an image to you, and you will create a prompt that could be used for image-generation. 
-Once I described the image, give a 5-word summary and then include the following markdown. 
-  
-![Image](https://image.pollinations.ai/prompt/{description}?width={width}&height={height})
-  
-where {description} is:
-{sceneDetailed}%20{adjective}%20{charactersDetailed}%20{visualStyle}%20{genre}%20{artistReference}
-  
-Make sure the prompts in the URL are encoded. Don't quote the generated markdown or put any code box around it.`,
   markdown: ({ imageURL, prompt, width, height, seed, model }) =>
     `# Image Parameters
 Prompt: **${prompt}**
@@ -191,7 +227,7 @@ print(image.url)
 }
 
 export function CodeExamples(image) {
-  const [tabValue, setTabValue] = useState(0)
+  const [tabValue, setTabValue] = useState(0) // Set initial tab to 0 (llm_prompt)
 
   const handleChange = (event, newValue) => {
     setTabValue(newValue)
@@ -199,12 +235,15 @@ export function CodeExamples(image) {
 
   const codeExampleTabs = Object.keys(CODE_EXAMPLES)
 
-  // Add "api_description" as the first tab
+  // Add "llm_prompt" and "llm_prompt_advanced" as the first tabs
   const allTabs = [
+    "llm_prompt",
     "api_description",
+    "llm_prompt_advanced",
+
     "link",
     "discord_bot",
-    ...codeExampleTabs.filter((tab) => tab !== "api_description"),
+    ...codeExampleTabs.filter((tab) => tab !== "llm_prompt" && tab !== "llm_prompt_advanced" && tab !== "api_description"),
   ]
 
   return (
@@ -226,8 +265,8 @@ export function CodeExamples(image) {
               <Tab
                 key={key}
                 label={
-                  key === "api_description"
-                    ? "API Description"
+                  key === "llm_prompt" || key === "llm_prompt_advanced"
+                    ? key.replace("_", " ").toUpperCase()
                     : key.charAt(0).toUpperCase() + key.slice(1)
                 }
                 style={{
@@ -279,6 +318,14 @@ export function CodeExamples(image) {
             }
 
             const text = CODE_EXAMPLES[key](image)
+
+            if (key === "api_description") {
+              return (
+                <Box margin="30px" overflow="hidden">
+                  <ReactMarkdown>{text}</ReactMarkdown>
+                </Box>
+              )
+            }
 
             return (
               tabValue === index && (
