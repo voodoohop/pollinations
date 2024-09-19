@@ -7,7 +7,8 @@ import Home from "./pages/Home/"
 import Terms from "./components/Terms"
 import ChatComponent from "./components/ChatComponent"
 import MusicVideo from "./pages/MusicVideo"
-
+import ChessBoardGenerator from "./pages/ChessBoardGenerator"
+import { Box } from "@material-ui/core"
 
 const AppRoutes = [
   {
@@ -36,6 +37,12 @@ const AppRoutes = [
   // },
   {
     exact: true,
+    path: '/chess',
+    element: <ChessBoardGenerator />,
+    key: 'chess'
+  },
+  {
+    exact: true,
     path: '/musicvideo',
     element: <MusicVideo />,
     key: 'musicvideo'
@@ -55,13 +62,13 @@ const AppRoutes = [
 
 const App = () => <>
   <SEOMetadata />
-  <TopBar />
+  {/* <TopBar /> */}
   <Routes>
     {
       AppRoutes.map(route => <Route {...route} />)
     }
   </Routes>
-  <Footer />
+  {/* <Footer /> */}
 </>;
 
 export default App
