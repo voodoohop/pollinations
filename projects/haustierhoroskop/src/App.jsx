@@ -17,7 +17,7 @@ function App() {
   const horoscope = usePollinationsText(prompt, {
     seed: 42,
     jsonMode: true,
-    model: "claude",
+    model: "openai",
     systemPrompt: `
 Goal: create a horoscope text and image description for the pet in the form of a json object.
 
