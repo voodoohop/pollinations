@@ -196,56 +196,21 @@ const ProjectsSection = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const renderProjects = (projectList) => (
-        <Table className={classes.table}>
-            <TableBody>
-                {projectList.map((project, index) => (
-                    <TableRow key={index} className={classes.tableRow}>
-                        <TableCell className={classes.tableCell}>
-                            {!isMobile && (
-                                <img
-                                    src={generateImageUrl(project.name)}
-                                    alt={project.name}
-                                    className={classes.projectImage}
-                                    style={{ width: imageDimension, height: imageDimension }}
-                                />
-                            )}
-                        </TableCell>
-                        <TableCell className={classes.tableCell}>
-                            {renderProjectLink(project)}
-                            {project.author && (
-                                <span style={{ marginLeft: '8px', color: Colors.white, fontSize: '1em' }}>
-                                    by {project.author}
-                                </span>
-                            )}
-                        </TableCell>
-                        <TableCell className={classes.tableCell}>
-                            <span style={{ color: Colors.white, fontSize: '1em' }}>
-                                <Markdown>{project.description}</Markdown>
-                            </span>
-                            {project.repo && renderRepoLink(project.repo)}
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    );
-
     return (
         <Container className={classes.root} style={{ margin: '3em 0' }}>
             <ImageURLHeading>Integrations</ImageURLHeading>
 
             <ImageURLHeading width={350} height={70} whiteText={"yellow"}>AI Chat / LLMs</ImageURLHeading>
-            {renderProjects(projects.llmIntegration)}
+            <ProjectList projectList={projects.llmIntegration} isMobile={isMobile} classes={classes} />
 
             <ImageURLHeading width={350} height={70} whiteText={"yellow"}>Social Bots</ImageURLHeading>
-            {renderProjects(projects.socialBots)}
+            <ProjectList projectList={projects.socialBots} isMobile={isMobile} classes={classes} />
 
             <ImageURLHeading width={350} height={70} whiteText={"yellow"}>Mobile & Web Apps</ImageURLHeading>
-            {renderProjects(projects.apps)}
+            <ProjectList projectList={projects.apps} isMobile={isMobile} classes={classes} />
 
             <ImageURLHeading width={350} height={70} whiteText={"yellow"}>Tutorials</ImageURLHeading>
-            {renderProjects(projects.tutorials)}
+            <ProjectList projectList={projects.tutorials} isMobile={isMobile} classes={classes} />
 
             <Typography className={classes.listProjectText} style={{ fontSize: '1.5em' }}>
                 Have you created a project that integrates Pollinations? We'd love to feature it!<br />
@@ -256,6 +221,45 @@ const ProjectsSection = () => {
     );
 };
 
+const ProjectList = ({ projectList, isMobile, classes }) => {
+    return (
+        <Table className={classes.table}>
+            <TableBody>
+                {projectList.map((project, index) => {
+                    console.log(project);
+                    return (
+                        <TableRow key={index} className={classes.tableRow}>
+                            <TableCell className={classes.tableCell}>
+                                {!isMobile && (
+                                    <img
+                                        src={generateImageUrl(project.name)}
+                                        alt={project.name}
+                                        className={classes.projectImage}
+                                        style={{ width: imageDimension, height: imageDimension }}
+                                    />
+                                )}
+                            </TableCell>
+                            <TableCell className={classes.tableCell}>
+                                {renderProjectLink(project)}
+                                {project.author && (
+                                    <span style={{ marginLeft: '8px', color: Colors.white, fontSize: '1em' }}>
+                                        by {project.author}
+                                    </span>
+                                )}
+                            </TableCell>
+                            <TableCell className={classes.tableCell}>
+                                <span style={{ color: Colors.white, fontSize: '1em' }}>
+                                    <Markdown>{project.description}</Markdown>
+                                </span>
+                                {project.repo && renderRepoLink(project.repo)}
+                            </TableCell>
+                        </TableRow>
+                    )
+                })}
+            </TableBody>
+        </Table>
+    );
+};
 
 const StyledLink = styled(LinkStyle)`
   transition: color 0.3s ease;
