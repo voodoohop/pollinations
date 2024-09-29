@@ -8,7 +8,7 @@ import useResponsivePollinationsText from "../hooks/useResponsivePollinationsTex
 export function EmojiRephrase({ children }) {
     const seed = useRandomSeed();
     const prompt = `Format and add emojis. Only respond with the markdown. No explanation. No code box. try not to change the length much: '${children}'`;
-    const rephrase = useResponsivePollinationsText(prompt, { seed });
+    const rephrase = useResponsivePollinationsText(prompt, { seed, originalPrompt: children });
     return (
         <ReactMarkdown
             components={{
