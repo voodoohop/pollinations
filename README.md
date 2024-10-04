@@ -10,13 +10,13 @@
 
 ## 🚀 Key Features
 
-- 🔓 100% Open Source
-- 🆓 Free to use
+- 🔓 **100% Open Source**
+- 🆓 **_Free to use_**
 - 🔑 No signup or API keys
-- 🖼️ Embed like any normal image or text
-- 🌍 Over 50,000 active users and > 2 million images generated per month
-- 🤝 Used by various open-source LLMs, bots, and communities
-- 🎣 Easy-to-use React hooks and components ([React Components README](./pollinations-react/README.md))
+- 🖼️ **Embed like any normal image or text**
+- 🌍 Over **50,000 active users** and > **_8 million images generated per month_**
+- 🤝 Used by various **open-source LLMs**, **bots**, and **communities**
+- 🎣 **_Easy-to-use React hooks_** ([React Hooks Examples](https://react-hooks.pollinations.ai/))
 
 ## 🚀 Getting Started
 
@@ -69,33 +69,68 @@ To generate text, use this URL:
 
 ## 🛠️ Integration
 
-### React Components
+### React Hooks
 
-We offer React components for easy integration. Example usage:
+We offer React hooks for easy integration. Example usage:
 
     import React from 'react';
-    import { PollinationsImage, PollinationsMarkdown } from '@pollinations/react';
+    import { usePollinationsImage, usePollinationsText } from '@pollinations/react';
+    import ReactMarkdown from 'react-markdown';
 
-    const AIGeneratedContent = () => (
-      <div>
-        <h2>AI-Generated Travel Guide</h2>
-        <PollinationsImage 
-          prompt="Beautiful landscape of Paris with Eiffel Tower" 
-          width={800} 
-          height={600} 
-          seed={42} 
-        />
-        <PollinationsMarkdown seed={42}>
-          Write a brief travel guide for Paris, including top attractions and local cuisine
-        </PollinationsMarkdown>
-      </div>
-    );
+    const AIGeneratedContent = () => {
+      const imageUrl = usePollinationsImage("Beautiful landscape of Paris with Eiffel Tower", { width: 800, height: 600, seed: 42 });
+      const markdown = usePollinationsText("Write a brief travel guide for Paris, including top attractions and local cuisine in markdown", { seed: 42 });
+
+      return (
+        <div>
+          <h2>AI-Generated Travel Guide</h2>
+          <img src={imageUrl} alt="AI Generated" />
+          {markdown ? (
+            <ReactMarkdown>{markdown}</ReactMarkdown>
+          ) : (
+            <p>Loading markdown content...</p>
+          )}
+        </div>
+      );
+    };
 
     export default AIGeneratedContent;
 
-Check out our [Pollinations React Components](./pollinations-react/README.md) for more details.
+Check out our [Pollinations React Hooks](./pollinations-react/README.md) for more details.
 
-## 🌐 Projects Using Pollinations.AI
+## Architecture
+
+```mermaid
+graph LR
+    Q[Bots - Discord, Telegram, WhatsApp] --> L1
+    
+    N[30+ Mobile and Web Apps] --> L1
+    N --> L2
+    
+    A[pollinations.ai Web Frontend] --> L1
+    A --> L2
+    
+    R[AI Agents - Qwen, Sillytavern, ...] --> L1
+    
+    L1[Image CDN] --> B
+    L2[Text CDN] --> C
+    
+    B[image.pollinations.ai - AWS EC2 CPU] --> F[groqCloud - Prompt Enhancing]
+    B --> S[Safety Checker]
+    B --> M[llmplayground.net - Custom FLUX models]
+    F --> E[Translation Service - 1 GPU VM]
+    E --> D[FLUX image generation model - 2-6 GPU VMs on AWS]
+    
+    C[text.pollinations.ai - AWS EC2 CPU] --> P[karma.yt - Realtime News]
+    C --> G[Azure-hosted Serverless LLMs]
+    G  --> H[OpenAI]
+    G --> I[Mistral]
+    G --> J[Llama]
+    G --> K[Claude]
+
+```
+
+## ���� Projects Using Pollinations.AI
 
 Pollinations.AI is used in various projects, including:
 
@@ -121,6 +156,7 @@ Pollinations.AI is used in various projects, including:
 5. [StorySight](https://github.com/abiral-manandhar/storySight): An app to help children with learning disabilities by visualizing abstract concepts. Made using Django and Pollinations.ai. Submitted to: [Devpost](https://devpost.com/software/storysight)
 6. [StoryWeaver](https://devpost.com/software/storyweaver-013xdw): StoryWeaver crafts personalized picture books for children based on themes and prompts you choose, bringing your unique story ideas to life with AI! Created by Advaith Narayanan, Omeed Sabouri, Yufan Wang. [GitHub Repo](https://github.com/AdvaithN1/StoryWeaver)
 7. [Websim](https://websim.ai/c/bXsmNE96e3op5rtUS): A web simulation tool that integrates Pollinations.ai for generating AI-driven content. Remix the app with your own prompts. Created by @thomash_pollinations.
+8. [MIDIjourney](https://korus.co/): An AI-powered plugin for Ableton Live that turns text descriptions into music. Created by KORUS Labs. [GitHub Repo](https://github.com/korus-labs/MIDIjourney)
 
 ### Tutorials
 1. [Tutorial](https://guiadehospedagem.com.br/pollinations-ai/): An in-depth Portuguese tutorial on using Pollinations AI. Created by Janderson de Sales.
@@ -138,21 +174,6 @@ We're constantly exploring new ways to push the boundaries of AI-driven content 
 ## 🌍 Our Vision
 
 Pollinations.AI aims to bridge technological innovation with global creativity. Our international team combines precision engineering with artistic flair to create a platform that serves creators worldwide.
-
-## 🏢 Supported By
-
-Pollinations.AI is proud to be supported by:
-
-[![Supported Companies](https://pollinations.ai/p/Logos_of_AWS_Activate,_Google_Cloud_for_Startups,_OVH_Cloud,_NVIDIA_Inception,_Azure,_and_Outlier_Ventures_arranged_in_a_grid?width=300&height=200&nologo=true&seed=-1)](https://pollinations.ai/p/Logos_of_AWS_Activate,_Google_Cloud_for_Startups,_OVH_Cloud,_NVIDIA_Inception,_Azure,_and_Outlier_Ventures_arranged_in_a_grid?width=300&height=200&nologo=true&seed=-1)
-
-- [LLMPlayground.net](https://llmplayground.net/): Hosting Custom Flux Models
-- [Karma.YT](https://karma.yt): Social media integrations
-- [AWS Activate](https://aws.amazon.com/): GPU Cloud Credits
-- [Google Cloud for Startups](https://cloud.google.com/): GPU Cloud Credits
-- [OVH Cloud](https://www.ovhcloud.com/): GPU Cloud credits
-- [NVIDIA Inception](https://www.nvidia.com/en-us/deep-learning-ai/startups/): AI startup support
-- [Azure (MS for Startups)](https://azure.microsoft.com/): OpenAI credits
-- [Outlier Ventures](https://outlierventures.io/): Startup Accelerator
 
 ## 🤝 Community and Support
 

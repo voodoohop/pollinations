@@ -1,8 +1,12 @@
 import React from "react"
-import { Typography, Link } from "@material-ui/core"
+import { Typography, Link, useMediaQuery } from "@material-ui/core"
 import { Colors } from "../../../styles/global"
+import { useTheme } from "@material-ui/core/styles"
 
 export function ModelInfo({ model, wasPimped, referrer }) {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
+
   const formatReferrer = (url) => {
     if (!url) return "-"
     const domain = url.replace(/^https?:\/\//, "").split("/")[0]
@@ -10,57 +14,44 @@ export function ModelInfo({ model, wasPimped, referrer }) {
   }
 
   const renderModelInfo = (modelName, modelLink, loraLink) => (
-    <Typography
-      variant="caption"
-      color="textSecondary"
-      style={{ textAlign: "center", fontSize: "1rem" }}
-    >
-      Model:{" "}
-      <Link
-        href={modelLink}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ color: Colors.lime }}
-      >
-        {modelName}
-      </Link>
-      {loraLink && (
+    <Typography variant="body1" color="textSecondary" style={{ textAlign: "center", fontSize: "1.2rem" }}>
+      {isMobile ? (
         <>
-          &nbsp;&nbsp; LoRA:{" "}
-          <Link
-            href={loraLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: Colors.lime }}
-          >
-            DMD2
-          </Link>
+          Model: <Link href={modelLink} target="_blank" rel="noopener noreferrer" style={{ color: Colors.lime, fontSize: "1.2rem" }}>{modelName}</Link><br />
+          {loraLink && (
+            <>
+              LoRA: <Link href={loraLink} target="_blank" rel="noopener noreferrer" style={{ color: Colors.lime, fontSize: "1.2rem" }}>DMD2</Link><br />
+            </>
+          )}
+          {wasPimped && (
+            <>
+              Prompt Enhancer: <Link href="https://github.com/pollinations/pollinations/blob/master/image.pollinations.ai/groqPimp.js" target="_blank" rel="noopener noreferrer" style={{ color: Colors.lime, fontSize: "1.2rem" }}>Groq</Link><br />
+            </>
+          )}
+          {referrer && (
+            <>
+              Referrer: <Link href={referrer} target="_blank" rel="noopener noreferrer" style={{ color: Colors.lime, fontSize: "1.2rem" }}>{formatReferrer(referrer)}</Link>
+            </>
+          )}
         </>
-      )}
-      &nbsp;&nbsp; Prompt Enhancer:{" "}
-      {wasPimped ? (
-        <Link
-          href="https://github.com/pollinations/pollinations/blob/master/image.pollinations.ai/groqPimp.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: Colors.lime }}
-        >
-          Groq
-        </Link>
       ) : (
-        <i>N/A</i>
-      )}
-      {referrer && (
         <>
-          &nbsp;&nbsp;Referrer:{" "}
-          <Link
-            href={referrer}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: Colors.lime }}
-          >
-            {formatReferrer(referrer)}
-          </Link>
+          Model: <Link href={modelLink} target="_blank" rel="noopener noreferrer" style={{ color: Colors.lime, fontSize: "1.2rem" }}>{modelName}</Link>&nbsp;&nbsp;
+          {loraLink && (
+            <>
+              LoRA: <Link href={loraLink} target="_blank" rel="noopener noreferrer" style={{ color: Colors.lime, fontSize: "1.2rem" }}>DMD2</Link>&nbsp;&nbsp;
+            </>
+          )}
+          {wasPimped && (
+            <>
+              Prompt Enhancer: <Link href="https://github.com/pollinations/pollinations/blob/master/image.pollinations.ai/groqPimp.js" target="_blank" rel="noopener noreferrer" style={{ color: Colors.lime, fontSize: "1.2rem" }}>Groq</Link>&nbsp;&nbsp;
+            </>
+          )}
+          {referrer && (
+            <>
+              Referrer: <Link href={referrer} target="_blank" rel="noopener noreferrer" style={{ color: Colors.lime, fontSize: "1.2rem" }}>{formatReferrer(referrer)}</Link>
+            </>
+          )}
         </>
       )}
     </Typography>
@@ -90,5 +81,5 @@ export function ModelInfo({ model, wasPimped, referrer }) {
     return renderModelInfo("Flux.Realism", "https://llmplayground.net/", null)
   }
 
-  return null
+  return renderModelInfo("Unknown Model", "#", null)
 }

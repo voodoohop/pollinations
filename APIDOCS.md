@@ -1,5 +1,9 @@
 # Pollinations.AI Image Generation API
 
+## React Hooks
+
+For easy integration with React applications, check out our [Pollinations React Hooks documentation](./pollinations-react/README.md).
+
 ## Endpoint
 
     GET https://image.pollinations.ai/prompt/{prompt}
@@ -86,7 +90,7 @@ This endpoint generates text responses based on the provided prompt using AI. It
 | prompt    | required | Text prompt for the AI to respond to. Should be URL-encoded. | -       |
 | seed      | optional | Seed for reproducible results. Use -1 for random.          | null    |
 | json      | optional | Set to 'true' to receive response in JSON format.          | false   |
-| model     | optional | Model to use for text generation. Options: 'openai', 'mistral' | 'openai' |
+| model     | optional | Model to use for text generation. Options: 'openai', 'mistral'. See https://text.pollinations.ai/models for available models. | 'openai' |
 | system    | optional | System prompt to set the behavior of the AI. Should be URL-encoded. | - |
 
 ### Request Body (POST request)
@@ -96,7 +100,7 @@ This endpoint generates text responses based on the provided prompt using AI. It
 | messages | required | Array of message objects with 'role' and 'content' fields. |
 | seed     | optional | Seed for reproducible results. Use -1 for random.          |
 | jsonMode | optional | Set to true to receive response in JSON format.            |
-| model    | optional | Model to use for text generation. Options: 'openai', 'mistral' |
+| model    | optional | Model to use for text generation. Options: 'openai', 'mistral'. See https://text.pollinations.ai/models for available models. |
 
 ### Example Usage (GET)
 
@@ -129,4 +133,13 @@ This endpoint generates text responses based on the provided prompt using AI. It
 
     generateText();
 
+### OpenAI Compatible Endpoint
+
+We provide an OpenAI compatible endpoint that provides access to all the existing models and can be used in any third-party application that allows configuring a custom OpenAI endpoint. No API key is necessary.
+
+#### Endpoint
+
+    https://text.pollinations.ai/openai
+
 Note: The message format used in the POST request is similar to the one used by OpenAI's ChatGPT API. For more detailed information on structuring your messages, please refer to the [OpenAI API documentation](https://platform.openai.com/docs/guides/chat).
+

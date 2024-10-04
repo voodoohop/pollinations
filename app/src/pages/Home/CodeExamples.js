@@ -1,13 +1,40 @@
 import { useState } from "react"
-import { AppBar, Tabs, Tab, Box, Link } from "@material-ui/core"
+import { AppBar, ButtonGroup, Button, Box, IconButton } from "@material-ui/core"
 import { CodeBlock, irBlack } from "react-code-blocks"
 import { ImageURLHeading, URLExplanation } from "./ImageHeading"
-import { Colors } from "../../styles/global"
-import ReactMarkdown from "react-markdown"
+import { Colors, Fonts } from "../../styles/global"
+import { usePollinationsText } from "@pollinations/react"
+import useRandomSeed from "../../hooks/useRandomSeed"
+import React from "react";
+import { LinkStyle } from "./components"
+import FileCopyIcon from '@material-ui/icons/FileCopy'
+import { EmojiRephrase } from "../../components/EmojiRephrase"
 
-// Code examples as an object
+// Common styles
+const buttonStyle = (isActive) => ({
+  backgroundColor: isActive ? Colors.lime : "transparent",
+  color: isActive ? Colors.offblack : Colors.lime,
+  fontSize: '1.3rem',
+  fontFamily: 'Uncut-Sans-Variable',
+  fontStyle: 'normal',
+  fontWeight: 600,
+  height: "60px",
+  position: "relative",
+  margin: "0.5em",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  letterSpacing: "0.1em",
+  borderRadius: "5px",
+  padding: "0 1em",
+  whiteSpace: "nowrap",
+  border: `1px solid ${Colors.lime}`,
+});
+
+// Code examples as an object with language property
 const CODE_EXAMPLES = {
-  llm_prompt: () => `You will now act as a prompt generator. 
+  llm_prompt: {
+    code: () => `You will now act as a prompt generator. 
 I will describe an image to you, and you will create a prompt that could be used for image-generation. 
 Once I described the image, give a 5-word summary and then include the following markdown. 
   
@@ -17,68 +44,50 @@ where {description} is:
 {sceneDetailed}%20{adjective}%20{charactersDetailed}%20{visualStyle}%20{genre}%20{artistReference}
   
 Make sure the prompts in the URL are encoded. Don't quote the generated markdown or put any code box around it.`,
-  llm_prompt_advanced: () => `
-# Image Generator Instructions
+    language: "markdown"
+  },
+  llm_prompt_chat: {
+    code: () => `
+  # Image Generator Instructions
 
-You are an image generator. The user provides a prompt. Please infer the following parameters for image generation:
+  You are an image generator. The user provides a prompt. Please infer the following parameters for image generation:
 
-    {
-      "prompt": "[prompt, max 50 words]",
-      "seed": [seed],
-      "width": [width],
-      "height": [height],
-      "model": "[model]"
-    }
+  - **Prompt:** [prompt, max 50 words]
+  - **Seed:** [seed]
+  - **Width:** [width]
+  - **Height:** [height]
+  - **Model:** [model]
 
-Key points:
-- If the user's prompt is short, add creative details to make it about 50 words suitable for an image generator AI.
-- Each seed value creates a unique image for a given prompt.
-- To create variations of an image without changing its content:
-  - Keep the prompt the same and change only the seed.
-- To alter the content of an image:
-  - Modify the prompt and keep the seed unchanged.
-- Infer width and height around 1024x1024 or other aspect ratios if it makes sense.
-- Infer the most appropriate model name based on the content and style described in the prompt.
+  ## Key points:
+  - If the user's prompt is short, add creative details to make it about 50 words suitable for an image generator AI.
+  - Each seed value creates a unique image for a given prompt.
+  - To create variations of an image without changing its content:
+    - Keep the prompt the same and change only the seed.
+  - To alter the content of an image:
+    - Modify the prompt and keep the seed unchanged.
+  - Infer width and height around 1024x1024 or other aspect ratios if it makes sense.
+  - Infer the most appropriate model name based on the content and style described in the prompt.
 
-Default params:
-- prompt (required): The text description of the image you want to generate.
-- model (optional): The model to use for generation. See available models at https://image.pollinations.ai/models (default: 'flux')
-  - Infer the most suitable model based on the prompt's content and style.
-- seed (optional): Seed for reproducible results (default: random).
-- width/height (optional): Default 1024x1024.
-- nologo (optional): Set to true to disable the logo rendering.
+  ## Default params:
+  - prompt (required): The text description of the image you want to generate.
+  - model (optional): The model to use for generation. Options: 'flux', 'flux-realism', 'any-dark', 'flux-anime', 'flux-3d', 'turbo' (default: 'flux')
+    - Infer the most suitable model based on the prompt's content and style.
+  - seed (optional): Seed for reproducible results (default: random).
+  - width/height (optional): Default 1024x1024.
+  - nologo (optional): Set to true to disable the logo rendering.
 
-Additional instructions:
-- If the user specifies the /imagine command, return the parameters as JSON.
-- Response should be in valid JSON format only.
-`,
-  api_description: () => `
-# Pollinations AI Image Generation API
+  ## Additional instructions:
+  - If the user specifies the /imagine command, return the parameters as an embedded markdown image with the prompt in italic underneath.
 
-## Endpoint
-GET https://image.pollinations.ai/prompt/{prompt}
-
-## Description
-This endpoint generates an image based on the provided prompt and optional parameters. It returns a raw image file.
-
-## Parameters
-- prompt (required): The text description of the image you want to generate. Should be URL-encoded.
-- model (optional): The model to use for generation. See available models at https://image.pollinations.ai/models. Default: 'flux'
-- seed (optional): Seed for reproducible results. Default: random
-- width (optional): Width of the generated image. Default: 1024
-- height (optional): Height of the generated image. Default: 1024
-- nologo (optional): Set to 'true' to turn off the rendering of the logo
-- nofeed (optional): Set to 'true' to prevent the image from appearing in the public feed
-- enhance (optional): Set to 'true' or 'false' to turn on or off prompt enhancing (passes prompts through an LLM to add detail)
-
-## Example Usage
-https://image.pollinations.ai/prompt/A%20beautiful%20sunset%20over%20the%20ocean?model=flux&width=1280&height=720&seed=42&nologo=true&enhance=true
-
-## Response
-The API returns a raw image file (typically JPEG or PNG) as the response body. You can directly embed the image in your HTML or Markdown.
-`,
-  markdown: ({ imageURL, prompt, width, height, seed, model }) =>
-    `# Image Parameters
+  ## Example:
+  ![{description}](https://image.pollinations.ai/prompt/{description}?width={width}&height={height})
+  *{description}*
+  `,
+    language: "markdown"
+  },
+  markdown: {
+    code: ({ imageURL, prompt, width, height, seed, model }) =>
+      `# Image Parameters
 Prompt: **${prompt}**
 Width: **${width}**
 Height: **${height}**
@@ -87,8 +96,38 @@ Model: **${model || "flux"}**
 
 # Image
 ![Generative Image](${imageURL})`,
-  html: ({ imageURL, prompt, width, height, seed, model }) =>
-    `<html>
+    language: "markdown"
+  },
+  react: {
+    code: ({ prompt, width, height, seed, model }) => `
+// React code example using usePollinationsImage hook
+// For more details, visit: https://react-hooks.pollinations.ai/
+
+import React from 'react';
+import { usePollinationsImage } from '@pollinations/react';
+
+const GeneratedImageComponent = () => {
+  const imageUrl = usePollinationsImage('${prompt}', {
+    width: ${width},
+    height: ${height},
+    seed: ${seed},
+    model: '${model || "flux"}'
+  });
+
+  return (
+    <div>
+      {imageUrl ? <img src={imageUrl} alt="Generated Image" /> : <p>Loading...</p>}
+    </div>
+  );
+};
+
+export default GeneratedImageComponent;
+`,
+    language: "javascript"
+  },
+  html: {
+    code: ({ imageURL, prompt, width, height, seed, model }) =>
+      `<html>
   <body>
     <h2>Image Parameters</h2>
     <p>Prompt: ${prompt}</p>
@@ -104,15 +143,15 @@ Model: **${model || "flux"}**
   </body>
 </html>
 `,
-
-  rust: ({ prompt, width, height, seed, model }) => `
-// Here's the equivalent Rust code using the reqwest crate for HTTP requests
-// and the std::fs module for file operations.
-// First part of the code that fetches an image from a URL and saves it to a file.
+    language: "html"
+  },
+  rust: {
+    code: ({ prompt, width, height, seed, model }) => `
+// Rust code example for downloading an image
+// For more details, visit: https://github.com/pollinations/pollinations/blob/master/APIDOCS.md
 
 use reqwest::blocking::get;
 use std::fs::File;
-use std::io::copy;
 use std::io::Write;
 
 fn download_image(image_url: &str) -> Result<(), Box<dyn std::error::Error>> {
@@ -136,8 +175,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let model = "${model || "flux"}"; // Using 'flux' as default if model is not provided
 
     let image_url = format!(
-        "https://pollinations.ai/p/{}?width={}&height={}&seed={}&model={}",
-        prompt, width, height, seed, model
+      "https://pollinations.ai/p/{}?width={}&height={}&seed={}&model={}",
+      prompt, width, height, seed, model
     );
 
     download_image(&image_url)?;
@@ -148,11 +187,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 // Make sure you have the reqwest crate in your Cargo.toml:
 
 [dependencies]
-reqwest = { version = "0.11", features = ["blocking", "json"] }
-`,
-
-  nodejs: ({ prompt, width, height, seed, model }) => `
-// This Node.js snippet downloads the image using node-fetch and saves it to disk, including image details.
+reqwest = { version = "0.11", features =["blocking", "json"] }
+  `,
+    language: "rust"
+  },
+  nodejs: {
+    code: ({ prompt, width, height, seed, model }) => `
+// Node.js code example for downloading an image
+// For more details, visit: https://github.com/pollinations/pollinations/blob/master/APIDOCS.md
 
 import fs from 'fs';
 import fetch from 'node-fetch';
@@ -177,28 +219,32 @@ const model = '${model || "flux"}'; // Using 'flux' as default if model is not p
 
 const imageUrl = \`https://pollinations.ai/p/\${encodeURIComponent(prompt)}?width=\${width}&height=\${height}&seed=\${seed}&model=\${model}\`;
 
-downloadImage(imageUrl);`,
-
-  python: ({ prompt, width, height, seed, model }) => `
-# This Python snippet downloads the image using requests and saves it to disk, including image details.
+downloadImage(imageUrl);
+`,
+    language: "javascript"
+  },
+  python: {
+    code: ({ prompt, width, height, seed, model }) => `
+# Python code example for downloading an image
+# For more details, visit: https://github.com/pollinations/pollinations/blob/master/APIDOCS.md
 
 import requests
 
 def download_image(image_url):
-    // Fetching the image from the URL
+    # Fetching the image from the URL
     response = requests.get(image_url)
-    // Writing the content to a file named 'image.jpg'
+    # Writing the content to a file named 'image.jpg'
     with open('image.jpg', 'wb') as file:
         file.write(response.content)
-    // Logging completion message
+    # Logging completion message
     print('Download Completed')
 
 # Image details
 prompt = '${shorten(prompt)}'
 width = ${width}
 height = ${height}
-seed = ${seed} // Each seed generates a new image variation
-model = '${model || "flux"}' // Using 'flux' as default if model is not provided
+seed = ${seed} # Each seed generates a new image variation
+model = '${model || "flux"}' # Using 'flux' as default if model is not provided
 
 image_url = f"https://pollinations.ai/p/{prompt}?width={width}&height={height}&seed={seed}&model={model}"
 
@@ -211,9 +257,9 @@ download_image(image_url)
 
 import pollinations as ai
 
-model_obj: object = ai.Model()
+model_obj = ai.Model()
 
-image: object = model_obj.generate(
+image = model_obj.generate(
     prompt=f'${shorten(prompt)} {ai.realistic}',
     model=ai.${model || "flux"},
     width=${width},
@@ -224,131 +270,114 @@ image.save('image-output.jpg')
 
 print(image.url)
 `,
+    language: "python"
+  }
 }
 
-export function CodeExamples(image) {
-  const [tabValue, setTabValue] = useState(0) // Set initial tab to 0 (llm_prompt)
+export function CodeExamples({ image }) {
+  const [tabValue, setTabValue] = useState(0); // Set initial tab to 0 (markdown)
 
   const handleChange = (event, newValue) => {
-    setTabValue(newValue)
-  }
+    setTabValue(newValue);
+  };
 
-  const codeExampleTabs = Object.keys(CODE_EXAMPLES)
+  const codeExampleTabs = Object.keys(CODE_EXAMPLES);
 
-  // Add "llm_prompt" and "llm_prompt_advanced" as the first tabs
-  const allTabs = [
-    "llm_prompt",
-    "api_description",
-    "llm_prompt_advanced",
+  const seed = useRandomSeed();
+  const markdownText = usePollinationsText(
+    "Rephrase with emojis and simplify: 'Learn more on GitHub'",
+    { seed }
+  );
 
-    "link",
-    "discord_bot",
-    ...codeExampleTabs.filter((tab) => tab !== "llm_prompt" && tab !== "llm_prompt_advanced" && tab !== "api_description"),
-  ]
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    alert("Code copied to clipboard!");
+  };
 
   return (
-    <Box style={{ marginTop: "6em" }}>
-      <ImageURLHeading whiteText={"#E0F041"} width={350} height={70}>
-        Integrate
-      </ImageURLHeading>
-      <URLExplanation>
-        <AppBar position="static" style={{ color: "white", width: "auto", boxShadow: "none" }}>
-          <Tabs
-            value={tabValue}
-            onChange={handleChange}
-            aria-label="simple tabs example"
-            variant="scrollable"
-            scrollButtons="on"
-            TabIndicatorProps={{ style: { background: Colors.lime } }}
-          >
-            {allTabs.map((key, index) => (
-              <Tab
-                key={key}
-                label={
-                  key === "llm_prompt" || key === "llm_prompt_advanced"
-                    ? key.replace("_", " ").toUpperCase()
-                    : key.charAt(0).toUpperCase() + key.slice(1)
-                }
-                style={{
-                  color: tabValue === index ? Colors.lime : Colors.offwhite,
+    <URLExplanation>
+      <AppBar
+        position="static"
+        style={{ color: "white", width: "auto", boxShadow: "none" }}
+      >
+        <ButtonGroup
+          variant="contained"
+          aria-label="contained primary button group"
+          style={{ backgroundColor: "transparent", flexWrap: "wrap", justifyContent: "center" }}
+        >
+          {codeExampleTabs.map((key, index) => (
+            <Button
+              key={key}
+              onClick={() => handleChange(null, index)}
+              style={buttonStyle(tabValue === index)}
+            >
+              {key}
+            </Button>
+          ))}
+        </ButtonGroup>
+      </AppBar>
+      <>
+        {codeExampleTabs.map((key, index) => {
+          if (tabValue !== index || !image || !image.imageURL) return null;
+
+          const { code, language } = CODE_EXAMPLES[key];
+          const text = code(image);
+
+          return (
+            <Box key={key} position="relative">
+              <CodeBlock
+                text={text}
+                language={language}
+                theme={irBlack}
+                showLineNumbers={text.split("\n").length > 1}
+                customStyle={{
                   backgroundColor: "transparent",
-                  boxShadow: "none",
-                  fontFamily: "Uncut-Sans-Variable",
-                  fontStyle: "normal",
-                  borderRadius: 0,
+                  color: Colors.offwhite,
+                  scrollbarColor: "transparent transparent",
+                  border: `5px solid ${Colors.offblack}`,
+                  marginTop: "1em",
+                  marginLeft: "10px",
+                  marginRight: "10px",
                 }}
               />
-            ))}
-          </Tabs>
-        </AppBar>
-        <>
-          {allTabs.map((key, index) => {
-            if (tabValue !== index) return null
-
-            if (!image.imageURL && key !== "discord_bot") return null
-
-            if (key === "link") {
-              return (
-                <Box margin="30px" overflow="hidden">
-                  <Link
-                    variant="body2"
-                    href={image.imageURL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ fontSize: "1.0rem", wordBreak: "break-all" }}
-                  >
-                    {image.imageURL}
-                  </Link>
-                </Box>
-              )
-            } else if (key === "discord_bot") {
-              return (
-                <Box margin="30px" overflow="hidden">
-                  <Link
-                    variant="body2"
-                    href="https://discord.com/application-directory/1123551005993357342"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ fontSize: "1.0rem", wordBreak: "break-all" }}
-                  >
-                    Discord Bot
-                  </Link>
-                </Box>
-              )
-            }
-
-            const text = CODE_EXAMPLES[key](image)
-
-            if (key === "api_description") {
-              return (
-                <Box margin="30px" overflow="hidden">
-                  <ReactMarkdown>{text}</ReactMarkdown>
-                </Box>
-              )
-            }
-
-            return (
-              tabValue === index && (
-                <CodeBlock
-                  key={key}
-                  text={text}
-                  language={key}
-                  theme={irBlack}
-                  // wrapLongLines
-                  showLineNumbers={text.split("\n").length > 1}
-                  customStyle={{
-                    backgroundColor: "transparent",
-                    color: Colors.offwhite,
-                    scrollbarColor: "transparent transparent", // scrollbar thumb and track colors
-                  }}
-                />
-              )
-            )
-          })}
-        </>
-      </URLExplanation>
-    </Box>
-  )
+              <IconButton
+                onClick={() => handleCopy(text)}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  color: Colors.lime,
+                  marginRight: "10px",
+                }}
+              >
+                <FileCopyIcon />
+              </IconButton>
+            </Box>
+          );
+        })}
+      </>
+      <Box mt={2} textAlign="center">
+        <ImageURLHeading
+          customPrompt={`Github logo that looks cool, on a black background`}
+          width="100"
+          height="100"
+        />
+        <span style={{ color: Colors.offwhite, fontFamily: Fonts.body, fontStyle: "normal", fontWeight: "500", fontSize: "1.4em", maxWidth: "400px" }}>
+          <EmojiRephrase>
+            Check the API documentation
+          </EmojiRephrase>
+        </span><br />
+        <LinkStyle
+          href="https://github.com/pollinations/pollinations/blob/master/APIDOCS.md"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: Colors.lime, fontSize: "1.4em" }}
+        >
+          GitHub
+        </LinkStyle>
+      </Box>
+    </URLExplanation>
+  );
 }
 
 const shorten = (str) => (str.length > 60 ? str.slice(0, 60) + "..." : str)
