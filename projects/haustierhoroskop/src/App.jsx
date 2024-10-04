@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import ReactMarkdown from "react-markdown";
 import "./index.css";
 import { usePollinationsImage, usePollinationsText } from "@pollinations/react";
 
@@ -17,7 +18,7 @@ function App() {
   const horoscope = usePollinationsText(prompt, {
     seed: 42,
     jsonMode: true,
-    model: "openai",
+    model: "claude",
     systemPrompt: `
 Goal: create a horoscope text and image description for the pet in the form of a json object.
 
@@ -27,23 +28,32 @@ Horoscope text
 - a mix of serious and funny
 - the age in dog or cat years
 - one interesting fact related to the birthday: e.g. other celebrities born on this day, Halloween, World Cat Day, etc. select one that is obvious in an image.
-- include mmany emojis and bold italic markdown formatting
+- include many emojis and bold italic markdown formatting
+- dont inlude the unique event in the horoscope text as it is listed separately
 
 Pet image prompt
 - the description of the pet in the context of the horoscope suitable for an image generator.
 - the pet should be happy and healthy
 - Include details such as breed, age, gender, and any distinguishing visual features.
-- Dont include the name
+- Don't include the name
 
 Unique event / Celebrity
-- Select the event or celebrity  included in the horoscope text and describe it suitable for an image generator. (1 paragraph)
+- Select the event or celebrity included in the horoscope text and describe it suitable for an image generator. (1 paragraph)
+
+Nutrition tips
+- Provide useful nutrition tips for the type of pet, its age, and its look.
+- Explain how you came to the conclusion, but be very concise.
+
+Language
+- All text in German
 
 Return a json object with the following structure:
 {
     "horoscope": "The horoscope text (ca. 1 paragraph)",
     "petDescription": "detailed pet description (2 sentences)",
     "starSign": "The star sign of the pet",
-    "uniqueEvent": "unique event / celebrity (1 sentence)"
+    "uniqueEvent": "unique event / celebrity (1 sentence)",
+    "nutritionTips": "useful nutrition tips (1-2 sentences)"
 }`,
   });
 
@@ -59,7 +69,7 @@ ${horoscope.uniqueEvent}
     : "Loading text";
 
   console.log("imagePrompt", imagePrompt);
-  const imageUrl = usePollinationsImage(imagePrompt, { model: "flux" });
+  const imageUrl = usePollinationsImage(imagePrompt, { model: "flux-pro" });
   console.log("imageUrl", imageUrl);
   const generateHoroscope = () => {
     setPrompt([
@@ -164,19 +174,27 @@ Today is ${new Date().toLocaleDateString()}.
                 {petName}'s Horoscope
               </h3>
               <img
-                src={imageUrl}
+                src={
+                  imageUrl ||
+                  "https://image.pollinations.ai/prompt/loading%20text%20black%20on%20white%20background%20written%20with%20lots%20of%20pet%20related%20objects%20instead%20of%20letters?model=flux-pro"
+                }
                 alt={horoscope.petDescription}
                 className="rounded-lg max-h-[600px] w-full object-contain mx-auto"
               />
               <p className="text-center font-bold">{horoscope.starSign}</p>
-              {horoscope.horoscope.split("\n").map((line, index) => (
-                <p key={index} className="text-center italic">
-                  {line}
-                </p>
-              ))}
+              <ReactMarkdown className="text-center italic">
+                {horoscope.horoscope}
+              </ReactMarkdown>
               <Separator />
               <p className="text-center font-bold">Unique Events</p>
-              <p className="text-center italic">{horoscope.uniqueEvent}</p>
+              <ReactMarkdown className="text-center">
+                {horoscope.uniqueEvent}
+              </ReactMarkdown>
+              <Separator />
+              <p className="text-center font-bold">Nutrition Tips</p>
+              <ReactMarkdown className="text-center">
+                {horoscope.nutritionTips}
+              </ReactMarkdown>
             </div>
           )}
         </CardContent>
