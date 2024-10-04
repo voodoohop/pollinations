@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import ReactMarkdown from "react-markdown";
 import "./index.css";
 import { usePollinationsImage, usePollinationsText } from "@pollinations/react";
+import { extraNutritionInfo } from "./prompt";
 
 function App() {
   const [petImage, setPetImage] = useState("https://i.imgur.com/wHQbITR.png");
@@ -20,40 +21,123 @@ function App() {
     jsonMode: true,
     model: "claude",
     systemPrompt: `
-Goal: create a horoscope text and image description for the pet in the form of a json object.
+# Goal
+Goal: create a horoscope text, nutrition tips and image description for the pet in the form of a json object.
 
+# Nutrition Knowledge Base / Pet Supplement Ingredients List
+
+- Molkenproteinhydrolysat (Hydrolyzed Whey Protein)
+  - For muscle growth and maintenance in all pets
+  - For sensitive pets with allergies
+  - Especially beneficial for senior pets
+
+- Leinöl (Linseed Oil)
+  - For skin and coat health in all pets
+  - For pets with dry or itchy skin
+  - To support overall metabolism
+
+- B-Vitamin Complex
+  - For nervous system support in all pets
+  - For pets experiencing stress or anxiety
+  - To aid in mood regulation
+
+- Vitamin E
+  - For all pets as an antioxidant
+  - For senior pets to combat cellular aging
+
+- Biotin
+  - For skin and coat health in all pets
+  - Especially for pets with dull or brittle fur
+
+- Zinc, Copper, Manganese
+  - For overall health in all pets
+  - For skin and coat health
+  - For immune system support
+
+- Calcium and Phosphorus
+  - For bone health in all pets
+  - Especially important for growing puppies and kittens
+  - Crucial for cats in the correct ratio
+
+- Taurin (Taurine)
+  - Essential for all cats
+  - For heart health in cats and some dogs
+  - For eye health in cats
+
+- L-Carnitin (L-Carnitine)
+  - For heart health in all pets
+  - For weight management in overweight pets
+  - Beneficial for active or working dogs
+
+- Tryptophan
+  - For pets with anxiety or stress issues
+  - For pets with sleep problems
+  - To help calm aggressive pets
+
+- Bierhefe (Brewer's Yeast)
+  - For overall health in all pets
+  - As a natural source of B-vitamins
+
+- Manuka-Honig (Manuka Honey)
+  - For topical application on skin issues
+  - For pets with minor wounds or irritations
+
+- Kollagenpeptide (Collagen Peptides)
+  - For senior pets with joint issues
+  - For active dogs to support joint health
+  - For pets recovering from injuries
+
+- Leucin (Leucine)
+  - For senior pets to maintain muscle mass
+  - For active or working dogs
+
+- Omega-3 Fatty Acids
+  - For skin and coat health in all pets
+  - For pets with inflammatory conditions
+  - For cognitive support in senior pets
+
+- Magnesium and Potassium
+  - For heart health in all pets
+  - For pets with muscle issues
+
+Note: Always consider the pet's age, species (dog or cat), health condition, and any known allergies or sensitivities when recommending supplements. These ingredients are generally beneficial but should be used in appropriate amounts as part of a balanced diet.
+
+# Instructions
 Analyze the attached photo of the pet and infer the following facts.
 
-Horoscope text
+## Horoscope text
 - a mix of serious and funny
 - the age in dog or cat years
 - one interesting fact related to the birthday: e.g. other celebrities born on this day, Halloween, World Cat Day, etc. select one that is obvious in an image.
 - include many emojis and bold italic markdown formatting
 - dont inlude the unique event in the horoscope text as it is listed separately
 
-Pet image prompt
+## Pet image prompt
 - the description of the pet in the context of the horoscope suitable for an image generator.
 - the pet should be happy and healthy
 - Include details such as breed, age, gender, and any distinguishing visual features.
 - Don't include the name
 
-Unique event / Celebrity
-- Select the event or celebrity included in the horoscope text and describe it suitable for an image generator. (1 paragraph)
+## Unique event / Celebrity
+- Select the event or celebrity included in the horoscope text and describe it in a (1-2 sentences)
 
-Nutrition tips
+## Unique event /Celebtriy image description
+- Describe the event or celebrity and how it fits in the image in a way suitable for an image generator. (1 paragraph)
+
+## Nutrition tips
 - Provide useful nutrition tips for the type of pet, its age, and its look.
+- Try to include information and highlight ingrediets from the nutrition knowledge base.
 - Explain how you came to the conclusion, but be very concise.
 
-Language
-- All text in German
-
+# Structure
 Return a json object with the following structure:
 {
-    "horoscope": "The horoscope text (ca. 1 paragraph)",
+    "horoscope": "The horoscope text (ca. 1 paragraph, markdown)",
     "petDescription": "detailed pet description (2 sentences)",
     "starSign": "The star sign of the pet",
-    "uniqueEvent": "unique event / celebrity (1 sentence)",
-    "nutritionTips": "useful nutrition tips (1-2 sentences)"
+    "uniqueEvent": "unique event / celebrity (1 sentence, markdown)",
+    "uniqueEventImageDescription": "image description of the unique event / celebrity (1 paragraph)",
+    "nutritionTips": "useful nutrition tips (1-2 sentences, markdown)"
 }`,
   });
 
