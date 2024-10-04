@@ -196,7 +196,7 @@ Today is ${new Date().toLocaleDateString()}.
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl shadow-xl">
+      <Card className="w-full max-w-xl shadow-xl">
         <CardHeader>
           <CardTitle className="text-3xl font-bold text-center text-purple-700">
             Pet Horoscope
@@ -272,7 +272,7 @@ Today is ${new Date().toLocaleDateString()}.
                   "https://image.pollinations.ai/prompt/loading%20text%20black%20on%20white%20background%20written%20with%20lots%20of%20pet%20related%20objects%20instead%20of%20letters?model=flux-pro"
                 }
                 alt={horoscope.petDescription}
-                className="rounded-lg max-h-[600px] w-full object-contain mx-auto"
+                className="rounded-lg max-h-[600px] max-w-[85%] w-full object-contain mx-auto"
               />
               <div className="text-center">
                 <p className="font-bold text-lg">{horoscope.starSign}</p>
