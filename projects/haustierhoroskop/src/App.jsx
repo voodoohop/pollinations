@@ -110,7 +110,68 @@ Goal: create a horoscope text, nutrition tips and image description for the pet 
   - For heart health in all pets
   - For pets with muscle issues
 
-Note: Always consider the pet's age, species (dog or cat), health condition, and any known allergies or sensitivities when recommending supplements. These ingredients are generally beneficial but should be used in appropriate amounts as part of a balanced diet.
+- Chicken/Poultry
+  - Primary protein source for muscle maintenance in most pets
+  - Easily digestible for many dogs and cats
+  - Often the first ingredient in many commercial pet foods
+
+- Fish (e.g., Salmon, Whitefish)
+  - Excellent source of protein and omega-3 fatty acids
+  - Beneficial for skin and coat health in all pets
+  - Supports cognitive function, especially in senior pets
+
+- Brown Rice
+  - Digestible carbohydrate source for energy in dogs
+  - Provides fiber for digestive health
+  - Often used in foods for pets with sensitive stomachs
+
+- Eggs
+  - High-quality protein source for all pets
+  - Rich in essential amino acids and fatty acids
+  - Supports muscle development and maintenance
+
+- Peas
+  - Source of protein and carbohydrates in grain-free diets
+  - Provides fiber for digestive health
+  - Often used as a binding agent in kibble
+
+- Fish Oil
+  - Rich in omega-3 fatty acids for all pets
+  - Supports skin, coat, joint, and cognitive health
+  - Often added as a supplement in premium pet foods
+
+- Flaxseed
+  - Plant-based source of omega-3 fatty acids
+  - Provides fiber for digestive health
+  - Supports skin and coat health in dogs and cats
+
+- Probiotics
+  - Supports digestive health in all pets
+  - Helps maintain a healthy gut microbiome
+  - Often added to premium pet foods
+
+- Glucosamine and Chondroitin
+  - Supports joint health in dogs and cats
+  - Often included in senior pet formulas
+  - Beneficial for large breed dogs prone to joint issues
+
+- Carrots
+  - Natural source of vitamins and fiber
+  - Supports eye health and digestion
+  - Often used in limited ingredient diets
+
+- Blueberries
+  - Natural source of antioxidants
+  - Supports cognitive function and overall health
+  - Often included in "superfood" pet food formulas
+
+- Pumpkin
+  - Excellent source of fiber for digestive health
+
+- Chelated Minerals (e.g., Zinc, Iron, Copper)
+  - More easily absorbed forms of essential minerals
+  - Supports various bodily functions
+  - Often found in higher-quality pet food formulas
 
 # Instructions
 Analyze the attached photo of the pet and infer the following facts.
@@ -292,14 +353,14 @@ Today is ${new Date().toLocaleDateString()}.
                 {horoscope.horoscope}
               </ReactMarkdown>
               <Separator />
-              <p className="text-center font-bold">Unique Events</p>
-              <ReactMarkdown className="text-center">
-                {horoscope.uniqueEvent}
-              </ReactMarkdown>
-              <Separator />
               <p className="text-center font-bold">Nutrition Tips</p>
               <ReactMarkdown className="text-center">
                 {horoscope.nutritionTips}
+              </ReactMarkdown>
+              <Separator />
+              <p className="text-center font-bold">Unique Events</p>
+              <ReactMarkdown className="text-center">
+                {horoscope.uniqueEvent}
               </ReactMarkdown>
             </div>
           )}
