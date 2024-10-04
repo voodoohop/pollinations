@@ -11,10 +11,20 @@ import { extraNutritionInfo } from "./prompt";
 
 function App() {
   const [petImage, setPetImage] = useState("https://i.imgur.com/wHQbITR.png");
-  const [birthDate, setBirthDate] = useState("01-04-2019"); // Pre-filled reasonable birth date in European format
+  const [birthDate, setBirthDate] = useState("2019-04-01"); // Pre-filled reasonable birth date in ISO format
   const [petName, setPetName] = useState("Julyk"); // Pre-filled typical pet name
 
   const [prompt, setPrompt] = useState(null);
+
+  const calculateAge = (birthDate) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    const ageInMilliseconds = today - birth;
+    const ageInYears = ageInMilliseconds / (365 * 24 * 60 * 60 * 1000);
+    const humanYears = Math.floor(ageInYears);
+    const catYears = Math.floor(15 + (ageInYears - 1) * 4);
+    return { humanYears, catYears };
+  };
 
   const horoscope = usePollinationsText(prompt, {
     seed: 42,
@@ -26,12 +36,12 @@ Goal: create a horoscope text, nutrition tips and image description for the pet 
 
 # Nutrition Knowledge Base / Pet Supplement Ingredients List
 
-- Molkenproteinhydrolysat (Hydrolyzed Whey Protein)
+- Hydrolyzed Whey Protein
   - For muscle growth and maintenance in all pets
   - For sensitive pets with allergies
   - Especially beneficial for senior pets
 
-- Leinöl (Linseed Oil)
+- Linseed Oil
   - For skin and coat health in all pets
   - For pets with dry or itchy skin
   - To support overall metabolism
@@ -45,7 +55,7 @@ Goal: create a horoscope text, nutrition tips and image description for the pet 
   - For all pets as an antioxidant
   - For senior pets to combat cellular aging
 
-- Biotin
+- Biotine
   - For skin and coat health in all pets
   - Especially for pets with dull or brittle fur
 
@@ -59,12 +69,12 @@ Goal: create a horoscope text, nutrition tips and image description for the pet 
   - Especially important for growing puppies and kittens
   - Crucial for cats in the correct ratio
 
-- Taurin (Taurine)
+- Taurine
   - Essential for all cats
   - For heart health in cats and some dogs
   - For eye health in cats
 
-- L-Carnitin (L-Carnitine)
+- L-Carnitine
   - For heart health in all pets
   - For weight management in overweight pets
   - Beneficial for active or working dogs
@@ -74,20 +84,20 @@ Goal: create a horoscope text, nutrition tips and image description for the pet 
   - For pets with sleep problems
   - To help calm aggressive pets
 
-- Bierhefe (Brewer's Yeast)
+- Brewer's Yeast
   - For overall health in all pets
   - As a natural source of B-vitamins
 
-- Manuka-Honig (Manuka Honey)
+- Manuka Honey
   - For topical application on skin issues
   - For pets with minor wounds or irritations
 
-- Kollagenpeptide (Collagen Peptides)
+- Collagen Peptides
   - For senior pets with joint issues
   - For active dogs to support joint health
   - For pets recovering from injuries
 
-- Leucin (Leucine)
+- Leucine
   - For senior pets to maintain muscle mass
   - For active or working dogs
 
@@ -107,13 +117,13 @@ Analyze the attached photo of the pet and infer the following facts.
 
 ## Horoscope text
 - a mix of serious and funny
-- the age in dog or cat years
 - one interesting fact related to the birthday: e.g. other celebrities born on this day, Halloween, World Cat Day, etc. select one that is obvious in an image.
 - include many emojis and bold italic markdown formatting
 - dont inlude the unique event in the horoscope text as it is listed separately
 
 ## Pet image prompt
 - the description of the pet in the context of the horoscope suitable for an image generator.
+- describe the different colors of the pet in detail separately for its different visible parts
 - the pet should be happy and healthy
 - Include details such as breed, age, gender, and any distinguishing visual features.
 - Don't include the name
@@ -133,7 +143,7 @@ Analyze the attached photo of the pet and infer the following facts.
 Return a json object with the following structure:
 {
     "horoscope": "The horoscope text (ca. 1 paragraph, markdown)",
-    "petDescription": "detailed pet description (2 sentences)",
+    "petDescription": "detailed pet description (3-4 sentences)",
     "starSign": "The star sign of the pet",
     "uniqueEvent": "unique event / celebrity (1 sentence, markdown)",
     "uniqueEventImageDescription": "image description of the unique event / celebrity (1 paragraph)",
@@ -141,7 +151,7 @@ Return a json object with the following structure:
 }`,
   });
 
-  console.log("horoscope", horoscope);
+  // console.log("horoscope", horoscope);
 
   const imagePrompt = horoscope?.petDescription
     ? `A anime style ${horoscope.starSign} tarot card. Write star sign "${horoscope.starSign}" bold at center bottom.
@@ -152,15 +162,17 @@ ${horoscope.uniqueEvent}
       `
     : "Loading text";
 
-  console.log("imagePrompt", imagePrompt);
+  // console.log("imagePrompt", imagePrompt);
   const imageUrl = usePollinationsImage(imagePrompt, { model: "flux-pro" });
-  console.log("imageUrl", imageUrl);
+  // console.log("imageUrl", imageUrl);
   const generateHoroscope = () => {
+    const { humanYears, catYears } = calculateAge(birthDate);
     setPrompt([
       {
         type: "text",
         text: `
 The pet's name is ${petName} and birth date is ${birthDate}.
+The pet is ${humanYears} years old in human years and ${catYears} years old in cat years.
 Today is ${new Date().toLocaleDateString()}.
 `,
       },
@@ -184,7 +196,7 @@ Today is ${new Date().toLocaleDateString()}.
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg shadow-xl">
+      <Card className="w-full max-w-2xl shadow-xl">
         <CardHeader>
           <CardTitle className="text-3xl font-bold text-center text-purple-700">
             Pet Horoscope
@@ -223,16 +235,13 @@ Today is ${new Date().toLocaleDateString()}.
           </div>
           <div className="space-y-2">
             <Label htmlFor="birth-date" className="text-lg font-medium">
-              Pet's Birth Date (DD-MM-YYYY)
+              Pet's Birth Date
             </Label>
             <Input
               id="birth-date"
-              type="text"
-              placeholder="DD-MM-YYYY"
+              type="date"
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
-              pattern="\d{2}-\d{2}-\d{4}"
-              title="Please enter the date in DD-MM-YYYY format"
             />
           </div>
           <Button
@@ -265,7 +274,20 @@ Today is ${new Date().toLocaleDateString()}.
                 alt={horoscope.petDescription}
                 className="rounded-lg max-h-[600px] w-full object-contain mx-auto"
               />
-              <p className="text-center font-bold">{horoscope.starSign}</p>
+              <div className="text-center">
+                <p className="font-bold text-lg">{horoscope.starSign}</p>
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Age:</span>
+                  <span className="font-bold">
+                    {calculateAge(birthDate).humanYears}
+                  </span>
+                  <span className="italic"> human years</span> /
+                  <span className="font-bold">
+                    {" " + calculateAge(birthDate).catYears}
+                  </span>
+                  <span className="italic"> cat years</span>
+                </p>
+              </div>
               <ReactMarkdown className="text-center italic">
                 {horoscope.horoscope}
               </ReactMarkdown>
