@@ -163,7 +163,7 @@ ${horoscope.uniqueEvent}
     : "Loading text";
 
   // console.log("imagePrompt", imagePrompt);
-  const imageUrl = usePollinationsImage(imagePrompt, { model: "flux-pro" });
+  const imageUrl = usePollinationsImage(imagePrompt, { model: "flux" });
   // console.log("imageUrl", imageUrl);
   const generateHoroscope = () => {
     const { humanYears, catYears } = calculateAge(birthDate);
