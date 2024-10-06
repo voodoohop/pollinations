@@ -170,6 +170,16 @@ const callMeoow2 = async (prompt, safeParams) => {
     };
 
     console.log("calling meoow-2", body);
+
+        // Construct curl command
+    const curlCommand = `curl -X POST ${MEOOW_2_SERVER_URL} \\
+        -H 'Content-Type: application/json' \\
+        -H 'Authorization: Bearer ${MEOOW_2_API_KEY}' \\
+        -d '${JSON.stringify(body)}'`;
+  
+      console.log("Equivalent curl command:");
+      console.log(curlCommand);
+  
     const response = await fetch(MEOOW_2_SERVER_URL, {
       method: 'POST',
       headers: {

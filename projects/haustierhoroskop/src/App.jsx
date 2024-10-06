@@ -7,7 +7,6 @@ import { Separator } from "@/components/ui/separator";
 import ReactMarkdown from "react-markdown";
 import "./index.css";
 import { usePollinationsImage, usePollinationsText } from "@pollinations/react";
-import { extraNutritionInfo } from "./prompt";
 
 function App() {
   const [petImage, setPetImage] = useState("https://i.imgur.com/wHQbITR.png");
