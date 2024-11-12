@@ -26,7 +26,21 @@
  </picture>
 </a>
 
+## 🌍 Our Vision
 
+Pollinations.AI envisions a future where AI technology is:
+
+- **Open & Accessible**: We believe AI should be available to everyone, not locked behind paywalls or restricted access
+
+- **Transparent & Ethical**: Our open-source approach ensures transparency in how our models work and behave
+
+- **Community-Driven**: We're building a platform where developers, creators, and AI enthusiasts can collaborate and innovate
+
+- **Interconnected**: We're creating an ecosystem where AI services can seamlessly work together, fostering innovation through composability
+
+- **Evolving**: We embrace the rapid evolution of AI technology while maintaining our commitment to openness and accessibility
+
+We're committed to developing AI technology that serves humanity while respecting ethical boundaries and promoting responsible innovation. Join us in shaping the future of AI.
 
 ## 🚀 Getting Started
 
@@ -116,7 +130,6 @@ We offer React hooks for easy integration. Example usage:
 Check out our [Pollinations React Hooks](./pollinations-react/README.md) for more details.
 
 ## Architecture
-
 ```mermaid
 graph LR
     Q[Bots - Discord, Telegram, WhatsApp] --> L1
