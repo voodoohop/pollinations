@@ -204,7 +204,7 @@ We're committed to developing AI technology that serves humanity while respectin
 
 ## 🤝 Community and Support
 
-Join our vibrant community of over 12,000 Discord members to share your creations, get support, and collaborate with fellow AI enthusiasts. 
+Join our vibrant community on Discord to share your creations, get support, and collaborate with fellow AI enthusiasts. 
 
 For any questions or support, please visit our [Discord channel](https://discord.gg/k9F7SyTgqn) or create an issue on our [GitHub repository](https://github.com/pollinations/pollinations).
 
