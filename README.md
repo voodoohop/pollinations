@@ -169,7 +169,7 @@ Pollinations.AI is used in various projects, including:
 1. [Free AI Chatbot & Image Generator](https://freeaichat.app): A mobile app offering unlimited AI chat and image generation powered by GPT-4 and Flux. Created by @andreas_11.
 2. [Pollinator Android App](https://github.com/g-aggarwal/Pollinator): An open-source Android app for text-to-image generation using Pollinations.ai's endpoint. Created by @gaurav_87680.
 3. [Rangrez AI](https://rangrezai.com): A web platform focused on inspiring, creating, and customizing designs with AI-powered tools, powered by Pollinations and GroqCloud. Created by @saadaryf.
-4. [Roblox Character RP](https://www.roblox.com/games/108463136689847): 🆕 A Roblox game where players can create and roleplay with AI characters using Pollinations' text generation. Created by @user113.
+4. [Roblox Character RP](https://www.roblox.com/games/108463136689847): 🆕 A Roblox game where players can create and roleplay with AI characters using Pollinations' text generation. Created by user113.
 5. [MIDIjourney](https://github.com/korus-labs/MIDIjourney): An AI-powered plugin for Ableton Live that turns text descriptions into music. Created by KORUS Labs. [GitHub Repo](https://github.com/korus-labs/MIDIjourney)
 6. [TurboReel](https://turboreel.com): An open-source video generation system using AI to create engaging content from scripts. Created by @pedroriosa. [GitHub Repo](https://github.com/turboreel/turboreel)
 7. [Own-AI](https://own-ai.pages.dev/): An AI text-to-image generator powered by Pollinations.ai. Users can describe the images they want, generate them, and share them. Created by Sujal Goswami. [GitHub Repo](https://github.com/sujal-goswami/Own-AI)

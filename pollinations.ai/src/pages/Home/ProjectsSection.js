@@ -82,7 +82,8 @@ const projects = {
     {
       name: "Character RP (Roblox) 🆕",
       url: "https://www.roblox.com/games/108463136689847",
-      description: "A Roblox game where players can create and roleplay with AI characters. Created by @user113.",
+      description: "A Roblox game where players can create and roleplay with AI characters.",
+      author: "@user113",
     },
     {
       name: "Free AI Chatbot & Image Generator",
@@ -264,7 +265,8 @@ const projects = {
     {
       name: "Proyecto Descartes 🆕",
       url: "https://proyectodescartes.org/revista/Numeros/Revista_8_2024/index.html?page=102",
-      description: "An educational initiative integrating Pollinations AI into interactive STEM learning resources. Created by Juan Gmo. Rivera.",
+      description: "An educational initiative integrating Pollinations AI into interactive STEM learning resources.",
+      author: "Juan Gmo. Rivera",
     },
     {
       name: "Tutorial",
