@@ -129,7 +129,7 @@ export const getNextServerUrl = async (type = 'flux') => {
 // Wrapper functions for backward compatibility
 export const getNextFluxServerUrl = () => getNextServerUrl('flux');
 export const getNextTranslationServerUrl = () => getNextServerUrl('translate');
-export const getNextTurboServerUrl = () => getNextServerUrl('turbo');
+export const getNextTurboServerUrl = () => getNextServerUrl('turbo') + '/generate';
 
 /**
  * Fetches the list of available servers from the main server.
