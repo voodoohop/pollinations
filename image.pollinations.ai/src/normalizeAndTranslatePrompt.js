@@ -45,6 +45,7 @@ export const normalizeAndTranslatePrompt = async (originalPrompt, req, timingInf
     const startTime = Date.now();
     const detectedLanguage = await detectLanguage(prompt);
     if (detectedLanguage !== "en") {
+      logPrompt("detected language", detectedLanguage,"not english so setting enhance to true");
       enhance = true;
     }
 

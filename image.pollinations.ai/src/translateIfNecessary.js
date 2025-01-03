@@ -8,10 +8,11 @@ import debug from 'debug';
 const lock = new AsyncLock();
 const logError = debug('pollinations:error');
 const logPerf = debug('pollinations:perf');
-const logTranslate = debug('pollinations:translate');
+const logTranslate = debug('pollinations:prompt');
 
 export async function detectLanguage(promptAnyLanguage) {
   const controller = new AbortController();
+  logTranslate("detecting language for prompt", promptAnyLanguage);
   const detectPromise = fetchDetection(promptAnyLanguage, controller.signal);
   const timeoutPromise = new Promise((resolve) => {
     setTimeout(() => {
@@ -69,6 +70,7 @@ export async function translateIfNecessary(promptAnyLanguage) {
 async function fetchDetection(promptAnyLanguage, signal) {
   try {
     const host = await getNextTranslationServerUrl();
+    logTranslate("detecting language on host", host);
     const result = await fetch(`${host}/detect`, {
       method: "POST",
       body: JSON.stringify({
