@@ -29,7 +29,14 @@ setInterval(() => {
             }
         });
     });
+
+    if (!IS_MAIN_SERVER) {
+        fetchServersFromMainServer();
+    }
 }, 60 * 1000); // Every 1 minute
+
+if (!IS_MAIN_SERVER)
+    fetchServersFromMainServer();
 
 // Log server queue info every 5 seconds
 setInterval(() => {
@@ -103,9 +110,6 @@ export const registerServer = (url, type = 'flux') => {
  */
 export const getNextServerUrl = async (type = 'flux') => {
     const servers = SERVERS[type] || [];
-    if (!IS_MAIN_SERVER && servers.length === 0) {
-        await fetchServersFromMainServer();
-    }
 
     const activeServers = filterActiveServers(servers);
     if (activeServers.length === 0) {
@@ -129,7 +133,7 @@ export const getNextServerUrl = async (type = 'flux') => {
 // Wrapper functions for backward compatibility
 export const getNextFluxServerUrl = () => getNextServerUrl('flux');
 export const getNextTranslationServerUrl = () => getNextServerUrl('translate');
-export const getNextTurboServerUrl = () => getNextServerUrl('turbo') + '/generate';
+export const getNextTurboServerUrl = () => getNextServerUrl('turbo');
 
 /**
  * Fetches the list of available servers from the main server.
