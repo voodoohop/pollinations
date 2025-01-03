@@ -114,11 +114,19 @@ async function fetchTranslation(promptAnyLanguage, signal) {
 
 // Function to sanitize a string to ensure it contains valid UTF-8 characters
 export function sanitizeString(str) {
-  // Encode the string as UTF-8 and decode it back to filter out invalid characters
   logTranslate("sanitizeString", str);
-  const removedNonUtf8 = str.replace(/[^\x00-\x7F]/g, "");
-  logTranslate("removedNonUtf8", removedNonUtf8);
-  if (removedNonUtf8)
-    return removedNonUtf8;
-  return str;
+  
+  // Only remove truly invalid UTF-8 sequences
+  // This will preserve valid UTF-8 characters like Cyrillic, CJK, emojis, etc.
+  try {
+    // Check if string can be encoded/decoded without errors
+    const encoded = encodeURIComponent(str);
+    const decoded = decodeURIComponent(encoded);
+    return decoded;
+  } catch (e) {
+    // If there are invalid sequences, fall back to removing problematic characters
+    const cleaned = str.replace(/[\uFFFD\uFFFE\uFFFF]/g, '');
+    logTranslate("cleaned string", cleaned);
+    return cleaned;
+  }
 }
