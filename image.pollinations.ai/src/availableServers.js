@@ -15,7 +15,7 @@ const SERVERS = {
 const SERVER_TIMEOUT = 45000; // 45 seconds
 const MAIN_SERVER_URL = process.env.POLLINATIONS_MASTER_URL || 'https://image.pollinations.ai/register';
 
-const IS_MAIN_SERVER = MAIN_SERVER_URL === 'https://image.pollinations.ai/register';
+const IS_MAIN_SERVER = process.env.IS_CHILD_SERVER !== 'true';
 
 const concurrency = 2;
 
@@ -144,12 +144,19 @@ async function fetchServersFromMainServer() {
         const servers = await response.json();
         logServer(`[${new Date().toISOString()}] Received ${servers.length} servers from main server:`);
         servers.forEach((server, index) => {
-            logServer(`  ${index + 1}. ${server.url}`);
+            logServer(`  ${index + 1}. ${server.url} (${server.type || 'flux'})`);
         });
         
-        servers.forEach(server => {
-            registerServer(server.url, server.type);
+        // Clear existing servers
+        Object.keys(SERVERS).forEach(type => {
+            SERVERS[type] = [];
         });
+
+        // Register each server with its type
+        servers.forEach(server => {
+            registerServer(server.url, server.type || 'flux');
+        });
+        
         logServer(`[${new Date().toISOString()}] Successfully initialized ${Object.values(SERVERS).flat().length} servers`);
     } catch (error) {
         logError(`[${new Date().toISOString()}] Failed to fetch servers from main server:`, error);
@@ -184,16 +191,20 @@ export const handleRegisterEndpoint = (req, res) => {
             }
         });
     } else if (req.method === 'GET') {
-        const availableServers = Object.values(SERVERS).flat();
+        // Get all servers and include their type
+        const availableServers = Object.entries(SERVERS).flatMap(([type, servers]) => 
+            servers.map(server => ({
+                ...server,
+                type,
+                url: server.url,
+                queueSize: server.queue.size + server.queue.pending,
+                totalRequests: server.totalRequests,
+                errors: server.errors,
+                errorRate: server.totalRequests ? (server.errors / server.totalRequests) : 0
+            }))
+        );
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(availableServers.map(server => ({
-            url: server.url,
-            queueSize: server.queue.size + server.queue.pending,
-            totalRequests: server.totalRequests,
-            errors: server.errors,
-            errorRate: ((server.errors / server.totalRequests) * 100 || 0).toFixed(2) + '%',
-            requestsPerSecond: (server.totalRequests / ((Date.now() - server.startTime) / 1000)).toFixed(2)
-        }))));
+        res.end(JSON.stringify(availableServers));
     } else {
         res.writeHead(405, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: false, message: 'Method not allowed' }));
