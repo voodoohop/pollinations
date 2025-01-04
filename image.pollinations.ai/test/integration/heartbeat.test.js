@@ -1,6 +1,4 @@
 import express from 'express';
-import { spawn } from 'child_process';
-import fetch from 'node-fetch';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import HeartbeatRunner from '../utils/run_with_heartbeat.js';
 

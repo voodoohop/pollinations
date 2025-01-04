@@ -15,7 +15,7 @@ const SERVERS = {
 const SERVER_TIMEOUT = 90000; // 60 seconds
 const MAIN_SERVER_URL = process.env.POLLINATIONS_MASTER_URL || 'https://image.pollinations.ai/register';
 
-const IS_MAIN_SERVER = process.env.IS_CHILD_SERVER !== 'true';
+const isMainServer = () => !process.env.IS_CHILD_SERVER;
 
 const concurrency = 2;
 
@@ -30,13 +30,15 @@ setInterval(() => {
         });
     });
 
-    if (!IS_MAIN_SERVER) {
+    if (!isMainServer()) {
         fetchServersFromMainServer();
     }
 }, 60 * 1000); // Every 1 minute
 
-if (!IS_MAIN_SERVER)
-    fetchServersFromMainServer();
+
+let serversFetchedPromise = Promise.resolve();
+if (!isMainServer())
+    serversFetchedPromise = fetchServersFromMainServer();
 
 // Log server queue info every 5 seconds
 setInterval(() => {
@@ -109,8 +111,11 @@ export const registerServer = (url, type = 'flux') => {
  * @returns {Promise<string>} - The next server URL
  */
 export const getNextServerUrl = async (type = 'flux') => {
-    const servers = SERVERS[type] || [];
+    
+    // Wait for servers to be fetched
+    await serversFetchedPromise;
 
+    const servers = SERVERS[type] || [];
     const activeServers = filterActiveServers(servers);
     if (activeServers.length === 0) {
         throw new Error(`No active ${type} servers available`);
