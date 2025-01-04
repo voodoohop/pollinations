@@ -8,7 +8,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "start": "node src/index.js"
+    "start": "node --max-old-space-size=98304 src/index.js"
   },
   "keywords": [],
   "author": "",

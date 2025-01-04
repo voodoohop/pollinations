@@ -9,6 +9,7 @@ const memCache = new Map(); // Using Map to maintain insertion order for LRU
 
 const logError = debug('pollinations:error');
 const logCache = debug('pollinations:cache');
+const logMemory = debug('pollinations:memory');
 
 // Function to generate a cache path
 const generateCachePath = (prompt, extraParams) => {
@@ -55,6 +56,12 @@ export const getCachedImage = (prompt = "", extraParams) => {
   return null;
 };
 
+const logMemoryUsage = () => {
+  const used = process.memoryUsage();
+  logMemory('Memory usage - heapTotal: ' + Math.round(used.heapTotal / 1024 / 1024) + 'MB' +
+    ' heapUsed: ' + Math.round(used.heapUsed / 1024 / 1024) + 'MB');
+};
+
 export const cacheImage = async (prompt, extraParams, bufferPromiseCreator) => {
   if (isImageCached(prompt, extraParams)) {
     return getCachedImage(prompt, extraParams);
@@ -72,6 +79,10 @@ export const cacheImage = async (prompt, extraParams, bufferPromiseCreator) => {
 
   memCache.set(cachePath, buffer);
   logCache(`Cached image: ${cachePath}`);
+  
+  // Log memory usage after caching
+  logMemoryUsage();
+  
   return buffer;
 };
 
