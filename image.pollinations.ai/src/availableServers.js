@@ -12,7 +12,7 @@ const SERVERS = {
     turbo: []
 };
 
-const SERVER_TIMEOUT = 45000; // 45 seconds
+const SERVER_TIMEOUT = 90000; // 60 seconds
 const MAIN_SERVER_URL = process.env.POLLINATIONS_MASTER_URL || 'https://image.pollinations.ai/register';
 
 const IS_MAIN_SERVER = process.env.IS_CHILD_SERVER !== 'true';
