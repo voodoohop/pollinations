@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import fs from 'fs/promises'
 import path from 'path'
+import os from 'os'
 import { fileTypeFromBuffer } from 'file-type'
 import { blurImage, resizeImage, addPollinationsLogoWithImagemagick } from '../../src/imageOperations.js'
 
@@ -34,7 +35,7 @@ describe('Image Processing Integration Tests', () => {
       expect(finalType.ext).toBe('jpg')
 
       // Verify final image dimensions
-      const tempOutputFile = path.join(process.cwd(), 'test', 'tmp', 'final-test.jpg')
+      const tempOutputFile = path.join(os.tmpdir(), 'final-test.jpg')
       await fs.writeFile(tempOutputFile, finalBuffer)
       
       // Cleanup
@@ -54,7 +55,7 @@ describe('Image Processing Integration Tests', () => {
       expect(ext).toBe('jpg')
       
       // Should automatically scale down to maintain max pixel count
-      const tempFile = path.join(process.cwd(), 'test', 'tmp', 'large-test.jpg')
+      const tempFile = path.join(os.tmpdir(), 'large-test.jpg')
       await fs.writeFile(tempFile, largeBuffer)
       
       // Cleanup
