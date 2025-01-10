@@ -114,7 +114,7 @@ async function handleRequest(req, res, requestData) {
     } catch (error) {
         sendErrorResponse(res, error);
     }
-    await sleep(15000);
+    await sleep(8000);
 }
 
 // Helper function for consistent error responses
@@ -144,81 +144,70 @@ function sendContentResponse(res, completion) {
 
 // Common function to handle request data
 function getRequestData(req) {
-    const query = req.query;
-    const body = req.body || {};
-    const data = { ...query, ...body };
-
-    const jsonMode = data.jsonMode || 
-                    (typeof data.json === 'string' && data.json.toLowerCase() === 'true') ||
-                    (typeof data.json === 'boolean' && data.json === true) ||
-                    data.response_format?.type === 'json_object';
-                    
-    const seed = data.seed ? parseInt(data.seed, 10) : null;
-    const model = data.model || 'openai';
-    const systemPrompt = data.system ? data.system : null;
-    const temperature = data.temperature ? parseFloat(data.temperature) : undefined;
-    // Try request body first (both spellings), then HTTP header (standard spelling)
-    const referrer = req.headers.referer || data.referrer || data.referer || req.get('referrer') || req.get('referer') || 'undefined';
-    const isImagePollinationsReferrer = referrer.toLowerCase().includes('pollinations.ai') || referrer.toLowerCase().includes('thot');
-    const isRobloxReferrer = referrer.toLowerCase().includes('roblox');
-    const stream = data.stream || false; 
-
-    const messages =  data.messages ||  [{ role: 'user', content: req.params[0] }];
-    if (systemPrompt) {
-        messages.unshift({ role: 'system', content: systemPrompt });
-    }
-
+    const bypassCode = req.query.code || (req.body && req.body.code);
+    const hasValidBypassCode = bypassCode === 'BeesKnees';
+    
+    const ip = getIp(req);
+    const model = req.params[0] || req.body?.model || 'openai';
+    const temperature = parseFloat(req.query.temperature || req.body?.temperature || 0.7);
+    const messages = req.body?.messages || [{ role: 'user', content: req.query.prompt || '' }];
+    const stream = req.query.stream === 'true' || req.body?.stream === true;
+    const referrer = req.get('Referrer') || req.headers.origin || 'unknown';
+    
     return {
-        messages,
-        jsonMode,
-        seed,
+        ip,
         model,
         temperature,
-        isImagePollinationsReferrer,
-        isRobloxReferrer,
+        messages,
+        stream,
         referrer,
-        stream
+        hasValidBypassCode,
+        plaintTextResponse: true
     };
 }
 
 // Helper function to process requests with queueing and caching logic
 async function processRequest(req, res, requestData) {
-
     const cacheKey = createHashKey(requestData);
-
-    // Check cache first
     const cachedResponse = getFromCache(cacheKey);
+    
     if (cachedResponse) {
-        log('Cache hit for key:', cacheKey);
-        if (requestData.plaintTextResponse) {
-            sendContentResponse(res, cachedResponse);
+        log('Cache hit');
+        if (requestData.stream) {
+            sendAsOpenAIStream(res, cachedResponse);
         } else {
-            log('Cache hit for key:', cacheKey);
-            if (requestData.stream) {
-                sendAsOpenAIStream(res, cachedResponse);
-            }
-            else {
+            if (requestData.plaintTextResponse) {
+                sendContentResponse(res, cachedResponse);
+            } else {
                 sendOpenAIResponse(res, cachedResponse);
             }
         }
         return;
     }
+
+    const queue = getQueue(requestData.ip);
     
-    const ip = getIp(req);
-    const queue = getQueue(ip);
-
-    if (queue.size >= 60) {
-        errorLog('Queue size limit exceeded for IP: %s', ip);
-        return res.status(429).send('Too many requests in queue. Please try again later.');
-    }
-
-    log('Cache miss for key:', cacheKey);
-    const bypassQueue = requestData.isImagePollinationsReferrer || requestData.isRobloxReferrer;
-
-    if (bypassQueue) {
-        await handleRequest(req, res, requestData);
-    } else {
-        await getQueue(ip).add(() => handleRequest(req, res, requestData));
+    try {
+        await queue.add(async () => {
+            try {
+                await handleRequest(req, res, requestData);
+                if (!requestData.hasValidBypassCode) {
+                    await sleep(8000);
+                }
+            } catch (error) {
+                errorLog('Error in queue:', error);
+                sendErrorResponse(res, error);
+                if (!requestData.hasValidBypassCode) {
+                    await sleep(8000);
+                }
+            }
+        });
+    } catch (error) {
+        errorLog('Queue error:', error);
+        sendErrorResponse(res, error);
+        if (!requestData.hasValidBypassCode) {
+            await sleep(8000);
+        }
     }
 }
 
@@ -226,7 +215,7 @@ async function processRequest(req, res, requestData) {
 app.get('/*', async (req, res) => {
     const requestData = getRequestData(req);
     try {
-        await processRequest(req, res, {...requestData, plaintTextResponse: true});
+        await processRequest(req, res, requestData);
     } catch (error) {
         sendErrorResponse(res, error);
     }
@@ -239,9 +228,9 @@ app.post('/', async (req, res) => {
         return res.status(400).send(`Invalid messages array. Received: ${req.body.messages}`);
     }
 
-    const requestParams = getRequestData(req, true);
+    const requestParams = getRequestData(req);
     try {
-        await processRequest(req, res, {...requestParams, plaintTextResponse: true});
+        await processRequest(req, res, requestParams);
     } catch (error) {
         sendErrorResponse(res, error);
     }
@@ -274,40 +263,6 @@ app.post('/openai*', async (req, res) => {
     } catch (error) {
         sendErrorResponse(res, error);
     }
-    // const ip = getIp(req);
-    // const queue = getQueue(ip);
-    // const isStream = req.body.stream;
-
-    // const run = async () => {
-
-    //     try {
-    //         // sendToAnalytics(req, 'textGenerated', { messages: requestParams.messages, model: requestParams.model, options: requestParams });
-
-            
-    //         const response = await generateTextBasedOnModel(requestParams.messages, requestParams);
-    //         if (isStream) {
-    //             sendAsOpenAIStream(res, response);
-    //             return;
-    //         }
-
-    //         const result = formatAsOpenAIResponse(response, requestParams, isStream);
-
-    //         setInCache(cacheKey, result);
-    //         log("openai format result", JSON.stringify(result, null, 2));
-    //         sendOpenAIResponse(res, result);
-    //     } catch (error) {
-    //         sendErrorResponse(res, error);
-    //     }
-    //     await sleep(5000);
-
-    // };
-    // try {
-    //     await queue.add(run);
-    // } catch (error) {
-    //     sendErrorResponse(res, error);
-    //     await sleep(5000);
-    //     return;
-    // }
 })
 
 function sendAsOpenAIStream(res, completion) {
@@ -375,7 +330,7 @@ function formatAsOpenAIResponse(response, requestParams) {
     };
     return result;
 }
-4
+
 app.use((req, res, next) => {
     log(`Unhandled request: ${req.method} ${req.originalUrl}`);
     next();

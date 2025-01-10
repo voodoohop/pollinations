@@ -325,3 +325,74 @@ test('POST /openai should support streaming', async t => {
     t.is(response.status, 200, 'Response status should be 200');
     t.is(response.headers['content-type'], 'text/event-stream; charset=utf-8', 'Content-Type should be text/event-stream');
 });
+
+/**
+ * Test: Bypass Code Functionality
+ * 
+ * Purpose: Verify that the bypass code correctly skips delays while maintaining functionality
+ */
+
+test('should process request faster with valid bypass code in query params', async t => {
+    const startTime = Date.now();
+    const response = await axiosInstance.post('/?code=BeesKnees', {
+        messages: [{ role: 'user', content: 'Hello' }],
+        cache: false
+    });
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    t.is(response.status, 200);
+    t.true(duration < 9000, 'Request with bypass code should complete in less than 9 seconds');
+});
+
+test('should process request faster with valid bypass code in request body', async t => {
+    const startTime = Date.now();
+    const response = await axiosInstance.post('/', {
+        messages: [{ role: 'user', content: 'Hello' }],
+        code: 'BeesKnees',
+        cache: false
+    });
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    t.is(response.status, 200);
+    t.true(duration < 9000, 'Request with bypass code should complete in less than 9 seconds');
+});
+
+test('should have normal delay without bypass code', async t => {
+    const startTime = Date.now();
+    const response = await axiosInstance.post('/', {
+        messages: [{ role: 'user', content: 'Hello' }],
+        cache: false
+    });
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    t.is(response.status, 200);
+    t.true(duration >= 8000, 'Request without bypass code should take at least 8 seconds');
+});
+
+test('should have normal delay with invalid bypass code', async t => {
+    const startTime = Date.now();
+    const response = await axiosInstance.post('/', {
+        messages: [{ role: 'user', content: 'Hello' }],
+        code: 'wrongcode',
+        cache: false
+    });
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    t.is(response.status, 200);
+    t.true(duration >= 8000, 'Request with invalid bypass code should take at least 8 seconds');
+});
+
+test('should maintain functionality with bypass code', async t => {
+    const response = await axiosInstance.post('/?code=BeesKnees', {
+        messages: [{ role: 'user', content: 'Hello' }],
+        cache: false
+    });
+
+    t.is(response.status, 200);
+    t.true(response.data.choices && response.data.choices.length > 0, 'Response should contain choices array');
+    t.true(typeof response.data.choices[0].message.content === 'string', 'Response should contain message content');
+});
