@@ -307,6 +307,130 @@ test('OpenAI API should handle invalid model gracefully', async t => {
 });
 
 /**
+ * Test: Function Calling Support
+ * 
+ * Purpose: Verify that the API supports function calling while maintaining searchgpt compatibility
+ */
+test('should support basic function calling', async t => {
+    const tools = [{
+        type: "function",
+        function: {
+            name: "get_current_weather",
+            description: "Get the current weather in a given location",
+            parameters: {
+                type: "object",
+                properties: {
+                    location: {
+                        type: "string",
+                        description: "The city and state, e.g. San Francisco, CA"
+                    },
+                    unit: {
+                        type: "string",
+                        enum: ["celsius", "fahrenheit"]
+                    }
+                },
+                required: ["location"],
+                additionalProperties: false
+            }
+        }
+    }];
+
+    const response = await axiosInstance.post('/openai/chat/completions', {
+        messages: [{ role: 'user', content: "What's the weather like in San Francisco?" }],
+        model: 'openai',
+        tools,
+        cache: false
+    });
+
+    t.is(response.status, 200, 'Response status should be 200');
+    t.truthy(response.data.choices[0].message.tool_calls, 'Response should include tool calls');
+    const toolCall = response.data.choices[0].message.tool_calls[0];
+    t.is(toolCall.function.name, 'get_current_weather', 'Should call the weather function');
+    
+    const args = JSON.parse(toolCall.function.arguments);
+    t.is(args.location, 'San Francisco', 'Should extract correct location');
+});
+
+/**
+ * Test: SearchGPT Compatibility
+ * 
+ * Purpose: Verify that searchgpt functionality remains intact when function calling is enabled
+ */
+test('should maintain searchgpt functionality with function calling', async t => {
+    // First test regular function calling
+    const customTools = [{
+        type: "function",
+        function: {
+            name: "custom_function",
+            description: "A custom function",
+            parameters: {
+                type: "object",
+                properties: {
+                    param: { type: "string" }
+                },
+                required: ["param"],
+                additionalProperties: false
+            }
+        }
+    }];
+
+    const regularResponse = await axiosInstance.post('/openai/chat/completions', {
+        messages: [{ role: 'user', content: "Call the custom function with 'test'" }],
+        model: 'openai',
+        tools: customTools,
+        cache: false
+    });
+
+    t.is(regularResponse.status, 200, 'Regular function call response status should be 200');
+    t.truthy(regularResponse.data.choices[0].message.tool_calls, 'Should include custom tool calls');
+
+    // Then test searchgpt
+    const searchResponse = await axiosInstance.post('/', {
+        messages: [{ role: 'user', content: "What's the latest news about AI?" }],
+        model: 'searchgpt',
+        cache: false
+    });
+
+    t.is(searchResponse.status, 200, 'SearchGPT response status should be 200');
+    const content = searchResponse.data;
+    t.truthy(content.includes('search') || content.includes('found'), 'Response should indicate search was performed');
+});
+
+/**
+ * Test: Function Calling with Streaming
+ * 
+ * Purpose: Verify that function calling works with streaming responses
+ */
+test('should support function calling with streaming', async t => {
+    const tools = [{
+        type: "function",
+        function: {
+            name: "get_current_weather",
+            description: "Get the current weather",
+            parameters: {
+                type: "object",
+                properties: {
+                    location: { type: "string" }
+                },
+                required: ["location"],
+                additionalProperties: false
+            }
+        }
+    }];
+
+    const response = await axiosInstance.post('/openai/chat/completions', {
+        messages: [{ role: 'user', content: "What's the weather in Paris?" }],
+        model: 'openai',
+        tools,
+        stream: true,
+        cache: false
+    });
+
+    t.is(response.status, 200, 'Response status should be 200');
+    t.is(response.headers['content-type'], 'text/event-stream; charset=utf-8', 'Should use SSE content type');
+});
+
+/**
  * Test: Streaming Responses (Commented Out)
  *
  * Purpose: Verify that the API supports streaming responses for the OpenAI-compatible endpoint.
@@ -325,6 +449,170 @@ test('POST /openai should support streaming', async t => {
         stream: true,
         cache: false
     }, { responseType: 'stream' });
+    t.is(response.status, 200, 'Response status should be 200');
+    t.is(response.headers['content-type'], 'text/event-stream; charset=utf-8', 'Content-Type should be text/event-stream');
+});
+
+/**
+ * Test: Basic Function Calling
+ * 
+ * Purpose: Verify that the API supports basic function calling with a single function
+ * 
+ * Steps:
+ * 1. Define a simple calculator function
+ * 2. Send a request that should trigger the function
+ * 3. Verify the response includes function call and final result
+ */
+test('should support basic function calling', async t => {
+    const response = await axiosInstance.post('/openai/chat/completions', {
+        messages: [
+            { role: 'user', content: 'What is 25 plus 17?' }
+        ],
+        functions: [{
+            name: 'calculate',
+            description: 'Calculate basic math operations',
+            parameters: {
+                type: 'object',
+                properties: {
+                    operation: { type: 'string', enum: ['add', 'subtract', 'multiply', 'divide'] },
+                    a: { type: 'number' },
+                    b: { type: 'number' }
+                },
+                required: ['operation', 'a', 'b']
+            }
+        }],
+        cache: false
+    });
+
+    t.is(response.status, 200, 'Response status should be 200');
+    t.truthy(response.data.choices[0].message.function_call, 'Response should include function call');
+    t.is(response.data.choices[0].message.function_call.name, 'calculate', 'Function call should be for calculate function');
+    
+    const args = JSON.parse(response.data.choices[0].message.function_call.arguments);
+    t.is(args.operation, 'add', 'Operation should be add');
+    t.is(args.a, 25, 'First number should be 25');
+    t.is(args.b, 17, 'Second number should be 17');
+});
+
+/**
+ * Test: Multiple Function Calls
+ * 
+ * Purpose: Verify that the API supports multiple function calls in sequence
+ * 
+ * Steps:
+ * 1. Define multiple functions (search and scrape)
+ * 2. Send a request that requires multiple function calls
+ * 3. Verify the response includes all function calls and final result
+ */
+test('should support multiple function calls in sequence', async t => {
+    const response = await axiosInstance.post('/openai/chat/completions', {
+        messages: [
+            { role: 'user', content: 'Search for the latest news about AI and summarize the first article you find' }
+        ],
+        functions: [
+            {
+                name: 'web_search',
+                description: 'Search the web for information',
+                parameters: {
+                    type: 'object',
+                    properties: {
+                        query: { type: 'string' }
+                    },
+                    required: ['query']
+                }
+            },
+            {
+                name: 'web_scrape',
+                description: 'Scrape content from a webpage',
+                parameters: {
+                    type: 'object',
+                    properties: {
+                        url: { type: 'string' }
+                    },
+                    required: ['url']
+                }
+            }
+        ],
+        cache: false
+    });
+
+    t.is(response.status, 200, 'Response status should be 200');
+    
+    // First function call should be web_search
+    const firstCall = response.data.choices[0].message.function_call;
+    t.is(firstCall.name, 'web_search', 'First function call should be web_search');
+    t.truthy(JSON.parse(firstCall.arguments).query, 'Search query should be present');
+    
+    // Subsequent messages should include web_scrape call
+    t.truthy(response.data.choices[0].message.content.includes('web_scrape'), 'Response should include web scrape results');
+});
+
+/**
+ * Test: Function Call Error Handling
+ * 
+ * Purpose: Verify that the API handles function call errors gracefully
+ * 
+ * Steps:
+ * 1. Send a request with invalid function parameters
+ * 2. Verify the error response format
+ */
+test('should handle function call errors gracefully', async t => {
+    const response = await axiosInstance.post('/openai/chat/completions', {
+        messages: [
+            { role: 'user', content: 'Calculate 25 divided by 0' }
+        ],
+        functions: [{
+            name: 'calculate',
+            description: 'Calculate basic math operations',
+            parameters: {
+                type: 'object',
+                properties: {
+                    operation: { type: 'string', enum: ['add', 'subtract', 'multiply', 'divide'] },
+                    a: { type: 'number' },
+                    b: { type: 'number' }
+                },
+                required: ['operation', 'a', 'b']
+            }
+        }],
+        cache: false
+    });
+
+    t.is(response.status, 200, 'Response status should be 200');
+    t.truthy(response.data.choices[0].message.content.includes('error'), 'Response should include error message');
+    t.falsy(response.data.choices[0].message.function_call, 'Should not attempt function call with invalid input');
+});
+
+/**
+ * Test: Function Call with Streaming
+ * 
+ * Purpose: Verify that function calling works with streaming responses
+ * 
+ * Steps:
+ * 1. Send a request with function calling and streaming enabled
+ * 2. Verify the streaming response format includes function calls
+ */
+test('should support function calling with streaming', async t => {
+    const response = await axiosInstance.post('/openai/chat/completions', {
+        messages: [
+            { role: 'user', content: 'What is 42 plus 17?' }
+        ],
+        functions: [{
+            name: 'calculate',
+            description: 'Calculate basic math operations',
+            parameters: {
+                type: 'object',
+                properties: {
+                    operation: { type: 'string', enum: ['add', 'subtract', 'multiply', 'divide'] },
+                    a: { type: 'number' },
+                    b: { type: 'number' }
+                },
+                required: ['operation', 'a', 'b']
+            }
+        }],
+        stream: true,
+        cache: false
+    }, { responseType: 'stream' });
+
     t.is(response.status, 200, 'Response status should be 200');
     t.is(response.headers['content-type'], 'text/event-stream; charset=utf-8', 'Content-Type should be text/event-stream');
 });

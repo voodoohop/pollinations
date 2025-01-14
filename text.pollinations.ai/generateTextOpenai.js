@@ -1,8 +1,6 @@
 import { AzureOpenAI } from 'openai';
 import dotenv from 'dotenv';
-import { imageGenerationPrompt, spamTheSpammersPrompt } from './pollinationsPrompt.js';
-import { searchToolDefinition, performWebSearch } from './tools/searchTool.js';
-import { performWebScrape, scrapeToolDefinition } from './tools/scrapeTool.js';
+import { spamTheSpammersPrompt } from './pollinationsPrompt.js';
 
 dotenv.config();
 
@@ -29,7 +27,7 @@ function countMessageCharacters(messages) {
     }, 0);
 }
 
-export async function generateText(messages, options, performSearch = false) {
+export async function generateText(messages, options = {}) {
     const MAX_CHARS = 56000;
     const totalChars = countMessageCharacters(messages);
     
@@ -51,57 +49,24 @@ export async function generateText(messages, options, performSearch = false) {
         }
     }
 
-    let completion = await openai.chat.completions.create({
+    const completionOptions = {
         model: 'gpt-4o-mini',
         messages,
         seed: options.seed,
         response_format: options.jsonMode ? { type: 'json_object' } : undefined,
-        tools: performSearch ? [searchToolDefinition, scrapeToolDefinition] : undefined,
-        tool_choice: performSearch ? "auto" : undefined,
-    });
+        stream: options.stream,
+        max_tokens: options.max_tokens || 4096,
+    };
 
-    let responseMessage = completion.choices[0].message;
-
-    while (responseMessage.tool_calls) {
-        const toolCalls = responseMessage.tool_calls;
-        messages.push(responseMessage);
-
-        for (const toolCall of toolCalls) {
-            if (toolCall.function.name === 'web_search') {
-                const args = JSON.parse(toolCall.function.arguments);
-                const searchResponse = await performWebSearch(args);
-                
-                messages.push({
-                    tool_call_id: toolCall.id,
-                    role: "tool",
-                    name: toolCall.function.name,
-                    content: searchResponse
-                });
-            } else if (toolCall.function.name === 'web_scrape') {
-                const args = JSON.parse(toolCall.function.arguments);
-                const scrapeResponse = await performWebScrape(args);
-                
-                messages.push({
-                    tool_call_id: toolCall.id,
-                    role: "tool",
-                    name: toolCall.function.name,
-                    content: scrapeResponse
-                });
-            }
+    if (options.tools?.length > 0) {
+        completionOptions.tools = options.tools;
+        completionOptions.tool_choice = options.tool_choice || "auto";
+        if (options.parallel_tool_calls === false) {
+            completionOptions.parallel_tool_calls = false;
         }
-
-        completion = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
-            messages,
-            seed: options.seed,
-            response_format: options.jsonMode ? { type: 'json_object' } : undefined,
-            tools: [searchToolDefinition, scrapeToolDefinition],
-            tool_choice: "auto",
-            max_tokens: 4096,
-        });
-        responseMessage = completion.choices[0].message;
     }
-    return completion;
+
+    return openai.chat.completions.create(completionOptions);
 }
 
 function hasSystemMessage(messages) {
