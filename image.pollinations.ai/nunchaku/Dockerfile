@@ -1,4 +1,4 @@
-FROM nvidia/cuda:12.4.0-devel-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
@@ -44,7 +44,7 @@ RUN pip3 install --no-cache-dir \
     torch==2.4.1 \
     torchvision==0.19.1 \
     torchaudio==2.4.1 \
-    --index-url https://download.pytorch.org/whl/cu121
+    --index-url https://download.pytorch.org/whl/cu124
 
 # Install other dependencies
 RUN pip3 install --no-cache-dir \
@@ -67,7 +67,7 @@ RUN pip3 install --no-cache-dir \
 
 # Clone and install nunchaku
 WORKDIR /app
-RUN git clone https://github.com/mit-han-lab/nunchaku.git \
+RUN git clone https://github.com/pollinations/nunchaku.git \
     && cd nunchaku \
     && git submodule init \
     && git submodule update \
