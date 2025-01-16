@@ -41,9 +41,9 @@ RUN pip3 install --no-cache-dir numpy
 
 # Install PyTorch
 RUN pip3 install --no-cache-dir \
-    torch==2.4.1 \
-    torchvision==0.19.1 \
-    torchaudio==2.4.1 \
+    torch==2.5.1 \
+    torchvision \
+    torchaudio \
     --index-url https://download.pytorch.org/whl/cu124
 
 # Install other dependencies
