@@ -70,6 +70,12 @@ export function Gallery() {
               transform: translateY(0) skew(-5deg);
             }
           }
+          
+          @supports (mix-blend-mode: plus-lighter) {
+            .doca-bling {
+              mix-blend-mode: plus-lighter !important;
+            }
+          }
         `}
       </style>
       <div className="noise" />
@@ -81,6 +87,7 @@ export function Gallery() {
         loop
         muted
         playsInline
+        className="doca-bling"
         style={docaBlingStyle}
       >
         <source src="/doca_bling.mp4" type="video/mp4" />
@@ -95,7 +102,7 @@ export function Gallery() {
         rel="noopener noreferrer"
         style={paypalStyle}
       >
-        ⚡️ [[ pAyPaL $$$$$$ ]] ⚡️
+        paypal
       </a>
       {predictions.length === 0 ? (
         <div style={loadingStyle}>VALIDATING DIMENSIONAL PASSPORT...</div>

@@ -46,42 +46,22 @@ export const subHeaderStyle = {
 };
 
 export const paypalStyle = {
-  display: "block",
-  textAlign: "center",
-  padding: "15px 30px",
-  margin: "30px auto",
-  background: "repeating-linear-gradient(45deg, #000, #000 10px, #0ff 10px, #0ff 20px)",
-  border: "3px double #0ff",
-  color: "#fff",
+  position: "fixed",
+  bottom: "20px",
+  right: "20px",
+  padding: "8px 12px",
+  background: "transparent",
+  border: "1px solid rgba(0, 255, 255, 0.2)",
+  color: "rgba(0, 255, 255, 0.6)",
   textDecoration: "none",
-  fontFamily: "'Comic Sans MS', cursive, 'Space Mono', monospace",
-  letterSpacing: "2px",
-  fontSize: "1.2rem",
-  position: "relative",
+  fontFamily: "'Space Mono', monospace",
+  fontSize: "0.8rem",
+  letterSpacing: "1px",
   transition: "all 0.3s ease",
-  maxWidth: "400px",
-  cursor: "pointer",
-  animation: "blink 1s infinite",
-  textShadow: "2px 2px #000, -2px -2px #0ff",
+  zIndex: "100",
   "&:hover": {
-    transform: "rotate(2deg)",
-    animation: "rainbow 0.5s infinite",
-  },
-  "&::before": {
-    content: '"🌟"',
-    position: "absolute",
-    left: "20px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    fontSize: "1.2rem",
-  },
-  "&::after": {
-    content: '"🌟"',
-    position: "absolute",
-    right: "20px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    fontSize: "1.2rem",
+    background: "rgba(0, 255, 255, 0.1)",
+    color: "#0ff",
   },
 };
 
@@ -171,7 +151,9 @@ export const docaBlingStyle = {
   display: "block",
   filter: "drop-shadow(0 0 15px #0ff) invert(1)",
   mixBlendMode: "screen",
-  opacity: "0.8",
+  opacity: "0.6",
+  animation: "glitch 2s infinite",
+  willChange: "transform", // Optimize for animations
 };
 
 // Add luxury mockery keyframes
