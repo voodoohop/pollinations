@@ -164,6 +164,16 @@ export const loadingStyle = {
   animation: "glitch 2s infinite",
 };
 
+export const docaBlingStyle = {
+  width: "300px",
+  height: "auto",
+  margin: "20px auto",
+  display: "block",
+  filter: "drop-shadow(0 0 15px #0ff) invert(1)",
+  mixBlendMode: "screen",
+  opacity: "0.8",
+};
+
 // Add luxury mockery keyframes
 const berlinKeyframes = `
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" preserveAspectRatio="none">
+  <defs>
+    <style>
+      .background { fill: #0f0f0f; }
+      .text { fill: #ffd700; font-size: 5px; font-family: monospace; }
+      .dollar { fill: #00ffcc; }
+      .glow { animation: glow 4s infinite alternate; }
+      @keyframes glow {
+        from { opacity: 0.6; }
+        to { opacity: 1; }
+      }
+      .orbit { stroke: #666; stroke-width: 0.1; fill: none; animation: rotate 20s linear infinite; }
+      @keyframes rotate {
+        0% { transform: rotate(0deg); transform-origin: 50% 50%; }
+        100% { transform: rotate(360deg); transform-origin: 50% 50%; }
+      }
+      .sparkle {
+        fill: none;
+        stroke: #ffd700;
+        stroke-width: 0.2;
+        animation: scale-sparkle 4s infinite ease-in-out alternate;
+      }
+      @keyframes scale-sparkle {
+        0% { transform: scale(0.8); transform-origin: 50% 50%; }
+        100% { transform: scale(1.2); transform-origin: 50% 50%; }
+      }
+      .new-dollar { fill: #ff69b4; opacity: 0.8; animation: pulse 6s infinite ease-in-out; }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); transform-origin: 50% 50%; }
+        50% { transform: scale(1.2); transform-origin: 50% 50%; }
+      }
+    </style>
+  </defs>
+  <rect class="background" width="100" height="100" />
+  <text x="10" y="15" class="text">$ cosmic   dept.</text>
+  <g class="glow">
+    <circle cx="50" cy="50" r="10" class="dollar" />
+    <text x="46" y="52" class="text">$</text>
+  </g>
+  <g>
+    <circle cx="50" cy="50" r="20" class="orbit" />
+    <circle cx="50" cy="50" r="30" class="orbit" />
+    <circle cx="50" cy="50" r="40" class="orbit" />
+  </g>
+  <!-- Additional sparkles for more subtle luxury -->
+  <g>
+    <line x1="50" y1="10" x2="50" y2="12" class="sparkle" />
+    <line x1="90" y1="50" x2="88" y2="50" class="sparkle" />
+    <line x1="50" y1="90" x2="50" y2="88" class="sparkle" />
+    <line x1="10" y1="50" x2="12" y2="50" class="sparkle" />
+    <line x1="30" y1="30" x2="32" y2="32" class="sparkle" />
+    <line x1="70" y1="70" x2="68" y2="68" class="sparkle" />
+  </g>
+  <!-- New element: A smaller pulsating pink dollar sign orbiting -->
+  <g transform="translate(50, 50)">
+    <circle cx="0" cy="25" r="3" class="new-dollar" />
+    <text x="-1" y="27" font-size="2px" fill="#ff69b4">$</text>
+  </g>
+</svg>

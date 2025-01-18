@@ -11,7 +11,7 @@ import {
   galleryStyle,
   itemStyle,
   paypalStyle,
-  docaLogoStyle,
+  docaBlingStyle,
 } from "./galleryStyles";
 import { usePredictions } from "./usePredictions";
 
@@ -76,6 +76,15 @@ export function Gallery() {
       <div className="premium-overlay" />
       <div className="scanline" />
       <div className="vip-badge">DEPT. OF COSMIC AFFAIRS</div>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={docaBlingStyle}
+      >
+        <source src="/doca_bling.mp4" type="video/mp4" />
+      </video>
       <h1 style={headerStyle}>STUDIO 1111</h1>
       <i style={subHeaderStyle}>
         INTERDIMENSIONAL ARTIFACTS / CLEARANCE LEVEL Ω / REALITY DISTORTION PERMIT REQUIRED

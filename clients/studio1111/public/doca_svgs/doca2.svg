@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 800 800" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <style>
+      .bg { fill: #0a0a0a; }
+      .grid { fill: none; stroke: #444; stroke-width: 0.5; }
+      .text { fill: #ffd700; font-family: "Courier New", monospace; font-size: 14px; }
+      .wave { fill: none; stroke: #bb86fc; stroke-width: 2; stroke-linecap: round; }
+      .dot { fill: #03dac5; }
+      .sparkle { fill: #ffd700; }
+      .coin { fill: #bb86fc; stroke: #ffd700; stroke-width: 1; }
+      .luxury-dot { fill: #ff4081; }
+      .highlight { fill: #03dac5; font-size: 10px; font-family: monospace; }
+    </style>
+  </defs>
+  <rect class="bg" width="100%" height="100%"></rect>
+  <g id="grid">
+    <!-- Grid lines -->
+    <path class="grid" d="M0 100 H800 M0 200 H800 M0 300 H800 M0 400 H800 M0 500 H800 M0 600 H800 M0 700 H800"></path>
+    <path class="grid" d="M100 0 V800 M200 0 V800 M300 0 V800 M400 0 V800 M500 0 V800 M600 0 V800 M700 0 V800"></path>
+  </g>
+  <g id="asciiArt">
+    <!-- ASCII-style text -->
+    <text class="text" x="10" y="30">.::: DEPARTMENT</text>
+    <text class="text" x="10" y="50">.::: OF COSMIC AFFAIRS</text>
+    <text class="text" x="10" y="70">.::: * LUXE DIVISION *</text>
+    <text class="text" x="10" y="100">.::: WHERE STARS ARE THE CURRENCY</text>
+    <text class="text" x="10" y="140">.::: * COSMIC CRYPTO * </text>
+    <text class="text" x="10" y="180">.::: * INFINITE ROI *</text>
+    <!-- Subtle provocative message -->
+    <text class="highlight" x="10" y="220">[ * The Cosmos Likes Lavish * ]</text>
+    <text class="highlight" x="10" y="240">[ Invest in Stardust Futures ]</text>
+  </g>
+  <g id="wavesAndCircles">
+    <!-- Subtle animated wave -->
+    <path class="wave" d="M0 400 Q200 350 400 400 T800 400">
+      <animate attributeName="d" dur="8s" repeatCount="indefinite" values="
+               M0 400 Q200 350 400 400 T800 400;
+               M0 400 Q200 450 400 400 T800 400;
+               M0 400 Q200 350 400 400 T800 400"></animate>
+    </path>
+    <!-- Floating dots -->
+    <circle class="dot" cx="200" cy="400" r="5">
+      <animate attributeName="cy" dur="6s" repeatCount="indefinite" values="400; 380; 400"></animate>
+    </circle>
+    <circle class="dot" cx="600" cy="400" r="5">
+      <animate attributeName="cy" dur="6s" repeatCount="indefinite" values="400; 420; 400"></animate>
+    </circle>
+    <!-- Luxury dots -->
+    <circle class="luxury-dot" cx="300" cy="450" r="4">
+      <animate attributeName="cy" dur="6s" repeatCount="indefinite" values="450; 470; 450"></animate>
+    </circle>
+    <circle class="luxury-dot" cx="500" cy="350" r="4">
+      <animate attributeName="cy" dur="6s" repeatCount="indefinite" values="350; 330; 350"></animate>
+    </circle>
+  </g>
+  <g id="sparkles">
+    <!-- Sparkling stars -->
+    <circle class="sparkle" cx="400" cy="200" r="2">
+      <animate attributeName="r" dur="1.5s" repeatCount="indefinite" values="2; 4; 2"></animate>
+      <animate attributeName="opacity" dur="1.5s" repeatCount="indefinite" values="1; 0.5; 1"></animate>
+    </circle>
+    <circle class="sparkle" cx="100" cy="500" r="2">
+      <animate attributeName="r" dur="1.2s" repeatCount="indefinite" values="2; 4; 2"></animate>
+      <animate attributeName="opacity" dur="1.2s" repeatCount="indefinite" values="1; 0.5; 1"></animate>
+    </circle>
+    <circle class="sparkle" cx="700" cy="300" r="2">
+      <animate attributeName="r" dur="1.8s" repeatCount="indefinite" values="2; 4; 2"></animate>
+      <animate attributeName="opacity" dur="1.8s" repeatCount="indefinite" values="1; 0.5; 1"></animate>
+    </circle>
+    <!-- New sparkle -->
+    <circle class="sparkle" cx="400" cy="600" r="2">
+      <animate attributeName="r" dur="1.6s" repeatCount="indefinite" values="2; 5; 2"></animate>
+      <animate attributeName="opacity" dur="1.6s" repeatCount="indefinite" values="1; 0.4; 1"></animate>
+    </circle>
+  </g>
+  <g id="coins">
+    <!-- Rotating cosmic coins -->
+    <circle class="coin" cx="150" cy="150" r="10">
+      <animateTransform attributeName="transform" type="rotate" from="0 150 150" to="360 150 150" dur="10s" repeatCount="indefinite"></animateTransform>
+    </circle>
+    <circle class="coin" cx="650" cy="650" r="10">
+      <animateTransform attributeName="transform" type="rotate" from="360 650 650" to="0 650 650" dur="10s" repeatCount="indefinite"></animateTransform>
+    </circle>
+    <!-- Central coin with subtle size pulse -->
+    <circle class="coin" cx="400" cy="400" r="15">
+      <animateTransform attributeName="transform" type="rotate" from="0 400 400" to="360 400 400" dur="12s" repeatCount="indefinite"></animateTransform>
+      <animate attributeName="r" dur="6s" repeatCount="indefinite" values="15; 18; 15"></animate>
+    </circle>
+  </g>
+</svg>
