@@ -18,14 +18,31 @@ export async function generateDeepseek(messages, options) {
     });
 
     try {
+        // Validate input
+        if (!messages || messages.length === 0) {
+            throw new Error('Messages array cannot be empty');
+        }
+
+        const lastMessage = messages[messages.length - 1];
+        if (!lastMessage.content || lastMessage.content.trim() === '') {
+            throw new Error('Last message content cannot be empty');
+        }
+
+        // Sanitize messages by removing reasoning_content
+        const sanitizedMessages = messages.map(msg => {
+            const { reasoning_content, ...cleanMsg } = msg;
+            return cleanMsg;
+        });
+
         const requestBody = {
             model: options.model,
-            messages,
+            messages: sanitizedMessages,
             response_format: options.jsonMode ? { type: 'json_object' } : undefined,
             max_tokens: 4096,
             stream: false,
             tools: options.tools,
-            tool_choice: options.tool_choice
+            tool_choice: options.tool_choice,
+            temperature: options.temperature
         };
 
         log(`[${requestId}] Sending request to DeepSeek API`, {

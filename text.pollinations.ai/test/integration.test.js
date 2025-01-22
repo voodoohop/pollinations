@@ -305,7 +305,6 @@ test('OpenAI API should handle invalid model gracefully', async t => {
     t.truthy(response.data.choices[0].message, 'First choice should have a "message" object');
 });
 
-
 /**
  * Test Suite: Special Character Handling
  * 
@@ -344,7 +343,6 @@ test('POST /openai should handle special characters', async t => {
             `${testCase.description} should return a response`);
     }
 });
-
 
 /**
  * Test Suite: Seed Behavior Across Models
@@ -401,6 +399,90 @@ for (const modelConfig of chatModels) {
         }
     });
 }
+
+/**
+ * Test Suite: DeepSeek Model Integration Tests
+ * 
+ * Purpose: Test basic deepseek model functionality through the API endpoint
+ */
+test('deepseek model should handle basic completion', async t => {
+    try {
+        const response = await axiosInstance.post('/', {
+            messages: [{ role: 'user', content: 'What is 2+2?' }],
+            model: 'deepseek-reasoner',
+            cache: false
+        });
+        
+        t.is(response.status, 200, 'Response status should be 200');
+        t.truthy(response.data, 'Response should have data');
+        t.true(typeof response.data === 'string', 'Response should be a string');
+        t.true(response.data.length > 0, 'Response should not be empty');
+    } catch (error) {
+        console.error('Test error:', error);
+        t.fail(`Test failed with error: ${error.message}`);
+    }
+});
+
+test('deepseek model should handle empty content', async t => {
+    const response = await axiosInstance.post('/', {
+        messages: [{ role: 'user', content: '' }],
+        model: 'deepseek-reasoner',
+        cache: false
+    });
+    
+    t.true(response.status >= 400, 'Empty content should return error status');
+    t.truthy(response.data.error, 'Response should contain error message');
+});
+
+test('deepseek model should handle temperature parameter', async t => {
+    try {
+        const response = await axiosInstance.post('/', {
+            messages: [{ role: 'user', content: 'Tell me a short joke' }],
+            model: 'deepseek-reasoner',
+            temperature: 0.7,
+            cache: false
+        });
+        
+        t.is(response.status, 200, 'Response status should be 200');
+        t.truthy(response.data, 'Response should have data');
+        t.true(typeof response.data === 'string', 'Response should be a string');
+        t.true(response.data.length > 0, 'Response should not be empty');
+    } catch (error) {
+        console.error('Test error:', error);
+        t.fail(`Test failed with error: ${error.message}`);
+    }
+});
+
+test('deepseek model should handle seed parameter', async t => {
+    try {
+        // Test with just two seeds to be more efficient
+        const seed1 = 42;
+        const seed2 = 123;
+        
+        const response1 = await axiosInstance.post('/', {
+            messages: [{ role: 'user', content: 'Write a one-word response' }],
+            model: 'deepseek-reasoner',
+            seed: seed1,
+            cache: false
+        });
+        
+        const response2 = await axiosInstance.post('/', {
+            messages: [{ role: 'user', content: 'Write a one-word response' }],
+            model: 'deepseek-reasoner',
+            seed: seed2,
+            cache: false
+        });
+        
+        t.is(response1.status, 200, 'First response status should be 200');
+        t.is(response2.status, 200, 'Second response status should be 200');
+        t.true(typeof response1.data === 'string', 'First response should be a string');
+        t.true(typeof response2.data === 'string', 'Second response should be a string');
+        t.notDeepEqual(response1.data, response2.data, 'Different seeds should produce different responses');
+    } catch (error) {
+        console.error('Test error:', error);
+        t.fail(`Test failed with error: ${error.message}`);
+    }
+});
 
 /**
  * Test: Streaming Responses (Commented Out)

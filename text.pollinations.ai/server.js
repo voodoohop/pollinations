@@ -279,6 +279,15 @@ export async function sendErrorResponse(res, req, error, requestData, statusCode
 export function sendOpenAIResponse(res, completion) {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    
+    // Include reasoning_content in the response if it exists and response is JSON
+    if (completion.choices[0]?.message?.reasoning_content && completion.model?.includes('deepseek-reasoner')) {
+        completion.choices[0].message = {
+            ...completion.choices[0].message,
+            reasoning_content: completion.choices[0].message.reasoning_content
+        };
+    }
+    
     res.json(completion);
 }
 
