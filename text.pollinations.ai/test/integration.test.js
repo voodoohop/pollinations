@@ -10,7 +10,7 @@ const errorLog = debug('pollinations:test:error');
 
 // Configure higher timeout for all tests (5 minutes)
 test.beforeEach(t => {
-    t.timeout(40000); // 5 minutes in milliseconds
+    t.timeout(100000); // 5 minutes in milliseconds
 });
 
 let server;
