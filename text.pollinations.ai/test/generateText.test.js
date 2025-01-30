@@ -197,6 +197,175 @@ test('generateTextOpenai should handle jsonMode with existing system message', a
     }
 });
 
+// Additional Vision API Tests
+test('generateTextOpenai should handle invalid image URL', async t => {
+    try {
+        const messages = [{
+            role: "user",
+            content: [
+                { type: "text", text: "What's in this image?" },
+                {
+                    type: "image_url",
+                    image_url: { url: "https://invalid-url-that-does-not-exist.jpg" }
+                }
+            ]
+        }];
+        
+        await generateTextOpenai(messages, { model: 'openai-large' });
+        t.fail('Should have thrown error for invalid image URL');
+    } catch (error) {
+        t.truthy(error, 'Should throw an error for invalid image URL');
+    }
+});
+
+test('generateTextOpenai should handle multiple images in request', async t => {
+    try {
+        const messages = [{
+            role: "user",
+            content: [
+                { type: "text", text: "Compare these two images" },
+                {
+                    type: "image_url",
+                    image_url: { url: "https://image.pollinations.ai/prompt/red%20apple?width=512&height=512&seed=123&nologo=true" }
+                },
+                {
+                    type: "image_url",
+                    image_url: { url: "https://image.pollinations.ai/prompt/green%20apple?width=512&height=512&seed=456&nologo=true" }
+                }
+            ]
+        }];
+        
+        const response = await generateTextOpenai(messages, { model: 'openai-large' });
+        t.truthy(response.choices[0].message.content, 'Should provide comparison of both images');
+    } catch (error) {
+        t.fail(error.message);
+    }
+});
+
+test('generateTextOpenai should handle function calling', async t => {
+    try {
+        const messages = [{ role: 'user', content: 'What\'s the weather in London?' }];
+        const functions = [{
+            name: 'get_weather',
+            description: 'Get the weather in a location',
+            parameters: {
+                type: 'object',
+                properties: {
+                    location: {
+                        type: 'string',
+                        description: 'The city and state, e.g. San Francisco, CA'
+                    }
+                },
+                required: ['location']
+            }
+        }];
+        
+        const response = await generateTextOpenai(messages, { 
+            functions: functions,
+            function_call: 'auto'
+        });
+        
+        t.truthy(response, 'Response should not be empty');
+        t.true('choices' in response, 'Response should have choices property');
+    } catch (error) {
+        t.fail(error.message);
+    }
+});
+
+test('generateTextOpenai should handle detailed image analysis', async t => {
+    try {
+        const messages = [{
+            role: "user",
+            content: [
+                { type: "text", text: "Analyze this image in detail, including colors, composition, and any text visible" },
+                {
+                    type: "image_url",
+                    image_url: { url: "https://image.pollinations.ai/prompt/colorful%20abstract%20painting%20with%20text?width=512&height=512&seed=789&nologo=true" }
+                }
+            ]
+        }];
+        
+        const response = await generateTextOpenai(messages, { 
+            model: 'openai-large',
+            max_tokens: 500,
+            temperature: 0
+        });
+        
+        t.truthy(response.choices[0].message.content, 'Should provide detailed image analysis');
+        const content = response.choices[0].message.content.toLowerCase();
+        t.true(
+            content.includes('color') || 
+            content.includes('composition') || 
+            content.includes('text'),
+            'Response should include detailed analysis aspects'
+        );
+    } catch (error) {
+        t.fail(error.message);
+    }
+});
+
+// Vision API Tests
+test('generateTextOpenai should identify content in image', async t => {
+    try {
+        const messages = [
+            {
+                role: "user",
+                content: [
+                    {
+                        type: "text",
+                        text: "What's in this image?"
+                    },
+                    {
+                        type: "image_url",
+                        image_url: {
+                            url: "https://image.pollinations.ai/prompt/a%20red%20apple%20on%20a%20white%20table?width=512&height=512&seed=123&nologo=true"
+                        }
+                    }
+                ]
+            }
+        ];
+        
+        console.log('Making request with messages:', JSON.stringify(messages, null, 2));
+        console.log('Using model: openai-large');
+        
+        const response = await generateTextOpenai(messages, { 
+            model: 'openai-large',
+            max_tokens: 300,
+            temperature: 0
+        });
+        
+        console.log('Full response:', JSON.stringify(response, null, 2));
+        
+        t.truthy(response, 'Response should not be null');
+        if (!response) {
+            console.error('Response is null');
+            t.fail('Response is null');
+            return;
+        }
+
+        // Check if response has choices array with at least one item
+        t.true(Array.isArray(response.choices), 'Response should have choices array');
+        t.true(response.choices.length > 0, 'Response should have at least one choice');
+
+        const firstChoice = response.choices[0];
+        t.truthy(firstChoice.message, 'First choice should have message');
+        t.truthy(firstChoice.message.content, 'Message should have content');
+
+        const content = firstChoice.message.content.toLowerCase();
+        console.log('Response content:', content);
+        t.true(content.includes('apple') || content.includes('red') || content.includes('table'), 'Response should describe the apple on the table');
+    } catch (error) {
+        console.error('Error details:', error);
+        if (error.response) {
+            console.error('Error response:', JSON.stringify(error.response, null, 2));
+        }
+        if (error.request) {
+            console.error('Error request:', JSON.stringify(error.request, null, 2));
+        }
+        t.fail(error.message);
+    }
+});
+
 // Huggingface Tests
 test('generateTextHuggingface should handle basic text generation', async t => {
     try {
