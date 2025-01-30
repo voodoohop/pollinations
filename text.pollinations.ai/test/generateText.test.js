@@ -2,6 +2,7 @@ import test from 'ava';
 import { generateText as generateTextOpenai } from '../generateTextOpenai.js';
 import generateTextHuggingface from '../generateTextHuggingface.js';
 import { generateTextScaleway } from '../generateTextScaleway.js';
+import generateDeepseek from '../generateDeepseek.js';
 
 // Increase timeout for all tests
 test.beforeEach(t => {
@@ -497,6 +498,77 @@ test('generateTextScaleway should use default model when invalid model specified
         const messages = [{ role: 'user', content: 'Hello' }];
         const response = await generateTextScaleway(messages, { model: 'invalid-model' });
         t.truthy(response, 'Response should not be empty');
+    } catch (error) {
+        t.fail(error.message);
+    }
+});
+
+// Deepseek Tests
+test('generateDeepseek should handle seed parameter for deterministic output', async t => {
+    const messages = [{ role: 'user', content: 'Tell me a random number between 1 and 1000000' }];
+    const seed = 42;
+    
+    try {
+        // First call with seed
+        const response1 = await generateDeepseek(messages, { seed });
+        t.truthy(response1.choices[0].message.content, 'Should have content in first response');
+        
+        // Second call with same seed
+        const response2 = await generateDeepseek(messages, { seed });
+        t.truthy(response2.choices[0].message.content, 'Should have content in second response');
+        
+        // Compare responses - they should be identical with same seed
+        t.is(
+            response1.choices[0].message.content,
+            response2.choices[0].message.content,
+            'Responses should be identical with same seed'
+        );
+    } catch (error) {
+        t.fail(error.message);
+    }
+});
+
+test('generateDeepseek should generate different outputs with different seeds', async t => {
+    const messages = [{ role: 'user', content: 'Tell me a random number between 1 and 1000000' }];
+    
+    try {
+        // Call with first seed
+        const response1 = await generateDeepseek(messages, { seed: 42 });
+        t.truthy(response1.choices[0].message.content, 'Should have content in first response');
+        
+        // Call with different seed
+        const response2 = await generateDeepseek(messages, { seed: 123 });
+        t.truthy(response2.choices[0].message.content, 'Should have content in second response');
+        
+        // Compare responses - they should be different with different seeds
+        t.not(
+            response1.choices[0].message.content,
+            response2.choices[0].message.content,
+            'Responses should be different with different seeds'
+        );
+    } catch (error) {
+        t.fail(error.message);
+    }
+});
+
+test('generateDeepseek should generate different outputs without seed', async t => {
+    const messages = [{ role: 'user', content: 'Tell me a random number between 1 and 1000000' }];
+    
+    try {
+        // First call without seed
+        const response1 = await generateDeepseek(messages, {});
+        t.truthy(response1.choices[0].message.content, 'Should have content in first response');
+        
+        // Second call without seed
+        const response2 = await generateDeepseek(messages, {});
+        t.truthy(response2.choices[0].message.content, 'Should have content in second response');
+        
+        // Compare responses - they should likely be different without seeds
+        t.not(
+            response1.choices[0].message.content,
+            response2.choices[0].message.content,
+            'Responses should be different without seeds'
+        );
     } catch (error) {
         t.fail(error.message);
     }
