@@ -47,8 +47,13 @@ const Footer = () => {
           <b>TERMS & CONDITIONS</b>
         </StyledLink>
       </Box>
+
+      <Box m={4} textAlign="center" padding="0 1em">
+        <div><b>THOT Labs</b></div>
+        <div>11 avenue Maurice Chevalier - 06150 Cannes, France</div>
+        <div>THOT Labs operates under the domain thot-labs.com</div>
+      </Box>
     </SectionContainer>
   )
 }
 export default Footer
-
