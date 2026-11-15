@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Voice Lab — Is it the machine voice?</title>
+  <meta name="description" content="Four tools to detect, compare and strip the LLM voice — the recognizable way language models write. Built on Pollinations.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="polli.css">
+  <style>
+    /* ---- tabs ---- */
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+    .tab-btn {
+      background: transparent; border: 1px solid transparent; border-radius: 999px;
+      color: var(--text-dim); padding: 8px 16px; font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .tab-btn:hover { color: var(--text); border-color: var(--border-strong); }
+    .tab-btn.active { background: var(--accent-soft); border-color: rgba(245,197,24,0.4); color: var(--accent); }
+    .tab-btn .num { opacity: 0.55; font-size: 12px; margin-right: 4px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .tab-panel.active > .card:first-child { margin-top: 0; }
+
+    /* ---- scanner ---- */
+    .score-hero { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 14px; }
+    .score-gauge {
+      width: 118px; height: 118px; border-radius: 50%; flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: conic-gradient(var(--accent) calc(var(--pct) * 1%), var(--bg-soft) 0);
+      position: relative;
+    }
+    .score-gauge::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: var(--bg-card); }
+    .score-gauge .val { position: relative; font-size: 30px; font-weight: 800; line-height: 1; }
+    .score-gauge .lbl { position: relative; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-faint); margin-top: 4px; }
+    .verdict { flex: 1; min-width: 220px; }
+    .verdict .line { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+    .verdict .detail { color: var(--text-dim); font-size: 13.5px; }
+    .marker-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 4px; border-bottom: 1px solid var(--border); }
+    .marker-row:last-child { border-bottom: none; }
+    .marker-row .cnt {
+      flex-shrink: 0; width: 46px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono); font-size: 12.5px; font-weight: 600;
+      background: var(--bg-soft); color: var(--text-faint); border: 1px solid var(--border);
+    }
+    .marker-row.hit .cnt { background: rgba(255,107,107,0.12); border-color: rgba(255,107,107,0.4); color: var(--bad); }
+    .marker-row .info { flex: 1; min-width: 0; }
+    .marker-row .name { font-weight: 600; font-size: 13.5px; }
+    .marker-row .why { color: var(--text-dim); font-size: 12px; margin-top: 1px; }
+    .marker-row .quotes { margin-top: 5px; display: flex; flex-direction: column; gap: 3px; }
+    .marker-row .quote {
+      font-family: var(--mono); font-size: 11.5px; color: #ffd9d9; background: rgba(255,107,107,0.07);
+      border-left: 2px solid rgba(255,107,107,0.5); padding: 3px 8px; border-radius: 0 4px 4px 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .deep-marker { padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; background: var(--bg-soft); }
+    .deep-marker .head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap; }
+    .deep-marker .head .name { font-weight: 700; font-size: 13.5px; color: var(--warn); }
+    .deep-marker blockquote { margin: 6px 0 0; padding: 6px 10px; border-left: 2px solid var(--warn); color: var(--text-dim); font-style: italic; font-size: 13px; }
+    .deep-marker .why { color: var(--text-dim); font-size: 12.5px; }
+
+    /* ---- compare ---- */
+    .compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .compare-card { position: relative; }
+    .compare-card .head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .compare-card .head .m { font-weight: 700; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .compare-card .body { font-size: 13.5px; white-space: pre-wrap; word-break: break-word; }
+    .compare-card .foot { display: flex; gap: 8px; margin-top: 10px; font-size: 11px; color: var(--text-faint); align-items: center; flex-wrap: wrap; }
+    .scorebar { height: 7px; border-radius: 4px; background: var(--bg-soft); overflow: hidden; margin-top: 6px; }
+    .scorebar .fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--good), var(--warn), var(--bad)); width: 0%; transition: width 0.4s; }
+    .jury-body { font-size: 14px; white-space: pre-wrap; }
+
+    /* ---- game ---- */
+    .game-hero { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+    .round-chip { font-family: var(--mono); font-size: 13px; }
+    .sample-box {
+      font-size: 16.5px; line-height: 1.75; padding: 20px 22px; border: 1px solid var(--border-strong);
+      border-radius: var(--radius); background: var(--bg-soft); white-space: pre-wrap; min-height: 110px;
+    }
+    .game-actions { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+    .game-actions button { flex: 1; min-width: 160px; padding: 13px; font-size: 15px; }
+    .game-actions .b-human:hover { border-color: var(--good); color: var(--good); }
+    .game-actions .b-ai:hover { border-color: var(--bad); color: var(--bad); }
+    .feedback { margin-top: 14px; padding: 13px 16px; border-radius: var(--radius-sm); font-size: 14px; display: none; }
+    .feedback.right { display: block; background: rgba(62,207,142,0.1); border: 1px solid rgba(62,207,142,0.4); }
+    .feedback.wrong { display: block; background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.4); }
+    .feedback .verdict-line { font-weight: 700; margin-bottom: 4px; }
+    .feedback .marker-line { color: var(--text-dim); font-size: 13px; }
+    .feedback .marker-line code { font-family: var(--mono); color: var(--warn); font-size: 12px; }
+    .tally { text-align: center; }
+    .tally .big { font-size: 44px; font-weight: 800; letter-spacing: -1px; }
+    .tally .rating { font-size: 17px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+    .tally .sub2 { color: var(--text-dim); margin-top: 6px; font-size: 13.5px; }
+    .round-history { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 18px; }
+    .round-history .r { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; border: 1px solid var(--border); color: var(--text-faint); }
+    .round-history .r.h { border-color: rgba(62,207,142,0.5); color: var(--good); }
+    .round-history .r.a { border-color: rgba(255,107,107,0.5); color: var(--bad); }
+    .round-history .r.win { background: var(--good); color: #05261a; border-color: var(--good); }
+    .round-history .r.lose { background: var(--bad); color: #2b0808; border-color: var(--bad); }
+
+    /* ---- deslopper ---- */
+    .deslop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 860px) { .deslop-grid { grid-template-columns: 1fr; } }
+    .deslop-pane h3 { display: flex; justify-content: space-between; align-items: center; }
+    .deslop-pane .txt { font-size: 13.5px; white-space: pre-wrap; word-break: break-word; min-height: 140px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-soft); }
+    .delta-pill { font-size: 15px; font-weight: 800; }
+    .delta-pill.up { color: var(--bad); }
+    .delta-pill.down { color: var(--good); }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+    @media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } }
+    .flow-note { color: var(--text-faint); font-size: 12px; margin-top: 8px; }
+    .src-note { font-size: 12px; color: var(--text-faint); margin-top: 6px; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>LLM Voice Lab</h1>
+    <p class="sub">
+      Four tools about <strong>the LLM voice</strong> — the recognizable way language models write: load-bearing tapestries,
+      rule-of-three everything, corporate smoothness without soul. Detect it, compare it across models, guess it against real
+      humans, and strip it out. Inspired by <a href="https://martinfowler.com/bliki/LlmVoice.html" target="_blank" rel="noopener">Martin Fowler's LLM Voice bliki</a>.
+      Model calls run on <strong>your own Pollen</strong>.
+    </p>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="scanner"><span class="num">01</span>Voice Scanner</button>
+      <button class="tab-btn" data-tab="compare"><span class="num">02</span>Voice Compare</button>
+      <button class="tab-btn" data-tab="game"><span class="num">03</span>Human or Model</button>
+      <button class="tab-btn" data-tab="deslop"><span class="num">04</span>Deslopper</button>
+    </nav>
+
+    <!-- ================= 1. VOICE SCANNER ================= -->
+    <section class="tab-panel active" id="tab-scanner">
+      <div class="card">
+        <h2>Scan a text for the machine voice</h2>
+        <p class="sub" style="margin-bottom:12px;">
+          Paste any text — a LinkedIn post, an "helpful" explainer, your own draft. The heuristic scan runs entirely in your
+          browser: regex markers, rhythm statistics, formatting density. No API needed.
+        </p>
+        <textarea id="scan-input" rows="7" placeholder="Paste text to scan… e.g. that blog post that begins with 'In today's rapidly evolving digital landscape…'"></textarea>
+        <div class="hero-questions" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+          <button class="small ghost" id="scan-sample-llm">Load a slop sample</button>
+          <button class="small ghost" id="scan-sample-human">Load a human sample</button>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+          <button class="primary" id="scan-btn">Scan locally</button>
+          <button id="deep-btn" style="display:none;">Deep analysis (model)</button>
+        </div>
+      </div>
+
+      <div class="card" id="scan-results" style="display:none;">
+        <div class="score-hero">
+          <div class="score-gauge" id="scan-gauge"><span class="val" id="scan-score">–</span><span class="lbl">LLM-voice score</span></div>
+          <div class="verdict">
+            <div class="line" id="scan-verdict">–</div>
+            <div class="detail" id="scan-verdict-detail"></div>
+          </div>
+        </div>
+        <h3>Marker breakdown <span class="faint">(local heuristics)</span></h3>
+        <div id="scan-markers"></div>
+      </div>
+
+      <div class="card" id="deep-results" style="display:none;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <h2 style="margin:0;">Deep analysis</h2>
+          <span class="chip violet" id="deep-model"></span>
+        </div>
+        <p class="sub" id="deep-verdict" style="margin-bottom:12px;"></p>
+        <div id="deep-markers"></div>
+        <p class="flow-note">Deep analysis reads style-level markers regexes miss: clichéd extended metaphors, soulless smoothness, uniform rhythm of ideas, summaries nobody asked for.</p>
+      </div>
+    </section>
+
+    <!-- ================= 2. VOICE COMPARE ================= -->
+    <section class="tab-panel" id="tab-compare">
+      <div class="card">
+        <h2>One paragraph, three voices</h2>
+        <p class="sub" style="margin-bottom:12px;">
+          Send the same request — <em>"rewrite this text in your natural voice, same meaning"</em> — to three models in
+          parallel, score each rewrite locally for LLM voice, then let a fourth model act as jury and rank which one
+          sounds most human.
+        </p>
+        <textarea id="cmp-input" rows="5" placeholder="Paste a paragraph to rewrite…"></textarea>
+        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; align-items:center;">
+          <button class="primary" id="cmp-btn">Rewrite with 3 models</button>
+          <span class="faint small" id="cmp-status"></span>
+        </div>
+      </div>
+
+      <div class="card" id="cmp-results" style="display:none;">
+        <div class="compare-grid" id="cmp-grid"></div>
+      </div>
+
+      <div class="card" id="cmp-jury" style="display:none;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <h2 style="margin:0;">Jury</h2>
+          <span class="chip violet" id="jury-model"></span>
+        </div>
+        <div class="jury-body" id="jury-body"></div>
+      </div>
+    </section>
+
+    <!-- ================= 3. HUMAN OR MODEL ================= -->
+    <section class="tab-panel" id="tab-game">
+      <div class="card" id="game-start">
+        <h2>Human or Model?</h2>
+        <p class="sub" style="margin-bottom:14px;">
+          Ten rounds. Each round shows one short passage: either a real public-domain human classic (Austen, Twain,
+          Dickens, Woolf, Darwin…) or a fresh model generation asked to sound casual. Guess which. After each guess you
+          see the marker that gave it away. Model rounds call Pollinations live.
+        </p>
+        <button class="primary" id="game-start-btn" style="padding:12px 26px; font-size:15px;">Start game</button>
+      </div>
+
+      <div class="card" id="game-board" style="display:none;">
+        <div class="game-hero">
+          <span class="chip gold round-chip" id="game-round">Round 1 / 10</span>
+          <span class="chip" id="game-score">Score 0</span>
+          <span class="chip faint" id="game-source"></span>
+        </div>
+        <div class="sample-box" id="game-sample"><span class="spinner"></span>&nbsp; generating…</div>
+        <div class="game-actions" id="game-actions">
+          <button class="b-human" id="guess-human">🖐 Human wrote this</button>
+          <button class="b-ai" id="guess-ai">🤖 AI model wrote this</button>
+        </div>
+        <div class="feedback" id="game-feedback"></div>
+        <button id="game-next" style="display:none; margin-top:12px;">Next round →</button>
+      </div>
+
+      <div class="card tally" id="game-tally" style="display:none;">
+        <h2 style="margin-bottom:6px;">Final tally</h2>
+        <div class="big" id="tally-score">0 / 10</div>
+        <div class="rating" id="tally-rating"></div>
+        <div class="sub2" id="tally-sub"></div>
+        <div class="round-history" id="tally-history"></div>
+        <button class="primary" id="game-again" style="margin-top:18px;">Play again</button>
+      </div>
+    </section>
+
+    <!-- ================= 4. DESLOPPER ================= -->
+    <section class="tab-panel" id="tab-deslop">
+      <div class="card">
+        <h2>Strip the LLM voice</h2>
+        <p class="sub" style="margin-bottom:12px;">
+          Paste machine-flavoured text. A model rewrites it keeping the meaning but removing the AI-sounding patterns:
+          no em-dash chains, no rule-of-three, no tapestry metaphors, varied sentence lengths, allowed clunky humanity.
+          Output streams live. Local voice scores are computed before and after so you can see the delta.
+        </p>
+        <textarea id="deslop-input" rows="7" placeholder="Paste text to deslop…"></textarea>
+        <button class="primary" id="deslop-btn" style="margin-top:12px;">Deslop it</button>
+      </div>
+
+      <div class="card" id="deslop-results" style="display:none;">
+        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:14px;">
+          <h2 style="margin:0;">Before / after</h2>
+          <span class="chip bad" id="deslop-before-chip">before –</span>
+          <span>→</span>
+          <span class="chip good" id="deslop-after-chip">after –</span>
+          <span class="delta-pill" id="deslop-delta"></span>
+        </div>
+        <div class="deslop-grid">
+          <div class="deslop-pane">
+            <h3>Before <span class="faint" id="deslop-before-note"></span></h3>
+            <div class="txt" id="deslop-before"></div>
+          </div>
+          <div class="deslop-pane">
+            <h3>After <span class="faint" id="deslop-after-note"></span></h3>
+            <div class="txt" id="deslop-after"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="pollinations.js"></script>
+  <script src="polli-common.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
