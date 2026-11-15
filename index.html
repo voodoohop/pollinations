@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decision Arena — A game that AI models play</title>
+  <meta name="description" content="Grid Rush: decision models and reference bots race on a deterministic grid. Same seed, same pellets, fair race. Built on Pollinations.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏁</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="polli.css">
+  <style>
+    .layout { display: grid; grid-template-columns: 360px 1fr; gap: 18px; align-items: start; }
+    @media (max-width: 1020px) { .layout { grid-template-columns: 1fr; } }
+
+    .racer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .racer-box { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; background: var(--bg-soft); }
+    .racer-box h3 { margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .racer-box .swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+    .racer-box select, .racer-box input { margin-bottom: 8px; }
+    .racer-box select:last-child, .racer-box input:last-child { margin-bottom: 0; }
+
+    .seed-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .seed-row input { flex: 1; }
+    .speed-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .speed-row input[type='range'] { flex: 1; accent-color: var(--accent); }
+    .speed-row .mono { min-width: 64px; text-align: right; }
+
+    /* arena */
+    .arena { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 720px) { .arena { grid-template-columns: 1fr; } }
+    .lane { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; background: var(--bg-soft); }
+    .lane.hidden { display: none; }
+    .lane-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .lane-head .name { font-weight: 700; font-size: 13px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lane-head .swatch { width: 10px; height: 10px; border-radius: 3px; }
+    .lane canvas { display: block; width: 100%; height: auto; border-radius: 6px; background: #07080c; }
+    .lane .log { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); margin-top: 8px; min-height: 34px; white-space: pre-wrap; word-break: break-word; max-height: 72px; overflow-y: auto; }
+
+    .winner-banner { text-align: center; font-size: 17px; font-weight: 800; padding: 14px; border-radius: var(--radius-sm);
+      background: var(--accent-soft); border: 1px solid rgba(245, 197, 24, 0.4); color: var(--accent); margin-bottom: 14px; display: none; }
+
+    .mode-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+    .mode-tabs button { flex: 0 0 auto; }
+    .mode-tabs button.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+    /* leaderboard */
+    .lb-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .lb-table th { text-align: left; color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 8px 10px; border-bottom: 1px solid var(--border-strong); cursor: pointer; user-select: none; white-space: nowrap; }
+    .lb-table th:hover { color: var(--accent); }
+    .lb-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .lb-table tr:hover td { background: var(--bg-card-hover); }
+    .lb-table .num { font-family: var(--mono); }
+    .lb-table .ref { color: var(--text-faint); font-style: italic; }
+    .lb-wrap { overflow-x: auto; }
+
+    .status-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Decision Arena</h1>
+    <p class="sub">
+      <strong>Grid Rush</strong> — a deterministic snake-like collection game that AI models play.
+      Every tick, a decision model on Pollinations picks the next move. Same seed → same 20 pellets → fair race.
+      Reference bots (random / greedy) are free and shown separately, per Opper convention. Deterministic sim → every run is replayable.
+    </p>
+
+    <div class="layout">
+      <aside>
+        <div class="card">
+          <div class="mode-tabs">
+            <button id="mode-race" class="active">Race (2 racers)</button>
+            <button id="mode-solo">Solo (1 racer)</button>
+          </div>
+
+          <div class="racer-grid" id="racer-grid">
+            <div class="racer-box" id="racer1-box">
+              <h3><span class="swatch" style="background:#4da3ff;"></span>Racer 1</h3>
+              <select id="racer1-type">
+                <option value="model">Model (API)</option>
+                <option value="bot">Reference bot</option>
+              </select>
+              <select id="racer1-model"></select>
+              <input type="text" id="racer1-name" placeholder="Display name (optional)">
+            </div>
+            <div class="racer-box" id="racer2-box">
+              <h3><span class="swatch" style="background:#ff6ec7;"></span>Racer 2</h3>
+              <select id="racer2-type">
+                <option value="model">Model (API)</option>
+                <option value="bot">Reference bot</option>
+              </select>
+              <select id="racer2-model"></select>
+              <input type="text" id="racer2-name" placeholder="Display name (optional)">
+            </div>
+          </div>
+
+          <label class="field">Seed (same seed = same pellet layout for both racers)</label>
+          <div class="seed-row">
+            <input type="text" id="seed" class="mono" placeholder="e.g. 12345">
+            <button id="seed-random" class="ghost" title="Random seed">🎲 Random</button>
+          </div>
+
+          <label class="field">Replay speed</label>
+          <div class="speed-row">
+            <input type="range" id="speed" min="30" max="600" step="10" value="150">
+            <span class="mono" id="speed-label">150ms/tick</span>
+          </div>
+
+          <button class="primary" id="start" style="width:100%">Start race</button>
+          <div class="status-row">
+            <span class="status-dot busy" id="run-dot" style="visibility:hidden;"></span>
+            <span class="dim small" id="run-status">Pick racers and press start.</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>How it works</h2>
+          <p class="dim" style="font-size:13px; margin:0 0 8px;">
+            15×15 grid · snake starts center-left, length 3, moving right · 20 pellets from a seeded RNG (mulberry32) ·
+            eat a pellet → +1 score, +1 grow · hit a wall or your own body → game over · 200 tick max.
+            Model racers are asked for <span class="mono">DIRECTION: up|down|left|right</span> every tick at temperature 0.
+            Model moves are charged to <strong>your own Pollen</strong> (BYOP); reference bots are free.
+          </p>
+        </div>
+      </aside>
+
+      <main>
+        <div class="card">
+          <div class="winner-banner" id="winner-banner"></div>
+          <div class="arena" id="arena">
+            <div class="lane" id="lane1">
+              <div class="lane-head">
+                <span class="swatch" style="background:#4da3ff;"></span>
+                <span class="name" id="lane1-name">Racer 1</span>
+                <span class="chip gold" id="lane1-score">score 0</span>
+                <span class="chip faint mono" id="lane1-tick">tick 0/200</span>
+              </div>
+              <canvas id="lane1-canvas" width="450" height="450"></canvas>
+              <div class="log" id="lane1-log">waiting…</div>
+            </div>
+            <div class="lane" id="lane2">
+              <div class="lane-head">
+                <span class="swatch" style="background:#ff6ec7;"></span>
+                <span class="name" id="lane2-name">Racer 2</span>
+                <span class="chip gold" id="lane2-score">score 0</span>
+                <span class="chip faint mono" id="lane2-tick">tick 0/200</span>
+              </div>
+              <canvas id="lane2-canvas" width="450" height="450"></canvas>
+              <div class="log" id="lane2-log">waiting…</div>
+            </div>
+          </div>
+          <div class="status-row">
+            <button class="ghost small" id="stop" style="display:none;">■ Stop</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+            <h2 style="margin:0;">Leaderboard</h2>
+            <span class="chip faint" id="lb-count">0 runs</span>
+            <div style="flex:1"></div>
+            <button class="small ghost" id="lb-clear">Clear</button>
+            <button class="small" id="lb-export">Export JSON</button>
+          </div>
+          <div class="lb-wrap">
+            <table class="lb-table" id="lb-table">
+              <thead>
+                <tr>
+                  <th data-sort="racer">Racer</th>
+                  <th data-sort="model">Model</th>
+                  <th data-sort="mode">Mode</th>
+                  <th data-sort="seed">Seed</th>
+                  <th data-sort="score">Score ↓</th>
+                  <th data-sort="ticks">Ticks</th>
+                  <th data-sort="date">Date</th>
+                  <th>Replay</th>
+                </tr>
+              </thead>
+              <tbody id="lb-body"></tbody>
+            </table>
+          </div>
+          <p class="faint small" style="margin:10px 0 0;">
+            Sorted by score (desc). Rows marked <em>(ref)</em> are hand-written reference bots — unranked reference entries, per Opper decision-benchmark convention.
+            Every run records its move list, so ▶ replay re-runs the exact game.
+          </p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="pollinations.js"></script>
+  <script src="polli-common.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
