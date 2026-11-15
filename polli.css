@@ -1,0 +1,266 @@
+/* polli.css — shared design system for the Pollinations quest apps.
+   Dark, honey-themed, no build step. Credit Pollinations. */
+
+:root {
+  --bg: #0d0f14;
+  --bg-soft: #141822;
+  --bg-card: #171c28;
+  --bg-card-hover: #1c2231;
+  --border: #262d3f;
+  --border-strong: #38425c;
+  --text: #e8eaf0;
+  --text-dim: #9aa3b8;
+  --text-faint: #6b7488;
+  --accent: #f5c518;        /* pollen gold */
+  --accent-soft: rgba(245, 197, 24, 0.12);
+  --accent-2: #7c5cff;      /* violet */
+  --accent-2-soft: rgba(124, 92, 255, 0.14);
+  --good: #3ecf8e;
+  --bad: #ff6b6b;
+  --warn: #ffb454;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(124, 92, 255, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, rgba(245, 197, 24, 0.06), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---- header ---- */
+
+.polli-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(13, 15, 20, 0.85);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.polli-header .brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.2px;
+}
+
+.polli-header .brand .bee { font-size: 20px; }
+
+.polli-header .brand small {
+  color: var(--text-dim);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.polli-header .spacer { flex: 1; }
+
+/* ---- layout ---- */
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 26px 22px 90px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.card + .card { margin-top: 16px; }
+
+h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.3px; }
+h2 { font-size: 19px; margin: 0 0 12px; }
+h3 { font-size: 15px; margin: 0 0 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; }
+
+.sub { color: var(--text-dim); margin: 0 0 18px; }
+
+/* ---- controls ---- */
+
+button, .btn {
+  background: var(--bg-card-hover);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.05s;
+  font-family: var(--font);
+}
+
+button:hover, .btn:hover { border-color: var(--accent); }
+button:active { transform: translateY(1px); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #171204;
+}
+
+button.primary:hover { filter: brightness(1.08); }
+
+button.ghost { background: transparent; }
+
+button.small { padding: 4px 10px; font-size: 12px; }
+
+input[type='text'], input[type='search'], textarea, select {
+  background: var(--bg-soft);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--font);
+  width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+textarea { resize: vertical; min-height: 80px; }
+
+label.field {
+  display: block;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 6px;
+}
+
+/* ---- tags / chips ---- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.chip.gold { background: var(--accent-soft); border-color: rgba(245, 197, 24, 0.4); color: var(--accent); }
+.chip.violet { background: var(--accent-2-soft); border-color: rgba(124, 92, 255, 0.4); color: #a893ff; }
+.chip.good { background: rgba(62, 207, 142, 0.12); border-color: rgba(62, 207, 142, 0.4); color: var(--good); }
+.chip.bad { background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.4); color: var(--bad); }
+
+/* ---- status ---- */
+
+.status-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: var(--text-faint);
+}
+
+.status-dot.on { background: var(--good); box-shadow: 0 0 8px rgba(62, 207, 142, 0.7); }
+.status-dot.busy { background: var(--warn); box-shadow: 0 0 8px rgba(255, 180, 84, 0.7); }
+
+/* ---- footer with badge ---- */
+
+.polli-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  color: var(--text-faint);
+  font-size: 13px;
+}
+
+.polli-footer .polli-badge img {
+  display: block;
+  border-radius: 6px;
+  background: #fff;
+  padding: 3px 6px;
+}
+
+/* ---- misc ---- */
+
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: polli-spin 0.8s linear infinite;
+  vertical-align: -2px;
+}
+
+@keyframes polli-spin { to { transform: rotate(360deg); } }
+
+.mono { font-family: var(--mono); font-size: 13px; }
+.dim { color: var(--text-dim); }
+.faint { color: var(--text-faint); }
+.small { font-size: 12px; }
+
+.error-box {
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px solid rgba(255, 107, 107, 0.35);
+  color: #ffb3b3;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+.notice-box {
+  background: var(--accent-soft);
+  border: 1px solid rgba(245, 197, 24, 0.3);
+  color: #ffe9a8;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (max-width: 720px) {
+  .wrap { padding: 18px 14px 70px; }
+  h1 { font-size: 22px; }
+}

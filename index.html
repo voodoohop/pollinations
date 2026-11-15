@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Debate Stage — Two AIs that never hang up</title>
+  <meta name="description" content="Put 2-4 AI personas on a stage: debate, interview, free chat or therapy session. Text models + TTS voices from one Pollinations API.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎭</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="polli.css">
+  <style>
+    .layout { display: grid; grid-template-columns: 360px 1fr; gap: 18px; align-items: start; }
+    @media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
+
+    .persona-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 12px; background: var(--bg-soft); }
+    .persona-card .head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .persona-avatar { width: 26px; height: 26px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #111; }
+    .persona-card input[type="text"] { font-weight: 700; }
+    .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .persona-card textarea { min-height: 58px; font-size: 13px; margin-top: 8px; }
+    .preset-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+    .preset-row button { font-size: 11px; padding: 3px 8px; }
+    .preset-row button.active { border-color: var(--accent); color: var(--accent); }
+
+    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .mode-opt { display: flex; gap: 8px; align-items: flex-start; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 10px; cursor: pointer; font-size: 13px; }
+    .mode-opt:hover { border-color: var(--border-strong); }
+    .mode-opt.active { border-color: var(--accent); background: var(--accent-soft); }
+    .mode-opt input { accent-color: var(--accent); margin-top: 2px; }
+    .mode-opt b { display: block; font-size: 13px; }
+    .mode-opt span { color: var(--text-dim); font-size: 11.5px; line-height: 1.35; display: block; }
+
+    .stage-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+    .stage-controls .grow { flex: 1; }
+
+    #stage { min-height: 320px; max-height: 62vh; overflow-y: auto; padding: 6px 4px 6px 2px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { display: flex; gap: 10px; max-width: 86%; }
+    .msg .who { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--text-dim); margin-bottom: 4px; font-weight: 700; }
+    .msg .who .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .msg .bubble { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 12px; padding: 10px 13px; font-size: 14px; white-space: pre-wrap; word-break: break-word; }
+    .msg.left { align-self: flex-start; }
+    .msg.right { align-self: flex-end; flex-direction: row-reverse; }
+    .msg.right .who { flex-direction: row-reverse; }
+    .msg.center { align-self: center; max-width: 92%; }
+    .msg.center .bubble { background: var(--accent-soft); border-color: rgba(245, 197, 24, 0.35); font-size: 13px; text-align: center; }
+    .msg.mod .bubble { background: var(--accent-2-soft); border-color: rgba(124, 92, 255, 0.4); }
+    .msg.human .bubble { background: rgba(62, 207, 142, 0.1); border-color: rgba(62, 207, 142, 0.35); }
+    .msg .avatar { width: 30px; height: 30px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; color: #111; margin-top: 20px; }
+    .msg.typing .bubble { color: var(--text-dim); }
+
+    .interject { display: flex; gap: 8px; margin-top: 14px; }
+    .hint { font-size: 11.5px; color: var(--text-faint); margin-top: 6px; }
+    .turn-chip { min-width: 70px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>AI Debate Stage</h1>
+    <p class="sub">
+      Put two to four AI personas on one stage and let them talk — debate, job interview, free chat or
+      therapy. Turn the voices on and listen to them politely refuse to hang up.
+      Inspired by the viral <em>"two AI agents in a job interview and neither knows how to hang up"</em> video.
+    </p>
+
+    <div class="layout">
+      <aside>
+        <div class="card">
+          <h2>Stage setup</h2>
+          <div id="personas"></div>
+          <div style="display:flex; gap:8px;">
+            <button class="ghost" id="add-persona" style="flex:1;">+ Add persona</button>
+            <button class="ghost" id="reset-personas" style="flex:1;">Reset</button>
+          </div>
+
+          <div style="margin-top:16px;">
+            <h3>Conversation mode</h3>
+            <div class="modes" id="modes">
+              <label class="mode-opt active"><input type="radio" name="mode" value="debate" checked><span><b>Debate</b><span>One argues FOR the topic, one AGAINST.</span></span></label>
+              <label class="mode-opt"><input type="radio" name="mode" value="interview"><span><b>Interview</b><span>Candidate must end every answer with a question — it never hangs up.</span></span></label>
+              <label class="mode-opt"><input type="radio" name="mode" value="freechat"><span><b>Free chat</b><span>Open-ended conversation on the topic.</span></span></label>
+              <label class="mode-opt"><input type="radio" name="mode" value="therapy"><span><b>Therapy</b><span>Therapist + anxious client.</span></span></label>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;">
+            <label class="field">Topic</label>
+            <input type="text" id="topic" placeholder="e.g. Pineapple on pizza should be illegal" value="AI will replace most jobs within 10 years">
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:12px; align-items:center;">
+            <div style="flex:1;">
+              <label class="field">Turns (5–15)</label>
+              <input type="number" id="turns" min="5" max="15" value="8">
+            </div>
+            <label style="display:flex; gap:6px; align-items:center; font-size:13px; color:var(--text-dim); margin-top:14px;">
+              <input type="checkbox" id="moderator" style="accent-color:var(--accent-2);"> Moderator
+            </label>
+          </div>
+
+          <button class="primary" id="start" style="width:100%; margin-top:14px;">Start conversation</button>
+          <button id="stop" style="width:100%; margin-top:8px; display:none;">■ Stop</button>
+        </div>
+      </aside>
+
+      <main>
+        <div class="card">
+          <div class="stage-controls">
+            <span class="chip gold turn-chip" id="turn-chip">turn 0 / 0</span>
+            <button id="voices" class="small">🔊 Voices on</button>
+            <button class="small ghost" id="export">Copy transcript</button>
+            <span class="grow"></span>
+            <button class="small ghost" id="restart" style="display:none;">↺ Restart</button>
+          </div>
+          <div id="stage">
+            <div class="faint" style="text-align:center; margin:auto; padding:40px 10px;">
+              The stage is empty. Set up your personas on the left and press <b>Start conversation</b>.<br>
+              <span class="small">Connect your Pollen first (top-right) — the AIs won't speak without it.</span>
+            </div>
+          </div>
+          <div class="interject">
+            <input type="text" id="interject" placeholder="interrupt the conversation…" maxlength="300">
+            <button id="send-interject">Send</button>
+          </div>
+          <div class="hint">Your message is injected as <b>Human</b> — every AI on stage sees it and responds on their next turn.</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <audio id="tts-audio" preload="none"></audio>
+
+  <script src="pollinations.js"></script>
+  <script src="polli-common.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
