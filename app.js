@@ -5,16 +5,16 @@ const APP_KEY = 'pk_VkCwIsniDUAifKLQ';
 
 /* Decision models (the stars) + 2 text models for fun */
 const DECISION_MODELS = [
-  'typesafe/jev-1.14',
-  'perplexity/pplx-decider-v1.2',
   'vllm-sr/d3',
   'microsoft/microsoft-decision-1',
+  'typesafe/jev-1.14',
+  'perplexity/pplx-decider-v1.2',
   'openai/gpt-6-luna-decisions',
   'liquid/d1',
   'jaredpalmer/kev-4b',
   'respan/span-01-lite',
 ];
-const TEXT_MODELS = ['openai/gpt-5.4-nano', 'google/gemini-3.5-flash-lite'];
+const TEXT_MODELS = ['openai/gpt-5.4-nano', 'deepseek/deepseek-v4.1-flash'];
 
 const REFERENCE_BOTS = [
   { id: 'random', title: 'random (ref)' },
@@ -304,8 +304,10 @@ function buildModelSelects() {
         for (const b of REFERENCE_BOTS) sel.appendChild(el('option', { value: b.id, text: b.title }));
       } else {
         sel.appendChild(groupOptions());
+        if (n === 2) sel.selectedIndex = 1;
       }
     });
+    if (n === 2) sel.selectedIndex = 1;
   }
 }
 
