@@ -27,7 +27,7 @@ Built for Pollinations quest #19178. Credit Pollinations — Made with pollinati
   avatar colors, 1.2 s pause between turns.
 - **Voices**: toggle `🔊 Voices on` — each turn's text (first 500 chars) is spoken through
   an `<audio>` element using the persona's voice before the next turn starts.
-- **Moderator** (optional, `mistralai/mistral-large-4`): interjects every 4 turns with a
+- **Moderator** (optional, `mistralai/mistral-large-3`): interjects every 4 turns with a
   short steering message (e.g. *"You're going in circles — new angle please"*), and at the
   end declares a debate winner with a 2-sentence justification.
 - **Human interjection**: type in "interrupt the conversation…" — your message is injected
@@ -53,11 +53,11 @@ a mode and a topic, then **Start conversation**.
 | Endpoint | Method | Used for |
 | --- | --- | --- |
 | `https://gen.pollinations.ai/v1/chat/completions` | POST | Each persona's turn + moderator interjections/verdict |
-| `https://gen.pollinations.ai/audio/{voice}/{text}` | GET | TTS per turn via `client.audioUrl(text, {voice})` |
+| `https://gen.pollinations.ai/audio/{text}?voice=` | GET | TTS per turn via `client.audioUrl(text, {voice})` |
 | `https://enter.pollinations.ai` | — | BYOP `<polli-connect>` login flow |
 
-Models offered: `openai/gpt-5.4`, `anthropic/claude-haiku-5.5`, `google/gemini-3.8-flash`,
-`x-ai/grok-4.6`, `mistralai/mistral-small-4` (moderator: `mistralai/mistral-large-4`).
+Models offered (all free tier): `openai/gpt-5.4`, `deepseek/deepseek-v4.1-flash`, `z-ai/glm-5.3-flash`,
+`x-ai/grok-4.6`, `mistralai/mistral-large-3` (moderator: `mistralai/mistral-large-3`).
 Voices: `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer`.
 
 ## BYOP note

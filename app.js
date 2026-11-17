@@ -2,14 +2,14 @@
    Quest #19178 · Credit Pollinations — Made with pollinations.ai */
 
 const APP_KEY = 'pk_UGk679hhEaxXgbeC';
-const MODERATOR_MODEL = 'mistralai/mistral-large-4';
+const MODERATOR_MODEL = 'mistralai/mistral-large-3';
 
 const MODELS = [
   'openai/gpt-5.4',
-  'anthropic/claude-haiku-5.5',
-  'google/gemini-3.8-flash',
+  'deepseek/deepseek-v4.1-flash',
+  'z-ai/glm-5.3-flash',
   'x-ai/grok-4.6',
-  'mistralai/mistral-small-4',
+  'mistralai/mistral-large-3',
 ];
 
 const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
@@ -57,7 +57,7 @@ const COLORS = ['#f5c518', '#7c5cff', '#3ecf8e', '#ff6b6b', '#4fc3f7', '#ffb454'
 
 const DEFAULT_PERSONAS = [
   { name: 'Dr. Vera', model: 'openai/gpt-5.4', voice: 'alloy', prompt: PRESETS['Skeptical scientist'], color: 0 },
-  { name: 'Buddy', model: 'anthropic/claude-haiku-5.5', voice: 'nova', prompt: PRESETS['Enthusiastic optimist'], color: 1 },
+  { name: 'Buddy', model: 'deepseek/deepseek-v4.1-flash', voice: 'nova', prompt: PRESETS['Enthusiastic optimist'], color: 1 },
 ];
 
 const state = {

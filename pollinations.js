@@ -168,9 +168,10 @@ class PolliClient {
     return u.toString();
   }
 
-  /** GET /audio/{voice}/{text} → audio URL for <audio> playback. */
+  /** GET /audio/{text}?voice= → audio URL for <audio> playback. */
   audioUrl(text, { voice = 'alloy', model = 'openai/tts-1' } = {}) {
-    const u = new URL(POLLINATIONS.GEN_BASE + '/audio/' + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
+    const u = new URL(POLLINATIONS.GEN_BASE + '/audio/' + encodeURIComponent(text));
+    u.searchParams.set('voice', voice);
     u.searchParams.set('model', model);
     const key = this.apiKey || keyStore.get();
     if (key) u.searchParams.set('key', key);
