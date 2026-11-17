@@ -8,17 +8,17 @@ const MODELS = {
   deep: 'openai/gpt-5.4-nano',        // deep style analysis
   rewrite: [
     'openai/gpt-5.4',
-    'anthropic/claude-haiku-5.5',
+    'deepseek/deepseek-v4.1-flash',
     'x-ai/grok-4.6',
   ],                                   // voice compare trio
-  jury: 'mistralai/mistral-large-4',   // compare jury
+  jury: 'mistralai/mistral-large-3',   // compare jury
   deslop: 'openai/gpt-5.4',           // deslopper
   game: [                              // human-or-model generators
     'openai/gpt-5.4-nano',
-    'mistralai/mistral-small-4',
-    'google/gemini-3.8-flash',
+    'z-ai/glm-5.3-flash',
+    'minimax/minimax-m3.1-flash',
     'deepseek/deepseek-v4-flash',
-    'meta/llama-4-maverick',
+    'mistralai/mistral-large-3',
   ],
 };
 
